@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # ── State management (MVVM ViewModels = Cubits) ──────────────────────────
   flutter_bloc: ^9.1.1
@@ -43,7 +45,6 @@ dependencies:
   qr_flutter: ^4.1.0
 
   # ── UI / UX ──────────────────────────────────────────────────────────────
-  google_fonts: ^6.2.1
   fl_chart: ^0.69.2
   shimmer: ^3.0.0
   cupertino_icons: ^1.0.8
@@ -52,6 +53,10 @@ dependencies:
   intl: ^0.20.2
   image_picker: ^1.1.2
   package_info_plus: ^8.1.2
+
+  # Opens the employee profile's Email and Call actions in the device's own
+  # mail client and dialler. No other deep linking is used.
+  url_launcher: ^6.3.1
   logger: ^2.5.0
 
 dev_dependencies:
@@ -63,12 +68,68 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.2
 
 flutter:
   uses-material-design: true
 
+  # Generates lib/l10n/app_localizations.dart from the ARB files.
+  generate: true
+
   assets:
     - assets/
 
-  # Bundle a product font here later (Inter / Plus Jakarta Sans) to drop the
-  # runtime google_fonts download. See docs/ARCHITECTURE.md § Theming.
+  fonts:
+    # Latin UI face. Variable file, wght axis 100-900 -- the dashboard numerals
+    # are set at w900, which the previous face (Space Grotesk, ceiling w700)
+    # could not render without the engine synthesising a smeared faux-bold.
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo-Variable.ttf
+
+    # Identifiers only: asset tags, serials, ISO dates, hosts, versions. Those
+    # get compared character by character, so they need a face where 0/O and
+    # 1/l differ and where columns line up. Never used for prose.
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf
+
+    # Arabic companion. Space Grotesk ships zero Arabic glyphs, so this is
+    # registered as a per-glyph fallback rather than a separate theme: mixed
+    # "MacBook Pro / ماك بوك برو" strings render correctly in one TextStyle.
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+
+# ── Launcher icons ─────────────────────────────────────────────────────────
+#
+# Regenerate with: dart run flutter_launcher_icons
+#
+# The sources under assets/icon/ are derived from assets/sijil-app-icon.png:
+# a full-bleed square for iOS (which rounds it itself and rejects an alpha
+# channel), and a separate foreground for Android's adaptive icon, whose
+# content has to survive being masked to a circle, a squircle or a teardrop.
+flutter_launcher_icons:
+  image_path: "assets/icon/app-icon.png"
+
+  android: true
+  adaptive_icon_background: "#16255C"
+  adaptive_icon_foreground: "assets/icon/app-icon-foreground.png"
+  # Android 13 themed icons tint a monochrome layer to the wallpaper palette.
+  adaptive_icon_monochrome: "assets/icon/app-icon-monochrome.png"
+  # The sources are already sized for the mask-safe zone, so the tool must not
+  # inset them again — its 16% default would stack with ours and leave the
+  # mark floating small in the middle of the plate.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 23
+
+  ios: true
+  # iOS rejects an alpha channel in an app icon outright at submission.
+  remove_alpha_ios: true

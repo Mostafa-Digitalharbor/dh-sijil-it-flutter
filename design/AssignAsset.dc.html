@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #F5F7FB;
+      color: #16255C;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #14C289; }
+    a:hover { color: #0F9E73; }
+    svg { display: block; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; background: #F5F7FB; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 44px; flex: none;"></div>
+
+  <!-- app bar -->
+  <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 12px 10px;">
+    <div style="width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </div>
+    <div style="flex-grow: 1; font-size: 16px; font-weight: 800; letter-spacing: -0.2px;">Assign asset</div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; padding: 0 16px; overflow: hidden;">
+
+    <!-- asset being assigned -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 14px; padding: 11px 13px; display: flex; align-items: center; gap: 12px;">
+      <div style="flex: none; width: 38px; height: 38px; border-radius: 12px; background: #EEF1F8; display: flex; align-items: center; justify-content: center;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9H4z"/><path d="M2 18h20"/></svg>
+      </div>
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13.5px; font-weight: 700;">MacBook Pro M4</div>
+        <div style="font-size: 10.5px; font-weight: 500; color: #6E7799; margin-top: 1px;">DH-LAP-0027 &middot; Currently available</div>
+      </div>
+    </div>
+
+    <!-- step 1 -->
+    <div style="flex: none; display: flex; align-items: center; gap: 8px; margin-top: 20px; margin-bottom: 9px;">
+      <div style="width: 19px; height: 19px; border-radius: 999px; background: #16255C; display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 10px; font-weight: 800; color: #FFFFFF;">1</span>
+      </div>
+      <div style="font-size: 12.5px; font-weight: 800;">Select employee</div>
+      <div style="flex-grow: 1;"></div>
+      <div style="font-size: 10.5px; font-weight: 600; color: #6E7799;">from hr.employee</div>
+    </div>
+
+    <div style="flex: none; height: 46px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <div style="flex-grow: 1; font-size: 13.5px; font-weight: 600;">most</div>
+      <div style="width: 1.5px; height: 17px; background: #16255C;"></div>
+    </div>
+
+    <!-- employee results -->
+    <div style="flex: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+
+      <div style="background: #FFFFFF; border: 1.8px solid #2FE3A8; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 11px;">
+        <div style="flex: none; width: 38px; height: 38px; border-radius: 999px; background: #16255C; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12.5px; font-weight: 800; color: #FFFFFF;">MB</span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700;">Mostafa Bader</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #6E7799; margin-top: 1px;">IT &middot; Senior Flutter Engineer</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC;">mostafa.bader@company.com</div>
+        </div>
+        <div style="flex: none; width: 22px; height: 22px; border-radius: 999px; background: #2FE3A8; display: flex; align-items: center; justify-content: center;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 5 5L20 7"/></svg>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 11px;">
+        <div style="flex: none; width: 38px; height: 38px; border-radius: 999px; background: #EEF1F8; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12.5px; font-weight: 800; color: #16255C;">MK</span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700;">Mostafa Kamal</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #6E7799; margin-top: 1px;">Development &middot; Backend Engineer</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC;">m.kamal@company.com</div>
+        </div>
+        <div style="flex: none; width: 22px; height: 22px; border-radius: 999px; border: 1.6px solid #D7DCE9;"></div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 11px;">
+        <div style="flex: none; width: 38px; height: 38px; border-radius: 999px; background: #EEF1F8; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12.5px; font-weight: 800; color: #16255C;">MS</span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700;">Mostafa Selim</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #6E7799; margin-top: 1px;">Finance &middot; Accountant</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC;">m.selim@company.com</div>
+        </div>
+        <div style="flex: none; width: 22px; height: 22px; border-radius: 999px; border: 1.6px solid #D7DCE9;"></div>
+      </div>
+
+    </div>
+
+    <!-- step 2 -->
+    <div style="flex: none; display: flex; align-items: center; gap: 8px; margin-top: 20px; margin-bottom: 9px;">
+      <div style="width: 19px; height: 19px; border-radius: 999px; background: #16255C; display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 10px; font-weight: 800; color: #FFFFFF;">2</span>
+      </div>
+      <div style="font-size: 12.5px; font-weight: 800;">Assignment date</div>
+    </div>
+
+    <div style="flex: none; height: 50px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; gap: 11px; padding: 0 14px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <div style="flex-grow: 1; font-size: 14px; font-weight: 700;">23 August 2026</div>
+      <span style="font-size: 11px; font-weight: 700; color: #14C289;">Today</span>
+    </div>
+
+    <!-- step 3 -->
+    <div style="flex: none; display: flex; align-items: center; gap: 8px; margin-top: 18px; margin-bottom: 9px;">
+      <div style="width: 19px; height: 19px; border-radius: 999px; background: #E9EDF6; display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 10px; font-weight: 800; color: #6E7799;">3</span>
+      </div>
+      <div style="font-size: 12.5px; font-weight: 800;">Notes</div>
+      <span style="font-size: 11px; font-weight: 600; color: #98A1BC;">optional</span>
+    </div>
+
+    <div style="flex: none; height: 72px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; padding: 12px 14px;">
+      <div style="font-size: 13px; font-weight: 500; color: #98A1BC; line-height: 1.5;">Handed over with charger and USB-C hub&hellip;</div>
+    </div>
+
+  </div>
+
+  <!-- sticky action bar -->
+  <div style="flex: none; background: #FFFFFF; border-top: 1px solid #E4E8F2; padding: 14px 16px 0;">
+    <div style="height: 52px; background: #16255C; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2FE3A8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 5 5L20 7"/></svg>
+      <span style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Confirm assignment</span>
+    </div>
+    <div style="height: 24px;"></div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

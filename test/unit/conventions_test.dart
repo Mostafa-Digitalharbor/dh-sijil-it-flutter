@@ -1,0 +1,334 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+/// Guards the conventions the codebase is built on, by reading the source.
+///
+/// A code review catches these once; a test catches them on every commit. Each
+/// group below encodes one rule that is easy to state and easy to break by
+/// accident, and each failure message names the file and line so the fix is
+/// obvious.
+void main() {
+  late List<_SourceFile> ui;
+  late List<_SourceFile> all;
+
+  setUpAll(() {
+    all = _dartFilesUnder('lib');
+    // Every file that draws something. `app/theme` and `core/constants` are
+    // where the literals are *supposed* to live, so they are excluded — but
+    // `app/router` renders a navigation bar and a More page, and used to be
+    // the one place hardcoded English survived because this list was narrower.
+    ui = all
+        .where(
+          (f) =>
+              f.path.contains('lib/features/') ||
+              f.path.contains('lib/shared/') ||
+              f.path.contains('lib/app/router/') ||
+              f.path.contains('lib/app/app.dart'),
+        )
+        .toList();
+  });
+
+  group('no hardcoded user-facing text', () {
+    test('every Text() gets its string from AppL10n or a variable', () {
+      final offenders = <String>[];
+
+      // Text('literal') — but not Text(''), and not the l10n/variable forms.
+      final literalText = RegExp(r'''\bText\(\s*['"]([^'"]{2,})['"]''');
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          final match = literalText.firstMatch(line);
+          if (match == null) return;
+          offenders.add('${file.path}:$number  ${match.group(1)}');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'User-facing text must come from AppL10n so it translates.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+
+    test('no Arabic or English prose is embedded in widget code', () {
+      final offenders = <String>[];
+      final arabic = RegExp(r'[؀-ۿ]{3,}');
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          if (!arabic.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Arabic belongs in lib/l10n/app_ar.arb, never in a widget.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('no magic numbers in layout', () {
+    test('SizedBox uses the spacing scale', () {
+      final offenders = <String>[];
+      final literal = RegExp(
+        r'SizedBox\(\s*(?:width|height):\s*(\d+(?:\.\d+)?)\s*[,)]',
+      );
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          final match = literal.firstMatch(line);
+          if (match == null) return;
+          // 0 and 1 are not measurements; they are "none" and "a hairline".
+          final value = double.parse(match.group(1)!);
+          if (value <= 1) return;
+          offenders.add('${file.path}:$number  SizedBox(${match.group(1)})');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use AppSpacing / AppDimens so one edit changes the whole app.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+
+    test('EdgeInsets values come from the spacing scale', () {
+      final offenders = <String>[];
+      final literal = RegExp(
+        r'EdgeInsets(?:Directional)?\.(?:all|symmetric|only|fromLTRB)\('
+        r'[^)]*?\b(\d{2,})(?:\.\d+)?\b',
+      );
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          final match = literal.firstMatch(line);
+          if (match == null) return;
+          offenders.add('${file.path}:$number  ${match.group(0)}');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use AppSpacing constants inside EdgeInsets.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('no hardcoded resource paths', () {
+    test('asset paths come from AppAssets', () {
+      final offenders = <String>[];
+      final assetPath = RegExp(r'''['"]assets/[^'"]+['"]''');
+
+      for (final file in all) {
+        // AppAssets is the one place the paths are allowed to be written.
+        if (file.path.endsWith('app_constants.dart')) continue;
+        file.forEachLine((line, number, raw) {
+          if (!assetPath.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Reference assets through AppAssets so a rename is one edit.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+
+    test('Odoo model names come from OdooModels', () {
+      final offenders = <String>[];
+      // Quoted `some.model` identifiers, which is how a model name looks.
+      final modelName = RegExp(
+        r'''['"](?:hr|maintenance|res|ir|stock|product|mail)\.[a-z_.]+['"]''',
+      );
+
+      for (final file in all) {
+        if (file.path.endsWith('odoo_models.dart')) continue;
+        file.forEachLine((line, number, raw) {
+          if (!modelName.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use the OdooModels catalog so a version rename is one edit.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('no hardcoded colours outside the palette', () {
+    test('Color(0x…) literals live only in AppColors', () {
+      final offenders = <String>[];
+      final colorLiteral = RegExp(r'Color\(0x[0-9A-Fa-f]{8}\)');
+
+      for (final file in all) {
+        if (file.path.endsWith('app_colors.dart')) continue;
+        file.forEachLine((line, number, raw) {
+          if (!colorLiteral.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Add the colour to AppColors and reference it.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('layering', () {
+    test('no widget imports an Odoo service directly (spec §18)', () {
+      final offenders = <String>[];
+
+      for (final file in ui) {
+        if (!file.path.contains('/presentation/')) continue;
+        file.forEachLine((line, number, raw) {
+          if (!raw.trimLeft().startsWith('import ')) return;
+          if (raw.contains('core/network/odoo/odoo_object_service') ||
+              raw.contains('core/network/odoo/odoo_auth_service') ||
+              raw.contains('core/network/xmlrpc/')) {
+            offenders.add('${file.path}:$number');
+          }
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Presentation talks to use cases and repositories, never to the '
+            'XML-RPC layer.\n${offenders.join('\n')}',
+      );
+    });
+
+    test('domain never imports data or presentation', () {
+      final offenders = <String>[];
+
+      for (final file in all) {
+        if (!file.path.contains('/domain/')) continue;
+        file.forEachLine((line, number, raw) {
+          if (!raw.trimLeft().startsWith('import ')) return;
+          if (raw.contains('/data/') || raw.contains('/presentation/')) {
+            offenders.add('${file.path}:$number  ${raw.trim()}');
+          }
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason: 'Dependencies point inward only.\n${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('RTL safety', () {
+    test('no directional EdgeInsets.only(left:/right:)', () {
+      final offenders = <String>[];
+      final leftRight = RegExp(r'EdgeInsets\.only\([^)]*\b(?:left|right):');
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          if (!leftRight.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use EdgeInsetsDirectional with start/end so Arabic mirrors '
+            'correctly.\n${offenders.join('\n')}',
+      );
+    });
+  });
+}
+
+/// One source file, with comments and doc comments stripped from the line the
+/// matchers see — so a rule explained in a comment does not trip the rule.
+class _SourceFile {
+  _SourceFile(this.path, this._lines);
+
+  final String path;
+  final List<String> _lines;
+
+  static _SourceFile read(File file) =>
+      _SourceFile(file.path.replaceAll(r'\', '/'), file.readAsLinesSync());
+
+  void forEachLine(
+    void Function(String stripped, int number, String raw) body,
+  ) {
+    var inBlockComment = false;
+
+    for (var i = 0; i < _lines.length; i++) {
+      final raw = _lines[i];
+      final trimmed = raw.trimLeft();
+
+      if (inBlockComment) {
+        if (trimmed.contains('*/')) inBlockComment = false;
+        continue;
+      }
+      if (trimmed.startsWith('/*')) {
+        if (!trimmed.contains('*/')) inBlockComment = true;
+        continue;
+      }
+      if (trimmed.startsWith('//')) continue;
+
+      // Strip a trailing line comment, but not a `//` inside a string.
+      final stripped = _stripTrailingComment(raw);
+      if (stripped.trim().isEmpty) continue;
+
+      body(stripped, i + 1, raw);
+    }
+  }
+
+  static String _stripTrailingComment(String line) {
+    var inSingle = false;
+    var inDouble = false;
+
+    for (var i = 0; i < line.length - 1; i++) {
+      final char = line[i];
+      if (char == r'\') {
+        i++;
+        continue;
+      }
+      if (char == "'" && !inDouble) inSingle = !inSingle;
+      if (char == '"' && !inSingle) inDouble = !inDouble;
+      if (!inSingle && !inDouble && char == '/' && line[i + 1] == '/') {
+        return line.substring(0, i);
+      }
+    }
+    return line;
+  }
+}
+
+List<_SourceFile> _dartFilesUnder(String directory) => Directory(directory)
+    .listSync(recursive: true)
+    .whereType<File>()
+    .where((f) => f.path.endsWith('.dart'))
+    // Generated localizations are not hand-written source.
+    .where((f) => !f.path.replaceAll(r'\', '/').contains('/l10n/generated/'))
+    .map(_SourceFile.read)
+    .toList();

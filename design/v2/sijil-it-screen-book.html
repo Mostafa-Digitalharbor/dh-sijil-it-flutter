@@ -1,0 +1,2278 @@
+<title>Sijil IT Screen Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================================
+   PAGE CHROME TOKENS — follow the viewer's theme (3 states: stamped light,
+   stamped dark, and the un-stamped default that only prefers-color-scheme
+   separates). Deliberately NOT the app's own surface colour, so the phones
+   read as objects sitting on a page rather than blending into it.
+   ========================================================================= */
+:root {
+  --bg: #EEF0F6;
+  --bg-deep: #E4E7F1;
+  --panel: #FFFFFF;
+  --ink: #16255C;
+  --muted: #6E7799;
+  --faint: #98A1BC;
+  --line: #DCE1ED;
+  --accent: #14C289;
+  --accent-ink: #0F9E73;
+  --accent-soft: #D3F9EC;
+  --mono-ink: #55618A;
+  --shadow: 0 26px 64px rgba(22, 37, 92, 0.18);
+  --shadow-sm: 0 2px 10px rgba(22, 37, 92, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080D1F;
+    --bg-deep: #050915;
+    --panel: #121B3A;
+    --ink: #EDF0F9;
+    --muted: #97A2C6;
+    --faint: #6E7799;
+    --line: #1F2A4E;
+    --accent: #2FE3A8;
+    --accent-ink: #2FE3A8;
+    --accent-soft: #12352C;
+    --mono-ink: #8E9AC4;
+    --shadow: 0 26px 64px rgba(0, 0, 0, 0.55);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #080D1F;
+  --bg-deep: #050915;
+  --panel: #121B3A;
+  --ink: #EDF0F9;
+  --muted: #97A2C6;
+  --faint: #6E7799;
+  --line: #1F2A4E;
+  --accent: #2FE3A8;
+  --accent-ink: #2FE3A8;
+  --accent-soft: #12352C;
+  --mono-ink: #8E9AC4;
+  --shadow: 0 26px 64px rgba(0, 0, 0, 0.55);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Space Grotesk', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+svg { display: block; }
+img { max-width: 100%; }
+
+/* ---- bilingual text: one markup, two languages -------------------------- */
+.ar { display: none; }
+[data-lang="ar"] .en { display: none; }
+[data-lang="ar"] .ar { display: inline; }
+
+/* ============================================================================
+   PAGE LAYOUT
+   ========================================================================= */
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 28px 96px; }
+
+.masthead {
+  padding: 56px 0 30px;
+  display: flex;
+  align-items: flex-end;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+.masthead__logo { width: 210px; flex: none; }
+.masthead__text { flex: 1 1 380px; min-width: 0; }
+
+h1 {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -1.3px;
+  line-height: 1.06;
+  margin: 0;
+  text-wrap: balance;
+}
+.lede {
+  margin: 14px 0 0;
+  max-width: 58ch;
+  font-size: 15.5px;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 20px;
+}
+.fact {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--mono-ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+.fact b { color: var(--ink); font-weight: 600; }
+
+/* ---- sticky control bar ------------------------------------------------- */
+.controls {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 -28px 40px;
+  padding: 12px 28px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.controls__label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.seg {
+  display: flex;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.seg button {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 15px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.seg button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.controls__spacer { flex: 1 1 auto; }
+.locked {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--faint);
+}
+
+/* ---- stage / sections --------------------------------------------------- */
+.stage { display: block; }
+
+section { margin-bottom: 58px; scroll-margin-top: 80px; }
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.sec-head h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.sec-head p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  flex: 1 1 260px;
+}
+
+.sheet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 44px 40px;
+}
+
+/* one phone plus its annotation rail */
+.plate { width: 390px; }
+.plate--tall { width: 390px; }
+
+.plate__cap {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+.plate__cap h3 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.plate__ref {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.plate__notes {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.plate__notes li {
+  position: relative;
+  padding-inline-start: 15px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+.plate__notes li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.plate__notes code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--mono-ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+/* ============================================================================
+   PHONE MOCKUP TOKENS — independent of the viewer's theme. Driven by the
+   page's own Light/Dark control so someone can inspect the app's dark mode
+   while their browser stays light. Values are lifted from AppColors.
+   ========================================================================= */
+.stage {
+  --s-bg: #F5F7FB;
+  --s-card: #FFFFFF;
+  --s-line: #E4E8F2;
+  --s-hair: #F0F3F9;
+  --s-ink: #16255C;
+  --s-muted: #6E7799;
+  --s-faint: #98A1BC;
+  --s-tint: #EEF1F8;
+  --s-navy: #16255C;
+  --s-on-navy: #FFFFFF;
+  --s-navy-sub: #9AA6CE;
+  --s-mint: #2FE3A8;
+  --s-mint-soft: #D3F9EC;
+
+  --c-avail: #14C289;  --i-avail: #0F9E73;
+  --c-assign: #3B6FE0; --i-assign: #3B6FE0;
+  --c-resv: #7C5CE0;   --i-resv: #7C5CE0;
+  --c-maint: #F2A63B;  --i-maint: #C97F17;
+  --c-dmg: #E5533D;    --i-dmg: #C93E29;
+  --c-lost: #B03A8C;   --i-lost: #B03A8C;
+  --c-retd: #7A849F;   --i-retd: #67718D;
+}
+
+.stage[data-ui="dark"] {
+  --s-bg: #0C1330;
+  --s-card: #141E42;
+  --s-line: #25315C;
+  --s-hair: #1C2750;
+  --s-ink: #F2F5FC;
+  --s-muted: #9AA3C2;
+  --s-faint: #6E7799;
+  --s-tint: #1C2750;
+  --s-navy: #1A2550;
+  --s-on-navy: #F2F5FC;
+  --s-navy-sub: #9AA3C2;
+  --s-mint-soft: #12352C;
+
+  --i-avail: #2FE3A8;
+  --i-maint: #F2A63B;
+  --i-dmg: #FF7A63;
+  --i-retd: #9AA3C2;
+}
+
+/* ---- device shell ------------------------------------------------------- */
+.phone {
+  width: 390px;
+  border-radius: 42px;
+  padding: 5px;
+  background: linear-gradient(160deg, #2B3763 0%, #141C3B 46%, #232E58 100%);
+  box-shadow: var(--shadow);
+}
+.screen {
+  width: 380px;
+  height: var(--h, 834px);
+  border-radius: 38px;
+  overflow: hidden;
+  background: var(--s-bg);
+  color: var(--s-ink);
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+[data-lang="ar"] .screen {
+  direction: rtl;
+  font-family: 'IBM Plex Sans Arabic', 'Space Grotesk', sans-serif;
+}
+/* Latin identifiers stay LTR inside an RTL screen. */
+.ltr { direction: ltr; unicode-bidi: isolate; }
+
+.safe { height: 40px; flex: none; }
+
+/* ---- primitives --------------------------------------------------------- */
+.row { display: flex; align-items: center; gap: 10px; }
+.row--top { align-items: flex-start; }
+.col { display: flex; flex-direction: column; }
+.grow { flex-grow: 1; min-width: 0; }
+.none { flex: none; }
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+
+.appbar { flex: none; display: flex; align-items: center; gap: 11px; padding: 2px 15px 9px; }
+.ab-title { font-size: 19px; font-weight: 700; letter-spacing: -0.4px; line-height: 1.16; }
+.ab-sub { font-size: 10.5px; font-weight: 500; color: var(--s-muted); margin-top: 1px; }
+.ab-btn {
+  width: 36px; height: 36px; flex: none;
+  border-radius: 12px;
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--s-ink);
+}
+.ab-plain { width: 36px; height: 36px; flex: none; display: flex; align-items: center; justify-content: center; color: var(--s-ink); }
+
+.body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 0 15px;
+  overflow: hidden;
+}
+
+.card {
+  flex: none;
+  background: var(--s-card);
+  border: 1px solid var(--s-line);
+  border-radius: 16px;
+  padding: 13px 14px;
+}
+.card--flush { padding: 0 14px; }
+.card--navy {
+  background: var(--s-navy);
+  border-color: transparent;
+  border-radius: 20px;
+  color: var(--s-on-navy);
+}
+.stage[data-ui="dark"] .card--navy { border: 1px solid var(--s-line); }
+
+.hd {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--s-muted);
+}
+[data-lang="ar"] .hd { letter-spacing: 0; font-size: 10.5px; }
+
+.k { font-size: 9.5px; font-weight: 500; color: var(--s-faint); }
+.v { font-size: 12.5px; font-weight: 600; margin-top: 2px; }
+.t1 { font-size: 13px; font-weight: 600; line-height: 1.25; }
+.t2 { font-size: 10.5px; font-weight: 500; color: var(--s-muted); margin-top: 2px; }
+.t3 { font-size: 10px; font-weight: 500; color: var(--s-faint); }
+.num { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; font-variant-numeric: tabular-nums; }
+.num--xl { font-size: 30px; letter-spacing: -1px; }
+.link { font-size: 10.5px; font-weight: 700; color: var(--i-avail); }
+
+.tile { flex: none; width: 40px; height: 40px; border-radius: 13px; background: var(--s-tint); display: flex; align-items: center; justify-content: center; color: var(--s-ink); }
+.tile--sm { width: 29px; height: 29px; border-radius: 10px; }
+.av { flex: none; width: 38px; height: 38px; border-radius: 999px; background: var(--s-navy); color: var(--s-on-navy); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.stage[data-ui="dark"] .av { background: var(--s-tint); }
+
+.dot { width: 6px; height: 6px; border-radius: 999px; flex: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 999px; padding: 3px 9px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+[data-lang="ar"] .chip { letter-spacing: 0; font-size: 10px; }
+.chip--soft { background: var(--s-tint); color: var(--s-muted); }
+
+.bar { flex-grow: 1; height: 6px; border-radius: 999px; background: var(--s-hair); overflow: hidden; }
+.bar > i { display: block; height: 6px; border-radius: 999px; }
+
+.field {
+  height: 46px; flex: none;
+  background: var(--s-card);
+  border: 1px solid var(--s-line);
+  border-radius: 12px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 13px;
+  font-size: 13px; font-weight: 500;
+}
+.field.is-focus { border: 1.6px solid var(--s-ink); }
+.field .ph { color: var(--s-faint); }
+.caret { width: 1.5px; height: 16px; background: var(--s-ink); flex: none; }
+
+.btn {
+  height: 48px; flex: none;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 13.5px; font-weight: 700;
+}
+.btn--fill { background: var(--s-navy); color: var(--s-on-navy); }
+.stage[data-ui="dark"] .btn--fill { background: #2FE3A8; color: #0C1330; }
+.btn--accent { background: #2FE3A8; color: #16255C; }
+.btn--ghost { background: var(--s-card); border: 1px solid var(--s-line); color: var(--s-ink); }
+.btn--sm { height: 40px; font-size: 12.5px; }
+
+.hair { height: 1px; background: var(--s-hair); flex: none; }
+
+/* ---- bottom navigation -------------------------------------------------- */
+.nav {
+  flex: none; height: 80px;
+  background: var(--s-card);
+  border-top: 1px solid var(--s-line);
+  padding: 8px 4px 0;
+  display: flex;
+}
+.navi { flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--s-muted); }
+.navi span { font-size: 9.5px; font-weight: 500; }
+.navi .pill { width: 54px; height: 29px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.navi.is-on { color: var(--s-ink); }
+.navi.is-on .pill { background: var(--s-mint-soft); }
+.navi.is-on span { font-weight: 700; }
+
+.fabwrap { position: relative; }
+.fab {
+  position: absolute; inset-inline-end: 16px; bottom: 96px;
+  width: 54px; height: 54px; border-radius: 18px;
+  background: #2FE3A8; color: #16255C;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 20px rgba(22, 37, 92, 0.24);
+}
+
+.sticky {
+  flex: none;
+  background: var(--s-card);
+  border-top: 1px solid var(--s-line);
+  padding: 11px 15px 0;
+}
+
+/* chevrons point along the reading direction */
+[data-lang="ar"] .chev svg { transform: scaleX(-1); }
+
+/* ---- scanner-specific --------------------------------------------------- */
+.cam {
+  flex-grow: 1; position: relative; display: flex; flex-direction: column; overflow: hidden;
+  background: radial-gradient(120% 78% at 50% 30%, #1D2A55 0%, #0F1734 46%, #070C1D 100%);
+  color: #FFFFFF;
+}
+.finder { width: 226px; height: 226px; position: relative; }
+.finder i {
+  position: absolute; width: 50px; height: 50px; border: 3.4px solid #2FE3A8;
+}
+.finder i:nth-child(1) { inset: 0 auto auto 0; border-width: 3.4px 0 0 3.4px; border-radius: 26px 0 0 0; }
+.finder i:nth-child(2) { inset: 0 0 auto auto; border-width: 3.4px 3.4px 0 0; border-radius: 0 26px 0 0; }
+.finder i:nth-child(3) { inset: auto auto 0 0; border-width: 0 0 3.4px 3.4px; border-radius: 0 0 0 26px; }
+.finder i:nth-child(4) { inset: auto 0 0 auto; border-width: 0 3.4px 3.4px 0; border-radius: 0 0 26px 0; }
+.finder u {
+  position: absolute; left: 16px; right: 16px; top: 50%; height: 2px;
+  background: linear-gradient(90deg, transparent, #2FE3A8, transparent);
+  box-shadow: 0 0 16px rgba(47, 227, 168, 0.75);
+  animation: sweep 2.6s ease-in-out infinite;
+}
+@keyframes sweep {
+  0%, 100% { transform: translateY(-88px); }
+  50% { transform: translateY(88px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .finder u { animation: none; }
+}
+
+/* ============================================================================
+   TOKEN APPENDIX
+   ========================================================================= */
+.tok {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px 26px;
+}
+.tok h4 {
+  margin: 0 0 16px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 12px; }
+.sw b { display: block; height: 52px; border-radius: 12px; border: 1px solid var(--line); }
+.sw em { display: block; font-style: normal; font-size: 11.5px; font-weight: 600; margin-top: 7px; }
+.sw i {
+  display: block; font-style: normal;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px; color: var(--faint);
+}
+.ramp { display: flex; flex-direction: column; gap: 11px; }
+.ramp div { display: flex; align-items: baseline; gap: 14px; }
+.ramp p { margin: 0; flex-grow: 1; }
+.ramp code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px; color: var(--faint); white-space: nowrap;
+}
+.tokgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+footer {
+  margin-top: 44px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--faint);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 16px 64px; }
+  .controls { margin: 0 -16px 30px; padding: 10px 16px; }
+  .sheet { gap: 36px 24px; }
+  .phone { transform-origin: top left; }
+}
+</style>
+
+<style>
+  .ico { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .ico--bold { stroke-width: 2.2; }
+  .ico--fill { fill: currentColor; stroke: none; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9H4z"/><path d="M2 18h20"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/></symbol>
+  <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="7" rx="2"/><path d="M7 15h10v5H7z"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+  <symbol id="i-mouse" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path d="M12 10v3"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M13.5 13.5h3v3M20.5 17v3.5H17"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></symbol>
+  <symbol id="i-kebab" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M17 20V4M17 4l3 3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M9 14H4v5"/><path d="M4 14a8 8 0 1 0 2.3-5.6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="14" r="4"/><path d="m11 11 8-8 2 2-2 2 2 2-3 3-2-2-2 2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 13 5 5L20 7"/></symbol>
+  <symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.4 12 2.5 2.5 4.7-5.2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 3.5a5 5 0 0 0-6.4 6.4L3 15v6h6l5.1-5.1a5 5 0 0 0 6.4-6.4l-3.3 3.3-2.8-2.8z"/></symbol>
+  <symbol id="i-flash" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.6 6.5 8.4 6 8.4-6"/></symbol>
+  <symbol id="i-call" viewBox="0 0 24 24"><path d="M4.5 4h4l2 5-2.5 1.5a12 12 0 0 0 5.5 5.5L15 13.5l5 2v4a1.5 1.5 0 0 1-1.7 1.5A16.5 16.5 0 0 1 3 5.7 1.5 1.5 0 0 1 4.5 4z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 8.5v4.5M12 16.5h.01"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.4h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 12H4"/><path d="m8 8-4 4 4 4"/><path d="M11 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/></symbol>
+  <symbol id="i-bug" viewBox="0 0 24 24"><path d="M8 4h8l1 4H7z"/><rect x="5" y="8" width="14" height="12" rx="3"/><path d="M9 13h6"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-cloudoff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M7 17h10a4 4 0 0 0 .9-7.9A6 6 0 0 0 8.5 7"/></symbol>
+</svg>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <img class="masthead__logo" src="data:image/png;base64,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" alt="Sijil IT">
+    <div class="masthead__text">
+      <h1>
+        <span class="en">Screen book</span>
+        <span class="ar">دليل الشاشات</span>
+      </h1>
+      <p class="lede">
+        <span class="en">Ten screens for the Sijil&nbsp;IT asset app, in both themes and both languages. Every colour, size and weight is already in <code>lib/app/theme</code> — these are a reference to build against, not a proposal to redraw.</span>
+        <span class="ar">عشر شاشات لتطبيق سِجل&nbsp;IT لإدارة الأصول، بالوضعين الفاتح والداكن وباللغتين. كل لون ومقاس ووزن موجود بالفعل في <code>lib/app/theme</code> — فهذه مرجع للتنفيذ لا مقترح لإعادة الرسم.</span>
+      </p>
+      <div class="facts">
+        <span class="fact">Space Grotesk <b>300–700</b></span>
+        <span class="fact">IBM Plex Sans Arabic <b>AR</b></span>
+        <span class="fact">Material 3</span>
+        <span class="fact"><b>#16255C</b> / <b>#2FE3A8</b></span>
+        <span class="fact">390 × 844</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <span class="controls__label">
+      <span class="en">Theme</span><span class="ar">الوضع</span>
+    </span>
+    <div class="seg" id="themeSeg">
+      <button type="button" data-ui="light" aria-pressed="true">
+        <span class="en">Light</span><span class="ar">فاتح</span>
+      </button>
+      <button type="button" data-ui="dark" aria-pressed="false">
+        <span class="en">Dark</span><span class="ar">داكن</span>
+      </button>
+    </div>
+
+    <span class="controls__label">
+      <span class="en">Language</span><span class="ar">اللغة</span>
+    </span>
+    <div class="seg" id="langSeg">
+      <button type="button" data-lang="en" aria-pressed="true">English</button>
+      <button type="button" data-lang="ar" aria-pressed="false">العربية</button>
+    </div>
+
+    <span class="controls__spacer"></span>
+
+    <span class="locked">
+      <svg class="ico" width="13" height="13" aria-hidden="true"><use href="#i-lock"/></svg>
+      <span class="en">Fixed reference — screens are not editable</span>
+      <span class="ar">مرجع ثابت — الشاشات غير قابلة للتعديل</span>
+    </span>
+  </div>
+
+  <div class="stage" id="stage" data-ui="light">
+
+    <!-- ================================================================ -->
+    <section id="first-run">
+      <div class="sec-head">
+        <h2><span class="en">First run</span><span class="ar">التشغيل الأول</span></h2>
+        <p>
+          <span class="en">Connect once, then sign in. Nothing is installed on the customer's Odoo.</span>
+          <span class="ar">اتصال لمرة واحدة ثم تسجيل الدخول. لا يُثبَّت أي شيء على أودو العميل.</span>
+        </p>
+      </div>
+
+      <div class="sheet">
+
+        <!-- ---------- 1 · Connection ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Connect to Odoo</span><span class="ar">الاتصال بأودو</span></h3>
+            <span class="plate__ref">§3 · §25</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+            <div class="body" style="gap:0;padding:14px 22px 0">
+              <img src="data:image/png;base64,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" alt="" style="width:150px;height:auto;flex:none">
+
+              <div style="font-size:24px;font-weight:700;letter-spacing:-0.7px;margin-top:22px;line-height:1.15">
+                <span class="en">Connect to Odoo</span><span class="ar">الاتصال بأودو</span>
+              </div>
+              <div class="t2" style="font-size:12.5px;line-height:1.5;margin-top:7px">
+                <span class="en">Point Sijil&nbsp;IT at your Odoo instance. Nothing is installed on the server.</span>
+                <span class="ar">وجّه سِجل&nbsp;IT إلى نسخة أودو لديك. لا يُثبَّت أي شيء على الخادم.</span>
+              </div>
+
+              <div class="hd" style="margin:20px 0 6px">
+                <span class="en">Server URL</span><span class="ar">عنوان الخادم</span>
+              </div>
+              <div class="field">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-server"/></svg>
+                <span class="grow ltr" style="font-weight:600">https://company.odoo.com</span>
+                <span class="chip none" style="background:var(--s-mint-soft);color:var(--i-avail)">
+                  <svg class="ico ico--bold" width="10" height="10"><use href="#i-lock"/></svg>TLS
+                </span>
+              </div>
+
+              <div class="row" style="margin:12px 0 6px">
+                <span class="hd grow"><span class="en">Database</span><span class="ar">قاعدة البيانات</span></span>
+                <span class="link"><span class="en">Detect</span><span class="ar">اكتشاف</span></span>
+              </div>
+              <div class="field">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-db"/></svg>
+                <span class="grow ltr" style="font-weight:600">company-production</span>
+              </div>
+
+              <div class="hd" style="margin:12px 0 6px">
+                <span class="en">Username</span><span class="ar">اسم المستخدم</span>
+              </div>
+              <div class="field">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-person"/></svg>
+                <span class="grow ltr" style="font-weight:600">admin@company.com</span>
+              </div>
+
+              <div class="row" style="margin:12px 0 6px">
+                <span class="hd grow" style="color:var(--s-ink)"><span class="en">Credential</span><span class="ar">بيانات الدخول</span></span>
+                <span class="none" style="display:flex;background:var(--s-tint);border-radius:999px;padding:2px">
+                  <span style="font-size:9.5px;font-weight:600;color:var(--s-muted);padding:4px 9px">
+                    <span class="en">Password</span><span class="ar">كلمة المرور</span>
+                  </span>
+                  <span style="font-size:9.5px;font-weight:700;background:var(--s-card);border-radius:999px;padding:4px 9px">
+                    <span class="en">API key</span><span class="ar">مفتاح API</span>
+                  </span>
+                </span>
+              </div>
+              <div class="field is-focus">
+                <svg class="ico none" width="17" height="17"><use href="#i-key"/></svg>
+                <span class="grow ltr" style="font-weight:700;letter-spacing:2px">••••••••••••</span>
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-eye"/></svg>
+              </div>
+
+              <div class="card" style="margin-top:14px;background:var(--s-mint-soft);border-color:transparent;padding:11px 12px">
+                <div class="row">
+                  <svg class="ico ico--bold none" width="15" height="15" style="color:var(--i-avail)"><use href="#i-checkc"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:var(--i-avail)">
+                    <span class="en">Reachable — Odoo 18.0</span><span class="ar">متصل — أودو 18.0</span>
+                  </span>
+                </div>
+                <div class="row" style="gap:5px;flex-wrap:wrap;margin-top:8px">
+                  <span class="chip" style="background:rgba(20,194,137,.16);color:var(--i-avail)">Maintenance</span>
+                  <span class="chip" style="background:rgba(20,194,137,.16);color:var(--i-avail)">Employees</span>
+                  <span class="chip" style="background:rgba(20,194,137,.16);color:var(--i-avail)">Inventory</span>
+                </div>
+              </div>
+
+              <div class="grow"></div>
+
+              <div class="btn btn--ghost" style="margin-bottom:9px">
+                <svg class="ico ico--bold" width="16" height="16"><use href="#i-refresh"/></svg>
+                <span class="en">Test connection</span><span class="ar">اختبار الاتصال</span>
+              </div>
+              <div class="btn btn--fill">
+                <span class="en">Save &amp; sign in</span><span class="ar">حفظ وتسجيل الدخول</span>
+              </div>
+              <div class="row" style="justify-content:center;gap:6px;padding:11px 0 18px">
+                <svg class="ico ico--bold none" width="11" height="11" style="color:var(--s-faint)"><use href="#i-lock"/></svg>
+                <span class="t3">
+                  <span class="en">Stored in your device keychain, never as plain text</span>
+                  <span class="ar">محفوظة في مخزن مفاتيح جهازك، لا كنص صريح</span>
+                </span>
+              </div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Test connection calls <code>common.version</code> — the cheapest unauthenticated probe, and it doubles as app detection.</span><span class="ar">«اختبار الاتصال» يستدعي <code>common.version</code> — أرخص فحص بلا مصادقة، ويكشف التطبيقات المتاحة في الوقت نفسه.</span></li>
+            <li><span class="en">Most production servers disable <code>db.list</code>, so Detect degrades to a plain text field instead of erroring.</span><span class="ar">أغلب الخوادم تعطّل <code>db.list</code>، لذا يتحول «اكتشاف» إلى حقل نصي عادي بدل إظهار خطأ.</span></li>
+            <li><span class="en">The credential goes straight to the keychain and is never held in a state object.</span><span class="ar">تذهب بيانات الدخول مباشرة إلى مخزن المفاتيح ولا تُحفظ في أي كائن حالة.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 2 · Login ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Sign in</span><span class="ar">تسجيل الدخول</span></h3>
+            <span class="plate__ref">§3 · §21</span>
+          </div>
+
+          <div class="phone"><div class="screen" style="background:var(--s-navy)">
+            <div class="safe"></div>
+
+            <div style="flex:none;padding:28px 24px 34px;position:relative;overflow:hidden">
+              <div style="position:absolute;inset-inline-end:-60px;top:-80px;width:210px;height:210px;border-radius:999px;background:rgba(47,227,168,.10)"></div>
+              <div style="position:absolute;inset-inline-end:24px;top:-30px;width:104px;height:104px;border-radius:999px;background:rgba(47,227,168,.07)"></div>
+              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAJ8UlEQVR42u1d/W8U1xU9773Z9drrr8VgY2wSQoxDQohS4boliSFpC00FFKUgGig/lLZKFVWRUoGqqsStKkCqIloloEYhaWjVUsgHUBE3UQgggQGjBPfbCWAICcXENQFsr3fXuzsz7/WH2TUkkMQIz/jtzj1/gL0z78x795577ztMKaVA8C04vQIiAIEIQCACEIgABCIAgQhAIAIQiAAEIgCBCEAgAhCIAAQiAIEIQCACEIgABCIAIY9gePnPlFKQSgHUhHZtMIAzBsaYd//Si57A7MILThvOcGBL6RkRXCeAUmroQbp7enHmv+dhWjY8JHlOQCkgYAjcfFMlqqsiV727nDwCsg9w8VIUq9duwetvtqM/GneOAcLVARljKCsNY97cBqx9YjkqxpS6TgLXdoDsn43FkliwdA1a2zowtqIUQtAx8Jnbvy1x4WIUs+69Ey3bmlEcDjkL5RIJXNsBpFQQgmPDcy1obetAbc1YpNMmpKSv/zN3Ac5QWzMWrYc7sHFTC362cglsW0IIlltpoBAclmXjr28cRWlJEUzTAu38w4sFTNNCaUkRWnYfhWXZ4C4Gz9zN7T8xmEJfNA4hOC3+dZJACI6+/jgSgykwdvmd5gQBGGOAAsJFIUTKw7BtSVH/db0/JxaIlBcjXBSCUu7FANzNXFYIjnlzv4joQAKBgEEkGObiBwIGogMJzJvbACE4pJS5mwUMxAaxcNlaHDhMWcD1ZAGz770Tu7Y+gZLiQlezAFeFoGwO29sXQ/O6LXj1jbcRjSZgu8jo3M4AOMpLi7DgwUasWb0ckfLi3NUBrqUE9pzvwwdne5BOW57q3bkR+CkEgwFMmliJqspyz5RAz2oBli0RMASttN9qAQAgpXQ1l71RwUpKCcbZ6FcpR6EaaHjxgjnnePfEWWzbfgCd730Iy7JHfeHLy8L4yqy78O2HmmAYwtluuf+OJVd3AGfxGV740x6s+vlmxONJGIYA06DuLqWCZdm4/77p2Pr8KoytKHU12vYdARz9muPgkXfw9UW/QHE4hGDA0KoSKATHh92XsOib9+ClzT+BUo4WD+oIGhlBAwCefrYFgCNumBps/Z8k6fjKCF57sx1v/a0TX264zRGwfNS44lotgHOOeCKF4ye7EAoFYdtS2zYsy7Jx9O8nnd/us2old1vWzJUjlXNGXcEjWQySUqKosABTp9QimUxrLQEHDIGGu+uc304xwMiVNAHgsUcW4LXd7UibFgqChlYNIUJwnOu+hEULZqJxRr3TxOKzxlVP0sDfb92LVc2bMTAwqF0a+LXZd+OPz/6Y0kC3SXC8swvbdrSi871zSKetUS+5jomU4P77puPhbzWBc+6J7u5LAuguBXtVdPH1aBhjTAv591rEdLqV/FuZHIXBkB6Y1ii3iCmgrCyMO6ZOhOB86JgCzQb6YzCEZZTJusnV+Onji/HQ/Jm+JYFvB0OUAgaTaQwOpvCHZx7HssWzfScDe1IMWvfrl9G8bsvQYIhO7eGGEEil0ygOF+Ltfb9B5bgy3wWEvh4MsWwbBQVBdPf0Yl/rv4a6cSgL8OFgSPf/Lg0FiEQAnw2GMAbUVFdcjhCJAP4YDDGEQDKZxvjKCB5omu4cXT4LAg03y6tKKTz2yHzs3f9P7QZDlAJi8UEkUyY2PvlDVI4rpyzAL4MhDEAwGEDd5GqsXrkECx5sJB3Ab4MhkfJi3F5fC+5zJdCzwRBbShhCr8EQlUkFdWpWUZkdinsUjXpTDYS6/EBKr35AXfGxd5bTgyGZB+k0+7Ar/j5OW1FYSoKBgS4MvMxEBQWDcUw2SrEwfAvqA+WekMDdjqDMA7wYO4k1ve1IKAsGmO9y7evZ/y0oFDEDzZEGPFw8xXUSuEaA7A9/K9WD7/TsQZgbCDBBV8QN46o4U9mISwtbq+agsaDKVRK4fgS8ED0GAAhAwFJ0L8DnfjhKIQABwMLvosfQOK4qB2sBmSg2oSycMvsRYgI2aPGHCxsSISZwyuxHQlngYK5FS9ztIJvTeX8Dx4H74RJ3a+ElFAqZgTqjDEllQ9DN9MOGAEdS2agzylDIDEgo14jgegywovR27B3sQho2gsyZw6cw8NM/HMYY0soeene5PRiSiV5fjp3Cmt52xJRJaeAw0sBiFkBzpAFLiutyNw38JAlOmf3YlXgfp80o0somIegaQlCQCUwOlGJh0S2oC5TlvhDktax5Q2mLZvJ03kjByKSEEmqo0KHTBRGGENo1qli27fQlsDwpBul6OxjnDLYt8e6Js+iPxjVwDOG4+aaq/HEM0XfxnVnFHa+24VdPbcfpMz1Ip01yDIFPLmEUnGPrKwfw3R89hcLCAhSGgtocA147hviKANmv6fxHfWj86koMxAdREAxodX8RY067Wte5C1i7evkVjiGcjCNH4usHgH2t/0Z3Ty9CBfpdXpUXjiG6p3tDQyDkGOIzAmSO0ZrqCu0HVXLeMURHZHv+H2i6C+MrI0imTAjNGlXzxjFE9yzgz68cwAqNs4C8cAzJCR3g6e344EwPkimTHEN8qQRKiROdXbjUF9PAMcTApIlV+ecYorNBE2PQ7gYz07JhCJ4/jiF0NZy+V+sZfl5807Tw4s6DOHC4A72jfAQAgGEI1N86AUsXz8Ydt030ZGbRdztA9nE/uhjFsh+sx/5D/0EgIJwXPcpvQsG5uj4cDmH9mu/h+8vnuE4C3xFASgXGgCUrnsTOljZMqB6jlRzMGUPatBCLJ7F7xy/RNHOaq/cWGH7UAI4cPY7X97RjfGVk1O8tvnomwBGCAGDDphY0zZzmal+Ir5TArBtI+z9OOVfXMn2zk1AoiGOdXYgnUkOXWRMBRnCbRU4YSTPXFUpfESDrBjLjC3WOi6mm0Y8QHMlkGlOn1KKosMAxtmSMYoCRKAZJqfClGfX4xpwZ2NlyBBOqK2DbtlbeRamUlXFbmf8x9xUiwAja2f12/aPo7Yth/6EOJw3U4FjIpoElJYV4Zv2jmHXPNMfGxsUrbHypBF4pBL30l0M42PYOLvRGR/1ICAYN1N9ag6WLZ2HqlNr8E4KUUs4FERqYNKvMl6WrHOyVFOzZLWFS+c+RC1QMupZjyHmYlg1GA6L5Pxiiq2OIzvpE3gyG6O4YAo17FLwcDDHcLLoIwbHhuRa0tnUMOYZISV//5+kAtTVj0Xq4Axs3tVwxGMLIMcQvsUDOD4bkomMIDYb42DEENBjiT8cQXRc/LwZDsn92IDaIhcvWaucYonsWkBeDIbo6huibAeThYMjVjiHnkU6bvjZs/vTBkAAmTazMv8EQqgVcf/zEGcu/wRBtqoEaj697tfA0Gkbwb1MogQhAIAIQiAAEIgARgEAEIBABCEQAAhGAQAQgEAEIRAACEYBABCAQAQhEAAIRgJC3+D+7y/aJdYS5pgAAAABJRU5ErkJggg==" alt="" style="width:44px;height:44px;border-radius:14px;position:relative">
+              <div style="font-size:25px;font-weight:700;letter-spacing:-0.7px;color:#FFFFFF;margin-top:18px;position:relative">
+                <span class="en">Welcome back</span><span class="ar">أهلًا بعودتك</span>
+              </div>
+              <div style="font-size:12.5px;font-weight:500;color:#9AA6CE;margin-top:5px;position:relative">
+                <span class="en">Sign in with your Odoo credentials.</span><span class="ar">سجّل الدخول ببيانات أودو الخاصة بك.</span>
+              </div>
+            </div>
+
+            <div style="flex-grow:1;background:var(--s-bg);border-radius:26px 26px 0 0;padding:22px 22px 0;display:flex;flex-direction:column;overflow:hidden">
+
+              <div class="card row" style="gap:11px">
+                <div class="tile"><svg class="ico" width="18" height="18"><use href="#i-server"/></svg></div>
+                <div class="grow">
+                  <div class="row" style="gap:6px">
+                    <span class="dot" style="background:var(--c-avail)"></span>
+                    <span class="t1 ltr">company.odoo.com</span>
+                  </div>
+                  <div class="t2 ltr">company-production · Odoo 18.0</div>
+                </div>
+                <span class="link none"><span class="en">Change</span><span class="ar">تغيير</span></span>
+              </div>
+
+              <div class="hd" style="margin:20px 0 6px"><span class="en">Username</span><span class="ar">اسم المستخدم</span></div>
+              <div class="field">
+                <span class="av none" style="width:26px;height:26px;font-size:10px">MB</span>
+                <span class="grow ltr" style="font-weight:600">mostafa.bader@company.com</span>
+              </div>
+
+              <div class="hd" style="margin:13px 0 6px;color:var(--s-ink)">
+                <span class="en">Password or API key</span><span class="ar">كلمة المرور أو مفتاح API</span>
+              </div>
+              <div class="field is-focus">
+                <svg class="ico none" width="17" height="17"><use href="#i-lock"/></svg>
+                <span class="grow ltr" style="font-weight:700;letter-spacing:2px">••••••••••</span>
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-eye"/></svg>
+              </div>
+
+              <div class="row" style="margin-top:12px">
+                <div class="row grow" style="gap:8px">
+                  <span class="none" style="width:18px;height:18px;border-radius:6px;background:var(--s-ink);display:flex;align-items:center;justify-content:center">
+                    <svg class="ico" width="11" height="11" style="color:var(--s-card);stroke-width:3"><use href="#i-check"/></svg>
+                  </span>
+                  <span style="font-size:11.5px;font-weight:500">
+                    <span class="en">Keep me signed in</span><span class="ar">أبقني مسجَّلًا</span>
+                  </span>
+                </div>
+                <span class="link"><span class="en">Need an API key?</span><span class="ar">تحتاج مفتاح API؟</span></span>
+              </div>
+
+              <div class="btn btn--fill" style="margin-top:20px">
+                <span class="en">Sign in</span><span class="ar">تسجيل الدخول</span>
+              </div>
+
+              <div class="card row row--top" style="gap:10px;margin-top:16px">
+                <svg class="ico none" width="15" height="15" style="color:var(--s-muted);margin-top:1px"><use href="#i-shield"/></svg>
+                <span class="t2" style="margin:0;line-height:1.5">
+                  <span class="en">Sijil&nbsp;IT works inside your Odoo permissions. You will only see and change what your Odoo user is allowed to.</span>
+                  <span class="ar">يعمل سِجل&nbsp;IT ضمن صلاحياتك في أودو. لن ترى أو تعدّل إلا ما يسمح به حسابك.</span>
+                </span>
+              </div>
+
+              <div class="row" style="gap:7px;margin-top:14px">
+                <svg class="ico none" width="13" height="13" style="color:var(--s-faint)"><use href="#i-clock"/></svg>
+                <span class="t3">
+                  <span class="en">Last signed in 3 days ago on this device</span>
+                  <span class="ar">آخر دخول قبل ٣ أيام من هذا الجهاز</span>
+                </span>
+              </div>
+
+              <div class="grow"></div>
+
+              <div class="row" style="justify-content:center;gap:6px;padding-bottom:24px">
+                <span class="t3"><span class="en">Connecting to a different server?</span><span class="ar">تريد الاتصال بخادم آخر؟</span></span>
+                <span class="link"><span class="en">Switch</span><span class="ar">تغيير</span></span>
+              </div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">The saved connection is shown, not re-typed — switching servers is a deliberate, separate action.</span><span class="ar">يُعرض الاتصال المحفوظ ولا يُعاد إدخاله — وتغيير الخادم إجراء منفصل ومقصود.</span></li>
+            <li><span class="en">The permissions notice sets expectations before the first ACL refusal, rather than after it.</span><span class="ar">تنبيه الصلاحيات يوضّح التوقعات قبل أول رفض من ACL بدلًا من بعده.</span></li>
+            <li><span class="en">The navy band is the only full-bleed brand moment in the app; every other screen is quiet.</span><span class="ar">الشريط الكحلي هو اللحظة البصرية الوحيدة الممتدة في التطبيق، وما عداها هادئ.</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="every-day">
+      <div class="sec-head">
+        <h2><span class="en">Every day</span><span class="ar">الاستخدام اليومي</span></h2>
+        <p>
+          <span class="en">What an IT admin opens the app for: what needs attention, what exists, and one record in full.</span>
+          <span class="ar">ما يفتح مسؤول تقنية المعلومات التطبيق من أجله: ما يحتاج انتباهًا، وما هو موجود، وسجل واحد بالكامل.</span>
+        </p>
+      </div>
+
+      <div class="sheet">
+
+        <!-- ---------- 3 · Dashboard ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Dashboard</span><span class="ar">الرئيسية</span></h3>
+            <span class="plate__ref">§4 · §15</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+
+            <div class="appbar">
+              <img src="data:image/png;base64,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" alt="" style="width:32px;height:32px;border-radius:10px;flex:none">
+              <div class="grow">
+                <div class="ab-title"><span class="en">Dashboard</span><span class="ar">الرئيسية</span></div>
+                <div class="ab-sub">
+                  <span class="ltr">company.odoo.com</span>
+                  <span class="en"> · synced 2 min ago</span><span class="ar"> · حُدِّث قبل دقيقتين</span>
+                </div>
+              </div>
+              <div class="ab-btn"><svg class="ico" width="18" height="18"><use href="#i-refresh"/></svg></div>
+            </div>
+
+            <div class="body">
+
+              <!-- attention strip -->
+              <div class="row none" style="gap:9px">
+                <div class="card grow" style="padding:10px 11px;border-color:rgba(242,166,59,.35);background:rgba(242,166,59,.10)">
+                  <div class="row" style="gap:7px">
+                    <svg class="ico ico--bold none" width="14" height="14" style="color:var(--i-maint)"><use href="#i-shield"/></svg>
+                    <span class="num" style="font-size:18px;color:var(--i-maint)">7</span>
+                  </div>
+                  <div class="t3" style="margin-top:5px;color:var(--i-maint);font-weight:600">
+                    <span class="en">Warranty ends &lt;30 days</span><span class="ar">ضمان ينتهي خلال ٣٠ يومًا</span>
+                  </div>
+                </div>
+                <div class="card grow" style="padding:10px 11px;border-color:rgba(124,92,224,.32);background:rgba(124,92,224,.10)">
+                  <div class="row" style="gap:7px">
+                    <svg class="ico ico--bold none" width="14" height="14" style="color:var(--c-resv)"><use href="#i-wrench"/></svg>
+                    <span class="num" style="font-size:18px;color:var(--c-resv)">9</span>
+                  </div>
+                  <div class="t3" style="margin-top:5px;color:var(--c-resv);font-weight:600">
+                    <span class="en">Open maintenance</span><span class="ar">صيانة مفتوحة</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- total hero -->
+              <div class="card card--navy" style="padding:14px 15px 13px">
+                <div class="row" style="align-items:flex-end">
+                  <div class="grow">
+                    <div class="hd" style="color:var(--s-navy-sub)">
+                      <span class="en">Total assets</span><span class="ar">إجمالي الأصول</span>
+                    </div>
+                    <div class="num num--xl" style="color:var(--s-on-navy);margin-top:3px">115</div>
+                  </div>
+                  <span class="chip none" style="background:rgba(47,227,168,.16);color:#2FE3A8;padding:5px 10px;font-size:10.5px">
+                    <svg class="ico ico--bold" width="12" height="12"><use href="#i-check"/></svg>
+                    <span class="en">112 in service</span><span class="ar">112 في الخدمة</span>
+                  </span>
+                </div>
+                <div class="row" style="gap:2px;margin-top:12px;height:6px;border-radius:999px;overflow:hidden">
+                  <i style="width:59.1%;height:6px;background:var(--c-assign)"></i>
+                  <i style="width:22.6%;height:6px;background:var(--c-avail)"></i>
+                  <i style="width:4.3%;height:6px;background:var(--c-resv)"></i>
+                  <i style="width:7.8%;height:6px;background:var(--c-maint)"></i>
+                  <i style="width:3.5%;height:6px;background:var(--c-dmg)"></i>
+                  <i style="width:2.6%;height:6px;background:var(--c-retd)"></i>
+                </div>
+              </div>
+
+              <!-- status tiles -->
+              <div class="g3 none">
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-assign)"></span>
+                  <div class="num" style="margin-top:6px">68</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Assigned</span><span class="ar">مُسلَّم</span></div>
+                </div>
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-avail)"></span>
+                  <div class="num" style="margin-top:6px">26</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Available</span><span class="ar">متاح</span></div>
+                </div>
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-resv)"></span>
+                  <div class="num" style="margin-top:6px">5</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Reserved</span><span class="ar">محجوز</span></div>
+                </div>
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-maint)"></span>
+                  <div class="num" style="margin-top:6px">9</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Maintenance</span><span class="ar">صيانة</span></div>
+                </div>
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-dmg)"></span>
+                  <div class="num" style="margin-top:6px">4</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Damaged</span><span class="ar">تالف</span></div>
+                </div>
+                <div class="card" style="padding:9px 10px 8px">
+                  <span class="dot" style="background:var(--c-retd)"></span>
+                  <div class="num" style="margin-top:6px">3</div>
+                  <div class="t3" style="margin-top:3px;font-weight:600"><span class="en">Retired</span><span class="ar">خارج الخدمة</span></div>
+                </div>
+              </div>
+
+              <!-- categories -->
+              <div class="card">
+                <div class="row" style="margin-bottom:10px">
+                  <span class="grow" style="font-size:12.5px;font-weight:700">
+                    <span class="en">Assets by category</span><span class="ar">الأصول حسب الفئة</span>
+                  </span>
+                  <span class="link"><span class="en">See all</span><span class="ar">عرض الكل</span></span>
+                </div>
+                <div class="col" style="gap:7px">
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Laptop</span><span class="ar">لابتوب</span></span>
+                    <span class="bar"><i style="width:100%;background:var(--s-navy)"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">43</span>
+                  </div>
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Monitor</span><span class="ar">شاشة</span></span>
+                    <span class="bar"><i style="width:72%;background:#2C4494"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">31</span>
+                  </div>
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Mobile</span><span class="ar">هاتف</span></span>
+                    <span class="bar"><i style="width:42%;background:var(--c-assign)"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">18</span>
+                  </div>
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Other</span><span class="ar">أخرى</span></span>
+                    <span class="bar"><i style="width:28%;background:var(--c-avail)"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">12</span>
+                  </div>
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Printer</span><span class="ar">طابعة</span></span>
+                    <span class="bar"><i style="width:16%;background:#2FE3A8"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">7</span>
+                  </div>
+                  <div class="row" style="gap:9px">
+                    <span class="none" style="width:56px;font-size:10.5px;font-weight:500;color:var(--s-muted)"><span class="en">Server</span><span class="ar">خادم</span></span>
+                    <span class="bar"><i style="width:9%;background:#2FE3A8"></i></span>
+                    <span class="none num" style="font-size:10.5px;width:20px;text-align:end">4</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- activity -->
+              <div class="card" style="padding-bottom:4px">
+                <div class="row" style="margin-bottom:2px">
+                  <span class="grow" style="font-size:12.5px;font-weight:700">
+                    <span class="en">Recent activity</span><span class="ar">النشاط الأخير</span>
+                  </span>
+                  <span class="link"><span class="en">See all</span><span class="ar">عرض الكل</span></span>
+                </div>
+                <div class="row" style="gap:10px;padding:8px 0;border-bottom:1px solid var(--s-hair)">
+                  <span class="tile tile--sm" style="background:rgba(59,111,224,.12);color:var(--c-assign)">
+                    <svg class="ico ico--bold" width="14" height="14"><use href="#i-person"/></svg>
+                  </span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:11.5px">
+                      <span class="en">MacBook Pro M4 assigned to Ahmed</span><span class="ar">تسليم MacBook Pro M4 إلى أحمد</span>
+                    </span>
+                    <span class="t3"><span class="en">12 minutes ago</span><span class="ar">قبل ١٢ دقيقة</span></span>
+                  </span>
+                </div>
+                <div class="row" style="gap:10px;padding:8px 0">
+                  <span class="tile tile--sm" style="background:rgba(20,194,137,.14);color:var(--i-avail)">
+                    <svg class="ico ico--bold" width="14" height="14"><use href="#i-return"/></svg>
+                  </span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:11.5px">
+                      <span class="en">Dell Latitude returned by Sara</span><span class="ar">استرجاع Dell Latitude من سارة</span>
+                    </span>
+                    <span class="t3"><span class="en">1 hour ago · Good condition</span><span class="ar">قبل ساعة · بحالة سليمة</span></span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="nav">
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--bold" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">The attention strip leads, because a dashboard that opens on totals makes you hunt for the problem.</span><span class="ar">شريط الانتباه في المقدمة، لأن لوحة تبدأ بالإجماليات تجعلك تبحث عن المشكلة.</span></li>
+            <li><span class="en">All six counts come from parallel <code>search_count</code> calls — the asset table is never downloaded to be counted.</span><span class="ar">تأتي الأعداد الستة من استدعاءات <code>search_count</code> متوازية — ولا يُنزَّل جدول الأصول للعدّ.</span></li>
+            <li><span class="en">Numbers use tabular figures so the tiles do not jitter as counts change.</span><span class="ar">تستخدم الأرقام أشكالًا جدولية حتى لا تهتز البطاقات عند تغيّر الأعداد.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 4 · Asset list ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Assets</span><span class="ar">الأصول</span></h3>
+            <span class="plate__ref">§5 · §11 · §20</span>
+          </div>
+
+          <div class="phone"><div class="screen fabwrap">
+            <div class="safe"></div>
+
+            <div class="appbar">
+              <div class="grow">
+                <div class="ab-title"><span class="en">Assets</span><span class="ar">الأصول</span></div>
+                <div class="ab-sub"><span class="en">Showing 24 of 115</span><span class="ar">عرض 24 من 115</span></div>
+              </div>
+              <div class="ab-btn"><svg class="ico" width="18" height="18"><use href="#i-sort"/></svg></div>
+            </div>
+
+            <div style="flex:none;padding:0 15px 10px">
+              <div class="field" style="padding-inline-end:5px">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-search"/></svg>
+                <span class="grow ph"><span class="en">Name, tag, serial, model…</span><span class="ar">الاسم أو الرمز أو الرقم التسلسلي…</span></span>
+                <span class="none" style="width:1px;height:19px;background:var(--s-line)"></span>
+                <span class="none" style="width:34px;height:34px;display:flex;align-items:center;justify-content:center">
+                  <svg class="ico" width="18" height="18"><use href="#i-scan"/></svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="row none" style="gap:7px;padding:0 15px 9px;overflow:hidden">
+              <span class="chip none" style="background:var(--s-navy);color:var(--s-on-navy);padding:6px 11px;font-size:10.5px">
+                <span class="en">Laptop</span><span class="ar">لابتوب</span>
+                <svg class="ico" width="11" height="11" style="stroke-width:2.6;color:var(--s-navy-sub)"><use href="#i-close"/></svg>
+              </span>
+              <span class="chip none" style="background:var(--s-navy);color:var(--s-on-navy);padding:6px 11px;font-size:10.5px">
+                <span class="en">Assigned</span><span class="ar">مُسلَّم</span>
+                <svg class="ico" width="11" height="11" style="stroke-width:2.6;color:var(--s-navy-sub)"><use href="#i-close"/></svg>
+              </span>
+              <span class="chip none" style="background:var(--s-card);border:1px solid var(--s-line);color:var(--s-ink);padding:6px 11px;font-size:10.5px">
+                <svg class="ico ico--bold" width="12" height="12"><use href="#i-filter"/></svg>
+                <span class="en">Filters</span><span class="ar">الفلاتر</span>
+              </span>
+              <span class="chip none chip--soft" style="padding:6px 11px;font-size:10.5px">
+                <span class="en">Warranty</span><span class="ar">الضمان</span>
+              </span>
+            </div>
+
+            <div class="row none" style="padding:0 15px 8px;gap:7px">
+              <svg class="ico none" width="12" height="12" style="color:var(--s-faint)"><use href="#i-cloudoff"/></svg>
+              <span class="t3 grow">
+                <span class="en">Offline copy from 08:12 — pull to refresh</span>
+                <span class="ar">نسخة دون اتصال من 08:12 — اسحب للتحديث</span>
+              </span>
+              <span class="t3" style="font-weight:600"><span class="en">A → Z</span><span class="ar">أ → ي</span></span>
+            </div>
+
+            <div class="body" style="gap:8px">
+
+              <div class="card row" style="gap:11px;padding:11px 12px">
+                <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-laptop"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">MacBook Pro M4</span>
+                  <span class="t2 ltr" style="display:block">DH-LAP-0027 · Apple · Ahmed Mohamed</span>
+                  <span class="row" style="gap:5px;margin-top:6px">
+                    <span class="chip" style="background:rgba(59,111,224,.12);border:1px solid rgba(59,111,224,.28);color:var(--i-assign)">
+                      <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                    </span>
+                    <span class="chip" style="background:rgba(20,194,137,.12);color:var(--i-avail)">
+                      <svg class="ico ico--bold" width="10" height="10"><use href="#i-shield"/></svg>
+                      <span class="en">In warranty</span><span class="ar">ضمان ساري</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+              </div>
+
+              <div class="card row" style="gap:11px;padding:11px 12px">
+                <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-monitor"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">Dell UltraSharp U2723QE</span>
+                  <span class="t2 ltr" style="display:block">DH-MON-0114 · Dell · Ahmed Mohamed</span>
+                  <span class="row" style="gap:5px;margin-top:6px">
+                    <span class="chip" style="background:rgba(59,111,224,.12);border:1px solid rgba(59,111,224,.28);color:var(--i-assign)">
+                      <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                    </span>
+                    <span class="chip" style="background:rgba(242,166,59,.14);color:var(--i-maint)">
+                      <svg class="ico ico--bold" width="10" height="10"><use href="#i-shield"/></svg>
+                      <span class="en">21 days left</span><span class="ar">باقٍ ٢١ يومًا</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+              </div>
+
+              <div class="card row" style="gap:11px;padding:11px 12px">
+                <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-mobile"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">iPhone 15 Pro</span>
+                  <span class="t2" style="display:block"><span class="ltr">DH-MOB-0042 · Apple</span><span class="en"> · screen replacement</span><span class="ar"> · تغيير الشاشة</span></span>
+                  <span class="row" style="gap:5px;margin-top:6px">
+                    <span class="chip" style="background:rgba(242,166,59,.14);border:1px solid rgba(242,166,59,.30);color:var(--i-maint)">
+                      <span class="dot" style="background:var(--c-maint)"></span><span class="en">MAINTENANCE</span><span class="ar">صيانة</span>
+                    </span>
+                    <span class="chip chip--soft">
+                      <svg class="ico ico--bold" width="10" height="10"><use href="#i-clock"/></svg>
+                      <span class="en">Due Thu</span><span class="ar">الخميس</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+              </div>
+
+              <div class="card row" style="gap:11px;padding:11px 12px">
+                <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-laptop"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">ThinkPad X1 Carbon G12</span>
+                  <span class="t2" style="display:block"><span class="ltr">DH-LAP-0033 · Lenovo</span><span class="en"> · unassigned</span><span class="ar"> · غير مُسلَّم</span></span>
+                  <span class="row" style="gap:5px;margin-top:6px">
+                    <span class="chip" style="background:rgba(20,194,137,.12);border:1px solid rgba(20,194,137,.30);color:var(--i-avail)">
+                      <span class="dot" style="background:var(--c-avail)"></span><span class="en">AVAILABLE</span><span class="ar">متاح</span>
+                    </span>
+                    <span class="chip chip--soft"><span class="en">Store room B</span><span class="ar">مخزن ب</span></span>
+                  </span>
+                </span>
+                <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+              </div>
+
+              <div class="card row" style="gap:11px;padding:11px 12px">
+                <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-printer"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">HP LaserJet Pro M404</span>
+                  <span class="t2" style="display:block"><span class="ltr">DH-PRN-0007 · HP</span><span class="en"> · floor 3</span><span class="ar"> · الدور الثالث</span></span>
+                  <span class="row" style="gap:5px;margin-top:6px">
+                    <span class="chip" style="background:rgba(229,83,61,.12);border:1px solid rgba(229,83,61,.30);color:var(--i-dmg)">
+                      <span class="dot" style="background:var(--c-dmg)"></span><span class="en">DAMAGED</span><span class="ar">تالف</span>
+                      <svg class="ico ico--bold" width="10" height="10"><use href="#i-mobile"/></svg>
+                    </span>
+                  </span>
+                </span>
+                <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+              </div>
+
+            </div>
+
+            <div class="fab"><svg class="ico" width="22" height="22" style="stroke-width:2.4"><use href="#i-plus"/></svg></div>
+
+            <div class="nav">
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--bold" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Active filters are chips you can dismiss, so you can always see why the list is short.</span><span class="ar">الفلاتر النشطة شرائح يمكن إزالتها، فتعرف دائمًا سبب قِصَر القائمة.</span></li>
+            <li><span class="en">The stale-copy line is honest about cached data instead of silently showing old counts.</span><span class="ar">سطر «نسخة دون اتصال» يصارحك بالبيانات المخزّنة بدل عرض أرقام قديمة بصمت.</span></li>
+            <li><span class="en">Search runs one <code>ilike</code> domain across name, tag, serial, model and manufacturer, debounced 350&nbsp;ms, 50 rows a page.</span><span class="ar">يُنفَّذ البحث بنطاق <code>ilike</code> واحد على الاسم والرمز والرقم التسلسلي والموديل والمصنّع، بتأخير ٣٥٠ مللي ثانية، و٥٠ صفًا لكل صفحة.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 5 · Asset detail (full scroll) ---------- -->
+        <div class="plate plate--tall">
+          <div class="plate__cap">
+            <h3><span class="en">Asset details</span><span class="ar">تفاصيل الأصل</span></h3>
+            <span class="plate__ref">§14 — <span class="en">full scroll</span><span class="ar">كامل التمرير</span></span>
+          </div>
+
+          <div class="phone"><div class="screen" style="--h:1276px">
+            <div class="safe"></div>
+
+            <div class="appbar" style="gap:6px;padding-inline:10px">
+              <div class="ab-plain chev"><svg class="ico ico--bold" width="20" height="20"><use href="#i-back"/></svg></div>
+              <div class="grow" style="font-size:12.5px;font-weight:600;color:var(--s-muted)">
+                <span class="en">Asset details</span><span class="ar">تفاصيل الأصل</span>
+              </div>
+              <div class="ab-btn"><svg class="ico" width="18" height="18"><use href="#i-qr"/></svg></div>
+              <div class="ab-plain"><svg class="ico ico--fill" width="18" height="18"><use href="#i-kebab"/></svg></div>
+            </div>
+
+            <div class="body">
+
+              <div class="card card--navy" style="padding:15px 16px 14px">
+                <div class="row row--top" style="gap:12px">
+                  <span class="none" style="width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:#2FE3A8">
+                    <svg class="ico" width="22" height="22"><use href="#i-laptop"/></svg>
+                  </span>
+                  <span class="grow">
+                    <span style="display:block;font-size:19px;font-weight:700;letter-spacing:-0.4px;color:var(--s-on-navy);line-height:1.2">MacBook&nbsp;Pro M4</span>
+                    <span style="display:block;font-size:10.5px;font-weight:500;color:var(--s-navy-sub);margin-top:4px">
+                      <span class="en">Laptop · Apple · 14-inch, 48&nbsp;GB</span><span class="ar">لابتوب · Apple · ١٤ بوصة، ٤٨ جيجابايت</span>
+                    </span>
+                  </span>
+                </div>
+                <div class="row" style="gap:6px;margin-top:13px">
+                  <span class="chip" style="background:rgba(59,111,224,.22);border:1px solid rgba(94,143,246,.45);color:#A9C4FA;padding:4px 10px;font-size:10px">
+                    <span class="dot" style="background:#7FA6F5"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                  </span>
+                  <span class="chip ltr" style="background:rgba(255,255,255,.08);color:#C6CFE8;padding:4px 10px;font-size:10px;letter-spacing:.6px">DH-LAP-0027</span>
+                </div>
+              </div>
+
+              <div class="row none" style="gap:8px">
+                <div class="btn btn--accent grow btn--sm">
+                  <svg class="ico ico--bold" width="16" height="16"><use href="#i-return"/></svg>
+                  <span class="en">Return</span><span class="ar">استرجاع</span>
+                </div>
+                <div class="btn btn--ghost grow btn--sm">
+                  <svg class="ico" width="16" height="16"><use href="#i-wrench"/></svg>
+                  <span class="en">Maintain</span><span class="ar">صيانة</span>
+                </div>
+                <div class="btn btn--ghost none btn--sm" style="width:44px">
+                  <svg class="ico" width="17" height="17"><use href="#i-edit"/></svg>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="hd" style="margin-bottom:11px"><span class="en">Device information</span><span class="ar">بيانات الجهاز</span></div>
+                <div class="g2">
+                  <div><div class="k"><span class="en">Manufacturer</span><span class="ar">الشركة المصنّعة</span></div><div class="v">Apple</div></div>
+                  <div><div class="k"><span class="en">Model</span><span class="ar">الموديل</span></div><div class="v">MacBook Pro 14″</div></div>
+                  <div><div class="k"><span class="en">Serial number</span><span class="ar">الرقم التسلسلي</span></div><div class="v ltr" style="letter-spacing:.4px">C02XK1YZQ6L4</div></div>
+                  <div><div class="k"><span class="en">Category</span><span class="ar">الفئة</span></div><div class="v"><span class="en">Laptop</span><span class="ar">لابتوب</span></div></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="hd" style="margin-bottom:10px"><span class="en">Ownership</span><span class="ar">العهدة</span></div>
+                <div class="row" style="gap:11px">
+                  <span class="av">AM</span>
+                  <span class="grow">
+                    <span class="t1" style="display:block">Ahmed Mohamed</span>
+                    <span class="t2" style="display:block"><span class="en">IT Department · Systems Engineer</span><span class="ar">قسم تقنية المعلومات · مهندس أنظمة</span></span>
+                  </span>
+                  <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="16" height="16"><use href="#i-chev"/></svg></span>
+                </div>
+                <div class="hair" style="margin:11px 0"></div>
+                <div class="row" style="gap:8px">
+                  <svg class="ico none" width="14" height="14" style="color:var(--s-muted)"><use href="#i-cal"/></svg>
+                  <span class="t2" style="margin:0"><span class="en">Assigned</span><span class="ar">تاريخ التسليم</span></span>
+                  <span style="font-size:11.5px;font-weight:600">23 Aug 2026</span>
+                  <span class="t3"><span class="en">· 0 days</span><span class="ar">· ٠ يوم</span></span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row" style="margin-bottom:10px">
+                  <span class="hd grow"><span class="en">Warranty</span><span class="ar">الضمان</span></span>
+                  <span class="chip" style="background:rgba(242,166,59,.14);color:var(--i-maint)">
+                    <svg class="ico ico--bold" width="11" height="11"><use href="#i-shield"/></svg>
+                    <span class="en">Expires in 43 days</span><span class="ar">ينتهي خلال ٤٣ يومًا</span>
+                  </span>
+                </div>
+                <div class="bar" style="flex-grow:0"><i style="width:88%;background:linear-gradient(90deg,#14C289,#F2A63B)"></i></div>
+                <div class="row" style="margin-top:8px">
+                  <span class="t3 grow"><span class="en">Started 05 Oct 2023</span><span class="ar">بدأ 05 أكتوبر 2023</span></span>
+                  <span style="font-size:10.5px;font-weight:600"><span class="en">Ends 05 Oct 2026</span><span class="ar">ينتهي 05 أكتوبر 2026</span></span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="hd" style="margin-bottom:11px"><span class="en">Purchase &amp; vendor</span><span class="ar">الشراء والمورّد</span></div>
+                <div class="g2">
+                  <div><div class="k"><span class="en">Purchase date</span><span class="ar">تاريخ الشراء</span></div><div class="v">05 Oct 2023</div></div>
+                  <div><div class="k"><span class="en">Purchase value</span><span class="ar">قيمة الشراء</span></div><div class="v num" style="font-size:12.5px;font-weight:600">EGP 128,400</div></div>
+                  <div><div class="k"><span class="en">Vendor</span><span class="ar">المورّد</span></div><div class="v">Apple Egypt</div></div>
+                  <div><div class="k"><span class="en">Invoice</span><span class="ar">الفاتورة</span></div><div class="v ltr">INV/2023/0417</div></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row" style="margin-bottom:11px">
+                  <span class="hd grow"><span class="en">Maintenance</span><span class="ar">الصيانة</span></span>
+                  <span class="link"><span class="en">New request</span><span class="ar">طلب جديد</span></span>
+                </div>
+                <div class="row" style="gap:10px">
+                  <span class="tile tile--sm" style="background:rgba(20,194,137,.14);color:var(--i-avail)">
+                    <svg class="ico ico--bold" width="14" height="14"><use href="#i-checkc"/></svg>
+                  </span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:11.5px"><span class="en">Battery service</span><span class="ar">صيانة البطارية</span></span>
+                    <span class="t3"><span class="en">Closed 14 Mar 2026 · 2h · Karim H.</span><span class="ar">أُغلق 14 مارس 2026 · ساعتان · كريم ح.</span></span>
+                  </span>
+                </div>
+                <div class="hair" style="margin:10px 0"></div>
+                <div class="row" style="gap:10px">
+                  <span class="tile tile--sm" style="background:var(--s-tint);color:var(--s-muted)">
+                    <svg class="ico" width="14" height="14"><use href="#i-clock"/></svg>
+                  </span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:11.5px"><span class="en">Next preventive check</span><span class="ar">الفحص الوقائي القادم</span></span>
+                    <span class="t3"><span class="en">Scheduled 05 Oct 2026</span><span class="ar">مجدول 05 أكتوبر 2026</span></span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="card" style="margin-bottom:14px">
+                <div class="hd" style="margin-bottom:11px"><span class="en">Activity</span><span class="ar">السجل</span></div>
+                <div class="row row--top" style="gap:10px">
+                  <span class="none col" style="align-items:center;gap:0">
+                    <span class="dot" style="background:var(--c-assign);width:8px;height:8px;margin-top:4px"></span>
+                    <span style="width:1.5px;flex-grow:1;background:var(--s-hair);min-height:22px"></span>
+                  </span>
+                  <span class="grow" style="padding-bottom:12px">
+                    <span class="t1" style="display:block;font-size:11.5px"><span class="en">Assigned to Ahmed Mohamed</span><span class="ar">سُلِّم إلى أحمد محمد</span></span>
+                    <span class="t3">23 Aug 2026 · 09:14</span>
+                  </span>
+                </div>
+                <div class="row row--top" style="gap:10px">
+                  <span class="none col" style="align-items:center;gap:0">
+                    <span class="dot" style="background:var(--c-avail);width:8px;height:8px;margin-top:4px"></span>
+                    <span style="width:1.5px;flex-grow:1;background:var(--s-hair);min-height:22px"></span>
+                  </span>
+                  <span class="grow" style="padding-bottom:12px">
+                    <span class="t1" style="display:block;font-size:11.5px"><span class="en">Returned by Sara Fouad — good</span><span class="ar">استُرجع من سارة فؤاد — سليم</span></span>
+                    <span class="t3">21 Aug 2026 · 16:40</span>
+                  </span>
+                </div>
+                <div class="row row--top" style="gap:10px">
+                  <span class="none" style="width:8px;display:flex;justify-content:center">
+                    <span class="dot" style="background:var(--s-faint);width:8px;height:8px;margin-top:4px"></span>
+                  </span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:11.5px"><span class="en">Created</span><span class="ar">أُنشئ</span></span>
+                    <span class="t3">05 Oct 2023 · 11:02</span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="nav">
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--bold" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Shown at full scroll height — on a device this is one screen you scroll, with the tab bar pinned.</span><span class="ar">معروضة بكامل ارتفاع التمرير — وعلى الجهاز هي شاشة واحدة تُمرَّر مع تثبيت شريط التبويبات.</span></li>
+            <li><span class="en">Sections follow §14 exactly. Each one is hidden when its fields are missing rather than showing blanks.</span><span class="ar">الأقسام تتبع §14 حرفيًا، ويُخفى القسم عند غياب حقوله بدل عرض فراغات.</span></li>
+            <li><span class="en">Maintenance and Activity only appear when <code>maintenance.request</code> and <code>mail.message</code> exist.</span><span class="ar">لا يظهر قسما الصيانة والسجل إلا عند وجود <code>maintenance.request</code> و<code>mail.message</code>.</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="workflows">
+      <div class="sec-head">
+        <h2><span class="en">Workflows</span><span class="ar">سير العمل</span></h2>
+        <p>
+          <span class="en">Hand a device over, take it back, or find it by pointing the camera at it.</span>
+          <span class="ar">تسليم جهاز، أو استرجاعه، أو العثور عليه بتوجيه الكاميرا نحوه.</span>
+        </p>
+      </div>
+
+      <div class="sheet">
+
+        <!-- ---------- 6 · Assign ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Assign asset</span><span class="ar">تسليم أصل</span></h3>
+            <span class="plate__ref">§7 · §10</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+
+            <div class="appbar" style="gap:6px;padding-inline:10px">
+              <div class="ab-plain"><svg class="ico ico--bold" width="18" height="18"><use href="#i-close"/></svg></div>
+              <div class="grow" style="font-size:15.5px;font-weight:700;letter-spacing:-0.2px">
+                <span class="en">Assign asset</span><span class="ar">تسليم أصل</span>
+              </div>
+            </div>
+
+            <div class="body" style="gap:0">
+
+              <div class="card row" style="gap:11px;padding:10px 12px">
+                <span class="tile" style="width:36px;height:36px"><svg class="ico" width="18" height="18"><use href="#i-laptop"/></svg></span>
+                <span class="grow">
+                  <span class="t1" style="display:block">MacBook Pro M4</span>
+                  <span class="t2" style="display:block"><span class="ltr">DH-LAP-0027</span><span class="en"> · currently available</span><span class="ar"> · متاح حاليًا</span></span>
+                </span>
+              </div>
+
+              <div class="row none" style="margin:18px 0 8px;gap:8px">
+                <span class="none" style="width:18px;height:18px;border-radius:999px;background:var(--s-ink);color:var(--s-card);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">1</span>
+                <span class="grow" style="font-size:12px;font-weight:700"><span class="en">Select employee</span><span class="ar">اختر الموظف</span></span>
+                <span class="t3 ltr">hr.employee</span>
+              </div>
+
+              <div class="field" style="height:44px">
+                <svg class="ico none" width="16" height="16" style="color:var(--s-muted)"><use href="#i-search"/></svg>
+                <span class="grow" style="font-weight:600">most</span>
+                <span class="caret"></span>
+              </div>
+
+              <div class="row none" style="gap:6px;margin-top:9px;overflow:hidden">
+                <span class="chip none" style="background:var(--s-navy);color:var(--s-on-navy);padding:5px 10px;font-size:10px">
+                  <span class="en">All departments</span><span class="ar">كل الأقسام</span>
+                </span>
+                <span class="chip none chip--soft" style="padding:5px 10px;font-size:10px">IT</span>
+                <span class="chip none chip--soft" style="padding:5px 10px;font-size:10px">
+                  <span class="en">Development</span><span class="ar">التطوير</span>
+                </span>
+                <span class="chip none chip--soft" style="padding:5px 10px;font-size:10px">
+                  <span class="en">Finance</span><span class="ar">المالية</span>
+                </span>
+              </div>
+
+              <div class="col none" style="gap:7px;margin-top:9px">
+                <div class="card row" style="gap:10px;padding:9px 11px;border:1.8px solid #2FE3A8">
+                  <span class="av">MB</span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px">
+                      <span class="en">Mostafa Bader</span><span class="ar">مصطفى بدر</span>
+                    </span>
+                    <span class="t2" style="display:block"><span class="en">IT · Senior Flutter Engineer</span><span class="ar">تقنية المعلومات · مهندس Flutter أول</span></span>
+                    <span class="t3 ltr" style="display:block">mostafa.bader@company.com</span>
+                  </span>
+                  <span class="none" style="width:21px;height:21px;border-radius:999px;background:#2FE3A8;color:#16255C;display:flex;align-items:center;justify-content:center">
+                    <svg class="ico" width="12" height="12" style="stroke-width:3.2"><use href="#i-check"/></svg>
+                  </span>
+                </div>
+
+                <div class="card row" style="gap:10px;padding:9px 11px">
+                  <span class="av" style="background:var(--s-tint);color:var(--s-ink)">MK</span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px">
+                      <span class="en">Mostafa Kamal</span><span class="ar">مصطفى كمال</span>
+                    </span>
+                    <span class="t2" style="display:block"><span class="en">Development · Backend Engineer</span><span class="ar">التطوير · مهندس خلفية</span></span>
+                    <span class="t3 ltr" style="display:block">m.kamal@company.com</span>
+                  </span>
+                  <span class="none" style="width:21px;height:21px;border-radius:999px;border:1.6px solid var(--s-line)"></span>
+                </div>
+
+                <div class="card row" style="gap:10px;padding:9px 11px">
+                  <span class="av" style="background:var(--s-tint);color:var(--s-ink)">MS</span>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px">
+                      <span class="en">Mostafa Selim</span><span class="ar">مصطفى سليم</span>
+                    </span>
+                    <span class="t2" style="display:block"><span class="en">Finance · Accountant</span><span class="ar">المالية · محاسب</span></span>
+                    <span class="t3 ltr" style="display:block">m.selim@company.com</span>
+                  </span>
+                  <span class="none" style="width:21px;height:21px;border-radius:999px;border:1.6px solid var(--s-line)"></span>
+                </div>
+              </div>
+
+              <div class="row none" style="margin:17px 0 8px;gap:8px">
+                <span class="none" style="width:18px;height:18px;border-radius:999px;background:var(--s-ink);color:var(--s-card);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">2</span>
+                <span class="grow" style="font-size:12px;font-weight:700"><span class="en">Assignment date</span><span class="ar">تاريخ التسليم</span></span>
+              </div>
+              <div class="field">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-cal"/></svg>
+                <span class="grow" style="font-weight:600">23 August 2026</span>
+                <span class="link none"><span class="en">Today</span><span class="ar">اليوم</span></span>
+              </div>
+
+              <div class="row none" style="margin:15px 0 8px;gap:8px">
+                <span class="none" style="width:18px;height:18px;border-radius:999px;background:var(--s-tint);color:var(--s-muted);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">3</span>
+                <span class="grow" style="font-size:12px;font-weight:700"><span class="en">Notes</span><span class="ar">ملاحظات</span></span>
+                <span class="t3"><span class="en">optional</span><span class="ar">اختياري</span></span>
+              </div>
+              <div class="card none" style="height:64px;padding:11px 13px">
+                <span class="t2 ph" style="margin:0;color:var(--s-faint)">
+                  <span class="en">Handed over with charger and USB-C hub…</span>
+                  <span class="ar">سُلِّم مع الشاحن وموزّع USB-C…</span>
+                </span>
+              </div>
+
+            </div>
+
+            <div class="sticky">
+              <div class="btn btn--fill">
+                <svg class="ico" width="17" height="17" style="stroke-width:2.4"><use href="#i-check"/></svg>
+                <span class="en">Confirm assignment</span><span class="ar">تأكيد التسليم</span>
+              </div>
+              <div style="height:22px"></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Employees come from <code>name_search</code>, so no Odoo record id is ever hardcoded in the app.</span><span class="ar">يأتي الموظفون من <code>name_search</code>، فلا يُكتب أي معرّف سجل من أودو داخل التطبيق.</span></li>
+            <li><span class="en">Department chips narrow a long directory without leaving the flow.</span><span class="ar">شرائح الأقسام تُضيّق دليلًا طويلًا دون مغادرة سير العمل.</span></li>
+            <li><span class="en">Confirm writes <code>employee_id</code> and <code>assign_date</code>, then posts the note to the record's chatter.</span><span class="ar">يكتب التأكيد <code>employee_id</code> و<code>assign_date</code> ثم يسجّل الملاحظة في محادثة السجل.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 7 · Return ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Return asset</span><span class="ar">استرجاع أصل</span></h3>
+            <span class="plate__ref">§8</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+
+            <div class="appbar" style="gap:6px;padding-inline:10px">
+              <div class="ab-plain"><svg class="ico ico--bold" width="18" height="18"><use href="#i-close"/></svg></div>
+              <div class="grow" style="font-size:15.5px;font-weight:700;letter-spacing:-0.2px">
+                <span class="en">Return asset</span><span class="ar">استرجاع أصل</span>
+              </div>
+            </div>
+
+            <div class="body" style="gap:0">
+
+              <div class="card row" style="gap:11px;padding:10px 12px">
+                <span class="av">MB</span>
+                <span class="grow">
+                  <span class="t1" style="display:block">MacBook Pro M4</span>
+                  <span class="t2" style="display:block">
+                    <span class="en">Mostafa Bader · held 312 days</span><span class="ar">مصطفى بدر · بالعهدة ٣١٢ يومًا</span>
+                  </span>
+                </span>
+                <span class="chip none" style="background:rgba(59,111,224,.12);color:var(--i-assign)">
+                  <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                </span>
+              </div>
+
+              <div class="hd" style="margin:17px 0 7px"><span class="en">Return date</span><span class="ar">تاريخ الاسترجاع</span></div>
+              <div class="field">
+                <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-cal"/></svg>
+                <span class="grow" style="font-weight:600">23 August 2026</span>
+                <span class="link none"><span class="en">Today</span><span class="ar">اليوم</span></span>
+              </div>
+
+              <div class="hd" style="margin:15px 0 8px"><span class="en">Condition on return</span><span class="ar">الحالة عند الاسترجاع</span></div>
+              <div class="g2 none" style="gap:8px">
+                <div class="card" style="padding:11px 11px 10px">
+                  <span class="tile tile--sm" style="background:rgba(20,194,137,.14);color:var(--i-avail)">
+                    <svg class="ico ico--bold" width="15" height="15"><use href="#i-checkc"/></svg>
+                  </span>
+                  <div class="t1" style="margin-top:8px;font-size:12px"><span class="en">Good</span><span class="ar">سليم</span></div>
+                  <div class="t3" style="margin-top:2px"><span class="en">Back to available</span><span class="ar">يعود إلى متاح</span></div>
+                </div>
+                <div class="card" style="padding:11px 11px 10px;border:1.8px solid var(--c-maint);position:relative">
+                  <span class="tile tile--sm" style="background:rgba(242,166,59,.18);color:var(--i-maint)">
+                    <svg class="ico ico--bold" width="15" height="15"><use href="#i-alert"/></svg>
+                  </span>
+                  <div class="t1" style="margin-top:8px;font-size:12px"><span class="en">Minor damage</span><span class="ar">تلف بسيط</span></div>
+                  <div class="t3" style="margin-top:2px"><span class="en">Back to available</span><span class="ar">يعود إلى متاح</span></div>
+                  <span style="position:absolute;top:10px;inset-inline-end:10px;width:19px;height:19px;border-radius:999px;background:var(--c-maint);color:#fff;display:flex;align-items:center;justify-content:center">
+                    <svg class="ico" width="11" height="11" style="stroke-width:3.4"><use href="#i-check"/></svg>
+                  </span>
+                </div>
+                <div class="card" style="padding:11px 11px 10px">
+                  <span class="tile tile--sm" style="background:rgba(229,83,61,.14);color:var(--i-dmg)">
+                    <svg class="ico ico--bold" width="15" height="15"><use href="#i-close"/></svg>
+                  </span>
+                  <div class="t1" style="margin-top:8px;font-size:12px"><span class="en">Damaged</span><span class="ar">تالف</span></div>
+                  <div class="t3" style="margin-top:2px"><span class="en">Marks as damaged</span><span class="ar">يُعلَّم كتالف</span></div>
+                </div>
+                <div class="card" style="padding:11px 11px 10px">
+                  <span class="tile tile--sm" style="background:rgba(124,92,224,.14);color:var(--c-resv)">
+                    <svg class="ico" width="15" height="15"><use href="#i-wrench"/></svg>
+                  </span>
+                  <div class="t1" style="margin-top:8px;font-size:12px"><span class="en">Needs service</span><span class="ar">يحتاج صيانة</span></div>
+                  <div class="t3" style="margin-top:2px"><span class="en">Opens a request</span><span class="ar">يفتح طلب صيانة</span></div>
+                </div>
+              </div>
+
+              <div class="hd" style="margin:15px 0 8px"><span class="en">Accessories returned</span><span class="ar">الملحقات المسترجعة</span></div>
+              <div class="row none" style="gap:6px;flex-wrap:wrap">
+                <span class="chip none" style="background:var(--s-mint-soft);color:var(--i-avail);padding:5px 10px;font-size:10px">
+                  <svg class="ico" width="11" height="11" style="stroke-width:3"><use href="#i-check"/></svg>
+                  <span class="en">Charger</span><span class="ar">الشاحن</span>
+                </span>
+                <span class="chip none" style="background:var(--s-mint-soft);color:var(--i-avail);padding:5px 10px;font-size:10px">
+                  <svg class="ico" width="11" height="11" style="stroke-width:3"><use href="#i-check"/></svg>
+                  <span class="en">Sleeve</span><span class="ar">الحقيبة</span>
+                </span>
+                <span class="chip none chip--soft" style="padding:5px 10px;font-size:10px">
+                  <span class="en">USB-C hub</span><span class="ar">موزّع USB-C</span>
+                </span>
+                <span class="chip none chip--soft" style="padding:5px 10px;font-size:10px">
+                  <span class="en">Dock</span><span class="ar">قاعدة التوصيل</span>
+                </span>
+              </div>
+
+              <div class="hd" style="margin:15px 0 7px"><span class="en">Notes</span><span class="ar">ملاحظات</span></div>
+              <div class="card none is-focus" style="padding:11px 13px;border:1.6px solid var(--s-ink)">
+                <span style="font-size:12.5px;font-weight:500">
+                  <span class="en">Small scratch on the left side.</span><span class="ar">خدش صغير في الجانب الأيسر.</span>
+                </span>
+              </div>
+
+              <div class="row none" style="margin:15px 0 7px">
+                <span class="hd grow"><span class="en">Photos</span><span class="ar">الصور</span></span>
+                <span class="t3">2 / 5</span>
+              </div>
+              <div class="row none" style="gap:8px">
+                <span class="none" style="width:58px;height:58px;border-radius:13px;background:var(--s-line);display:flex;align-items:center;justify-content:center;color:var(--s-faint)">
+                  <svg class="ico" width="20" height="20"><use href="#i-image"/></svg>
+                </span>
+                <span class="none" style="width:58px;height:58px;border-radius:13px;background:var(--s-line);display:flex;align-items:center;justify-content:center;color:var(--s-faint)">
+                  <svg class="ico" width="20" height="20"><use href="#i-image"/></svg>
+                </span>
+                <span class="none" style="width:58px;height:58px;border-radius:13px;border:1.4px dashed var(--s-faint);display:flex;align-items:center;justify-content:center;color:var(--s-muted)">
+                  <svg class="ico" width="18" height="18"><use href="#i-plus"/></svg>
+                </span>
+              </div>
+
+            </div>
+
+            <div class="sticky">
+              <div class="row" style="gap:8px;margin-bottom:9px">
+                <svg class="ico none" width="13" height="13" style="color:var(--s-muted)"><use href="#i-info"/></svg>
+                <span class="t3" style="line-height:1.4">
+                  <span class="en">Returns to <b style="color:var(--i-avail)">Available</b> and the note is posted to Odoo.</span>
+                  <span class="ar">يعود إلى <b style="color:var(--i-avail)">متاح</b> وتُسجَّل الملاحظة في أودو.</span>
+                </span>
+              </div>
+              <div class="btn btn--fill">
+                <svg class="ico ico--bold" width="17" height="17"><use href="#i-return"/></svg>
+                <span class="en">Confirm return</span><span class="ar">تأكيد الاسترجاع</span>
+              </div>
+              <div style="height:22px"></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Each condition states the status it produces, so nobody has to guess what Confirm will do.</span><span class="ar">كل حالة تُصرّح بالوضع الناتج عنها، فلا يحتاج أحد لتخمين أثر التأكيد.</span></li>
+            <li><span class="en">The accessories row exists because chargers are what actually go missing.</span><span class="ar">صف الملحقات موجود لأن الشواحن هي ما يُفقد فعليًا.</span></li>
+            <li><span class="en">Photos upload as <code>ir.attachment</code> records against the asset.</span><span class="ar">تُرفع الصور كسجلات <code>ir.attachment</code> مرتبطة بالأصل.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 8 · Scan ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Scan</span><span class="ar">المسح</span></h3>
+            <span class="plate__ref">§12 · §13</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="cam">
+              <div class="safe"></div>
+
+              <div class="row none" style="gap:8px;padding:2px 13px 0">
+                <span class="none" style="width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;color:#fff">
+                  <svg class="ico ico--bold" width="17" height="17"><use href="#i-close"/></svg>
+                </span>
+                <span class="grow" style="text-align:center;font-size:13.5px;font-weight:600;color:#fff">
+                  <span class="en">Scan asset</span><span class="ar">مسح أصل</span>
+                </span>
+                <span class="none" style="width:36px;height:36px;border-radius:12px;background:rgba(47,227,168,.18);display:flex;align-items:center;justify-content:center;color:#2FE3A8">
+                  <svg class="ico" width="17" height="17"><use href="#i-flash"/></svg>
+                </span>
+              </div>
+
+              <div class="grow" style="display:flex;align-items:center;justify-content:center">
+                <div class="finder"><i></i><i></i><i></i><i></i><u></u></div>
+              </div>
+
+              <div class="none" style="text-align:center;padding:0 36px">
+                <div style="font-size:13px;font-weight:600;color:#fff">
+                  <span class="en">Point at an asset code</span><span class="ar">وجّه الكاميرا نحو رمز الأصل</span>
+                </div>
+                <div style="font-size:11px;font-weight:400;color:#8E9AC4;margin-top:5px;line-height:1.5">
+                  <span class="en">QR codes, equipment barcodes and printed serial numbers all work.</span>
+                  <span class="ar">يعمل مع رموز QR وباركود الأجهزة والأرقام التسلسلية المطبوعة.</span>
+                </div>
+              </div>
+
+              <div class="row none" style="justify-content:center;margin-top:15px">
+                <span style="display:flex;background:rgba(255,255,255,.10);border-radius:999px;padding:3px">
+                  <span style="font-size:11px;font-weight:700;color:#16255C;background:#2FE3A8;border-radius:999px;padding:6px 16px">
+                    <span class="en">QR code</span><span class="ar">رمز QR</span>
+                  </span>
+                  <span style="font-size:11px;font-weight:500;color:#C6CFE8;padding:6px 16px">
+                    <span class="en">Barcode</span><span class="ar">باركود</span>
+                  </span>
+                </span>
+              </div>
+
+              <div class="none" style="margin:16px 14px 0">
+                <div style="font-size:9.5px;font-weight:600;letter-spacing:.8px;color:#8E9AC4;margin-bottom:7px;text-transform:uppercase">
+                  <span class="en">Recent scans</span><span class="ar">آخر عمليات المسح</span>
+                </div>
+                <div class="row" style="gap:7px;overflow:hidden">
+                  <span class="chip none ltr" style="background:rgba(255,255,255,.09);color:#C6CFE8;padding:5px 10px;font-size:10px">DH-LAP-0033</span>
+                  <span class="chip none ltr" style="background:rgba(255,255,255,.09);color:#C6CFE8;padding:5px 10px;font-size:10px">DH-MON-0114</span>
+                  <span class="chip none ltr" style="background:rgba(255,255,255,.09);color:#C6CFE8;padding:5px 10px;font-size:10px">DH-ACC-0231</span>
+                </div>
+              </div>
+
+              <div class="row none" style="margin:14px 14px 16px;background:var(--s-card);border-radius:18px;padding:12px 13px;gap:11px">
+                <span class="tile" style="background:var(--s-mint-soft);color:var(--i-avail)">
+                  <svg class="ico ico--bold" width="19" height="19"><use href="#i-checkc"/></svg>
+                </span>
+                <span class="grow">
+                  <span class="hd" style="display:block"><span class="en">Matched</span><span class="ar">تم التعرف</span> <span class="ltr">asset://87</span></span>
+                  <span class="t1" style="display:block;margin-top:2px">MacBook Pro M4</span>
+                  <span class="t2" style="display:block"><span class="ltr">DH-LAP-0027</span><span class="en"> · assigned to Ahmed</span><span class="ar"> · مُسلَّم إلى أحمد</span></span>
+                </span>
+                <span class="btn btn--fill none" style="height:34px;padding:0 14px;font-size:11.5px">
+                  <span class="en">Open</span><span class="ar">فتح</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--bold" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">The QR payload is <code>asset://87</code> and nothing else — no URL, database name, session or credential.</span><span class="ar">حمولة رمز QR هي <code>asset://87</code> فقط — بلا رابط أو اسم قاعدة بيانات أو جلسة أو بيانات دخول.</span></li>
+            <li><span class="en">An unrecognised code is treated as a serial and searched on <code>serial_no</code> before giving up.</span><span class="ar">يُعامل الرمز غير المعروف كرقم تسلسلي ويُبحث عنه في <code>serial_no</code> قبل الاستسلام.</span></li>
+            <li><span class="en">This screen is dark in both themes — a bright chrome around a camera feed is unusable.</span><span class="ar">هذه الشاشة داكنة في الوضعين، فالإطار الفاتح حول بث الكاميرا غير عملي.</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="people">
+      <div class="sec-head">
+        <h2><span class="en">People &amp; system</span><span class="ar">الأشخاص والنظام</span></h2>
+        <p>
+          <span class="en">Who holds what, and everything the admin needs to keep the connection healthy.</span>
+          <span class="ar">من يحمل ماذا، وكل ما يحتاجه المسؤول لإبقاء الاتصال سليمًا.</span>
+        </p>
+      </div>
+
+      <div class="sheet">
+
+        <!-- ---------- 9 · Employee ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Employee</span><span class="ar">الموظف</span></h3>
+            <span class="plate__ref">§9</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+
+            <div class="appbar" style="gap:6px;padding-inline:10px">
+              <div class="ab-plain chev"><svg class="ico ico--bold" width="20" height="20"><use href="#i-back"/></svg></div>
+              <div class="grow" style="font-size:12.5px;font-weight:600;color:var(--s-muted)">
+                <span class="en">Employee</span><span class="ar">الموظف</span>
+              </div>
+              <div class="ab-plain"><svg class="ico ico--fill" width="18" height="18"><use href="#i-kebab"/></svg></div>
+            </div>
+
+            <div class="body">
+
+              <div class="card" style="border-radius:20px;padding:16px 16px 14px">
+                <div class="row" style="gap:13px">
+                  <span class="av none" style="width:56px;height:56px;font-size:18px;letter-spacing:-0.5px">MB</span>
+                  <span class="grow">
+                    <span style="display:block;font-size:18px;font-weight:700;letter-spacing:-0.4px;line-height:1.2">
+                      <span class="en">Mostafa Bader</span><span class="ar">مصطفى بدر</span>
+                    </span>
+                    <span class="t2" style="display:block;font-size:11.5px;font-weight:600">
+                      <span class="en">Senior Flutter Engineer</span><span class="ar">مهندس Flutter أول</span>
+                    </span>
+                    <span class="chip chip--soft" style="margin-top:6px;padding:3px 9px">
+                      <svg class="ico ico--bold" width="11" height="11"><use href="#i-building"/></svg>
+                      <span class="en">IT Department</span><span class="ar">قسم تقنية المعلومات</span>
+                    </span>
+                  </span>
+                </div>
+                <div class="row" style="gap:8px;margin-top:13px">
+                  <span class="btn btn--ghost grow" style="height:38px;font-size:11.5px">
+                    <svg class="ico" width="15" height="15"><use href="#i-mail"/></svg>
+                    <span class="en">Email</span><span class="ar">بريد</span>
+                  </span>
+                  <span class="btn btn--ghost grow" style="height:38px;font-size:11.5px">
+                    <svg class="ico" width="15" height="15"><use href="#i-call"/></svg>
+                    <span class="en">Call</span><span class="ar">اتصال</span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="g3 none">
+                <div class="card card--navy" style="padding:10px 11px;border-radius:14px">
+                  <div class="num" style="font-size:20px;color:var(--s-on-navy)">4</div>
+                  <div class="t3" style="margin-top:4px;color:var(--s-navy-sub);font-weight:600">
+                    <span class="en">Assets held</span><span class="ar">في العهدة</span>
+                  </div>
+                </div>
+                <div class="card" style="padding:10px 11px;border-radius:14px">
+                  <div class="num" style="font-size:20px;color:var(--i-maint)">1</div>
+                  <div class="t3" style="margin-top:4px;font-weight:600">
+                    <span class="en">In service</span><span class="ar">في الصيانة</span>
+                  </div>
+                </div>
+                <div class="card" style="padding:10px 11px;border-radius:14px">
+                  <div class="num" style="font-size:15px">EGP<br>214k</div>
+                  <div class="t3" style="margin-top:4px;font-weight:600">
+                    <span class="en">Total value</span><span class="ar">إجمالي القيمة</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row none" style="padding:2px 2px 0">
+                <span class="grow" style="font-size:12.5px;font-weight:700">
+                  <span class="en">Assigned assets</span><span class="ar">الأصول المُسلَّمة</span>
+                </span>
+                <span class="t3"><span class="en">4 items</span><span class="ar">٤ عناصر</span></span>
+              </div>
+
+              <div class="col none" style="gap:8px">
+                <div class="card row" style="gap:11px;padding:10px 12px">
+                  <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-laptop"/></svg></span>
+                  <span class="grow">
+                    <span class="t1" style="display:block">MacBook Pro M4</span>
+                    <span class="t2" style="display:block"><span class="ltr">DH-LAP-0027</span><span class="en"> · since 15 Oct 2025</span><span class="ar"> · منذ 15 أكتوبر 2025</span></span>
+                  </span>
+                  <span class="chip none" style="background:rgba(59,111,224,.12);color:var(--i-assign)">
+                    <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                  </span>
+                </div>
+                <div class="card row" style="gap:11px;padding:10px 12px">
+                  <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-monitor"/></svg></span>
+                  <span class="grow">
+                    <span class="t1" style="display:block">Dell 27″ UltraSharp</span>
+                    <span class="t2" style="display:block"><span class="ltr">DH-MON-0114</span><span class="en"> · since 15 Oct 2025</span><span class="ar"> · منذ 15 أكتوبر 2025</span></span>
+                  </span>
+                  <span class="chip none" style="background:rgba(59,111,224,.12);color:var(--i-assign)">
+                    <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                  </span>
+                </div>
+                <div class="card row" style="gap:11px;padding:10px 12px">
+                  <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-mobile"/></svg></span>
+                  <span class="grow">
+                    <span class="t1" style="display:block">iPhone 15 Pro</span>
+                    <span class="t2" style="display:block"><span class="ltr">DH-MOB-0042</span><span class="en"> · screen replacement</span><span class="ar"> · تغيير الشاشة</span></span>
+                  </span>
+                  <span class="chip none" style="background:rgba(242,166,59,.14);color:var(--i-maint)">
+                    <span class="dot" style="background:var(--c-maint)"></span><span class="en">SERVICE</span><span class="ar">صيانة</span>
+                  </span>
+                </div>
+                <div class="card row" style="gap:11px;padding:10px 12px">
+                  <span class="tile"><svg class="ico" width="19" height="19"><use href="#i-mouse"/></svg></span>
+                  <span class="grow">
+                    <span class="t1" style="display:block">Logitech MX Master 3S</span>
+                    <span class="t2" style="display:block"><span class="ltr">DH-ACC-0231</span><span class="en"> · since 02 Mar 2026</span><span class="ar"> · منذ 02 مارس 2026</span></span>
+                  </span>
+                  <span class="chip none" style="background:rgba(59,111,224,.12);color:var(--i-assign)">
+                    <span class="dot" style="background:var(--c-assign)"></span><span class="en">ASSIGNED</span><span class="ar">مُسلَّم</span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="nav">
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--bold" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">Total value answers the question an IT manager actually asks during offboarding.</span><span class="ar">«إجمالي القيمة» يجيب السؤال الذي يطرحه مدير التقنية فعليًا عند إنهاء الخدمة.</span></li>
+            <li><span class="en">The whole screen hides when <code>hr.employee</code> is not installed; assets then show an owner user instead.</span><span class="ar">تُخفى الشاشة بالكامل عند غياب <code>hr.employee</code>، وتعرض الأصول عندها المستخدم المالك بدلًا منه.</span></li>
+          </ul>
+        </div>
+
+        <!-- ---------- 10 · Settings ---------- -->
+        <div class="plate">
+          <div class="plate__cap">
+            <h3><span class="en">Settings</span><span class="ar">الإعدادات</span></h3>
+            <span class="plate__ref">§17 · §23</span>
+          </div>
+
+          <div class="phone"><div class="screen">
+            <div class="safe"></div>
+
+            <div class="appbar" style="gap:6px;padding-inline:10px">
+              <div class="ab-plain chev"><svg class="ico ico--bold" width="20" height="20"><use href="#i-back"/></svg></div>
+              <div class="grow ab-title"><span class="en">Settings</span><span class="ar">الإعدادات</span></div>
+            </div>
+
+            <div class="body" style="gap:10px">
+
+              <div class="card">
+                <div class="row" style="margin-bottom:11px">
+                  <span class="hd grow"><span class="en">Odoo connection</span><span class="ar">الاتصال بأودو</span></span>
+                  <span class="chip" style="background:rgba(20,194,137,.13);color:var(--i-avail)">
+                    <span class="dot" style="background:var(--c-avail)"></span><span class="en">CONNECTED</span><span class="ar">متصل</span>
+                  </span>
+                </div>
+                <div class="g2" style="gap:11px">
+                  <div><div class="k"><span class="en">Server</span><span class="ar">الخادم</span></div><div class="v ltr">company.odoo.com</div></div>
+                  <div><div class="k"><span class="en">Database</span><span class="ar">قاعدة البيانات</span></div><div class="v ltr">company-production</div></div>
+                  <div><div class="k"><span class="en">Odoo version</span><span class="ar">إصدار أودو</span></div><div class="v">18.0</div></div>
+                  <div><div class="k"><span class="en">Signed in as</span><span class="ar">المستخدم الحالي</span></div><div class="v"><span class="en">Mostafa Bader</span><span class="ar">مصطفى بدر</span></div></div>
+                </div>
+                <div class="btn btn--ghost" style="height:38px;font-size:12px;margin-top:12px">
+                  <svg class="ico" width="15" height="15"><use href="#i-refresh"/></svg>
+                  <span class="en">Test connection</span><span class="ar">اختبار الاتصال</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="hd" style="margin-bottom:10px"><span class="en">Detected on your Odoo</span><span class="ar">المُكتشَف في أودو لديك</span></div>
+                <div class="row" style="flex-wrap:wrap;gap:6px">
+                  <span class="chip none" style="background:rgba(20,194,137,.12);color:var(--i-avail);padding:4px 10px;font-size:10px">
+                    <svg class="ico" width="10" height="10" style="stroke-width:3"><use href="#i-check"/></svg>Maintenance
+                  </span>
+                  <span class="chip none" style="background:rgba(20,194,137,.12);color:var(--i-avail);padding:4px 10px;font-size:10px">
+                    <svg class="ico" width="10" height="10" style="stroke-width:3"><use href="#i-check"/></svg>Employees
+                  </span>
+                  <span class="chip none" style="background:rgba(20,194,137,.12);color:var(--i-avail);padding:4px 10px;font-size:10px">
+                    <svg class="ico" width="10" height="10" style="stroke-width:3"><use href="#i-check"/></svg>Inventory
+                  </span>
+                  <span class="chip none chip--soft" style="padding:4px 10px;font-size:10px">
+                    <svg class="ico" width="10" height="10" style="stroke-width:2.6"><use href="#i-close"/></svg>Accounting assets
+                  </span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="hd" style="margin-bottom:9px"><span class="en">Appearance</span><span class="ar">المظهر</span></div>
+                <div class="row" style="background:var(--s-hair);border-radius:11px;padding:3px;gap:0">
+                  <span class="grow" style="height:32px;border-radius:9px;background:var(--s-card);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">
+                    <span class="en">System</span><span class="ar">النظام</span>
+                  </span>
+                  <span class="grow" style="height:32px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:500;color:var(--s-muted)">
+                    <span class="en">Light</span><span class="ar">فاتح</span>
+                  </span>
+                  <span class="grow" style="height:32px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:500;color:var(--s-muted)">
+                    <span class="en">Dark</span><span class="ar">داكن</span>
+                  </span>
+                </div>
+
+                <div class="hd" style="margin:13px 0 9px"><span class="en">Language</span><span class="ar">اللغة</span></div>
+                <div class="row" style="background:var(--s-hair);border-radius:11px;padding:3px;gap:0">
+                  <span class="grow en" style="height:32px;border-radius:9px;background:var(--s-card);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">English</span>
+                  <span class="grow en" style="height:32px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:500;color:var(--s-muted)">العربية</span>
+                  <span class="grow ar" style="height:32px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:500;color:var(--s-muted)">English</span>
+                  <span class="grow ar" style="height:32px;border-radius:9px;background:var(--s-card);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">العربية</span>
+                </div>
+              </div>
+
+              <div class="card card--flush">
+                <div class="row" style="gap:11px;height:50px;border-bottom:1px solid var(--s-hair)">
+                  <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-db"/></svg>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px"><span class="en">Clear cache</span><span class="ar">مسح الذاكرة المؤقتة</span></span>
+                    <span class="t3"><span class="en">18.4 MB · keeps local asset states</span><span class="ar">18.4 ميجابايت · مع الإبقاء على الحالات المحلية</span></span>
+                  </span>
+                  <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="15" height="15"><use href="#i-chev"/></svg></span>
+                </div>
+                <div class="row" style="gap:11px;height:50px;border-bottom:1px solid var(--s-hair)">
+                  <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-refresh"/></svg>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px"><span class="en">Refresh Odoo metadata</span><span class="ar">تحديث بيانات أودو الوصفية</span></span>
+                    <span class="t3"><span class="en">Last checked 2 hours ago</span><span class="ar">آخر فحص قبل ساعتين</span></span>
+                  </span>
+                  <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="15" height="15"><use href="#i-chev"/></svg></span>
+                </div>
+                <div class="row" style="gap:11px;height:50px">
+                  <svg class="ico none" width="17" height="17" style="color:var(--s-muted)"><use href="#i-bug"/></svg>
+                  <span class="grow">
+                    <span class="t1" style="display:block;font-size:12.5px"><span class="en">Diagnostics</span><span class="ar">التشخيص</span></span>
+                    <span class="t3"><span class="en">Technical log, credentials redacted</span><span class="ar">سجل تقني، مع إخفاء بيانات الدخول</span></span>
+                  </span>
+                  <span class="none chev" style="color:var(--s-faint)"><svg class="ico ico--bold" width="15" height="15"><use href="#i-chev"/></svg></span>
+                </div>
+              </div>
+
+              <div class="btn none" style="height:46px;background:var(--s-card);border:1px solid rgba(229,83,61,.35);color:var(--i-dmg);font-size:13px">
+                <svg class="ico ico--bold" width="16" height="16"><use href="#i-out"/></svg>
+                <span class="en">Sign out</span><span class="ar">تسجيل الخروج</span>
+              </div>
+
+              <div class="t3 none" style="text-align:center">Sijil IT 1.0.0 (build 1)</div>
+
+            </div>
+
+            <div class="nav">
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-dash"/></svg></span><span><span class="en">Dashboard</span><span class="ar">الرئيسية</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-laptop"/></svg></span><span><span class="en">Assets</span><span class="ar">الأصول</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-scan"/></svg></span><span><span class="en">Scan</span><span class="ar">مسح</span></span></div>
+              <div class="navi"><span class="pill"><svg class="ico" width="20" height="20"><use href="#i-person"/></svg></span><span><span class="en">Employees</span><span class="ar">الموظفون</span></span></div>
+              <div class="navi is-on"><span class="pill"><svg class="ico ico--fill" width="20" height="20"><use href="#i-more"/></svg></span><span><span class="en">More</span><span class="ar">المزيد</span></span></div>
+            </div>
+          </div></div>
+
+          <ul class="plate__notes">
+            <li><span class="en">The detected-apps card is the capability probe made visible, so a missing feature is explained rather than mysterious.</span><span class="ar">بطاقة «المُكتشَف» تُظهر فحص القدرات، فتُفسَّر الميزة الغائبة بدل أن تبقى لغزًا.</span></li>
+            <li><span class="en">Clear cache says what it keeps — the local Reserved / Damaged / Lost states are not cache.</span><span class="ar">«مسح الذاكرة» يوضّح ما يبقى — فحالات محجوز/تالف/مفقود المحلية ليست ذاكرة مؤقتة.</span></li>
+            <li><span class="en">Diagnostics shows the sanitized technical detail that never appears in a user-facing error.</span><span class="ar">يعرض «التشخيص» التفاصيل التقنية المنقّاة التي لا تظهر أبدًا في رسالة خطأ للمستخدم.</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="tokens">
+      <div class="sec-head">
+        <h2><span class="en">Tokens</span><span class="ar">الرموز التصميمية</span></h2>
+        <p>
+          <span class="en">Already in <code>lib/app/theme</code>. Build against these rather than re-deriving them.</span>
+          <span class="ar">موجودة بالفعل في <code>lib/app/theme</code>. نفِّذ اعتمادًا عليها بدل إعادة اشتقاقها.</span>
+        </p>
+      </div>
+
+      <div class="tokgrid">
+
+        <div class="tok">
+          <h4><span class="en">Brand — AppColors</span><span class="ar">ألوان العلامة — AppColors</span></h4>
+          <div class="swatches">
+            <div class="sw"><b style="background:#16255C"></b><em>navy</em><i>#16255C</i></div>
+            <div class="sw"><b style="background:#2C4494"></b><em>navy500</em><i>#2C4494</i></div>
+            <div class="sw"><b style="background:#6E7799"></b><em>navy300</em><i>#6E7799</i></div>
+            <div class="sw"><b style="background:#D7DCE9"></b><em>navy100</em><i>#D7DCE9</i></div>
+            <div class="sw"><b style="background:#2FE3A8"></b><em>mint</em><i>#2FE3A8</i></div>
+            <div class="sw"><b style="background:#14C289"></b><em>mint600</em><i>#14C289</i></div>
+            <div class="sw"><b style="background:#D3F9EC"></b><em>mint100</em><i>#D3F9EC</i></div>
+            <div class="sw"><b style="background:#F5F7FB"></b><em><span class="en">surface</span><span class="ar">السطح</span></em><i>#F5F7FB</i></div>
+          </div>
+        </div>
+
+        <div class="tok">
+          <h4><span class="en">Dark surfaces</span><span class="ar">أسطح الوضع الداكن</span></h4>
+          <div class="swatches">
+            <div class="sw"><b style="background:#0C1330"></b><em>surfaceDark</em><i>#0C1330</i></div>
+            <div class="sw"><b style="background:#141E42"></b><em>cardDark</em><i>#141E42</i></div>
+            <div class="sw"><b style="background:#25315C"></b><em>borderDark</em><i>#25315C</i></div>
+            <div class="sw"><b style="background:#F2F5FC"></b><em>textDark</em><i>#F2F5FC</i></div>
+            <div class="sw"><b style="background:#9AA3C2"></b><em>textSecDark</em><i>#9AA3C2</i></div>
+          </div>
+          <p style="margin:14px 0 0;font-size:12px;color:var(--muted);line-height:1.55">
+            <span class="en">In dark mode the primary colour becomes mint and the navy becomes the surface — the accent never sits on a navy ground where it would vibrate.</span>
+            <span class="ar">في الوضع الداكن يصبح اللون الأساسي هو النعناعي ويصير الكحلي هو السطح — فلا يقع اللون المميّز فوق أرضية كحلية تهتز معها الرؤية.</span>
+          </p>
+        </div>
+
+        <div class="tok">
+          <h4><span class="en">Status — fill / label</span><span class="ar">الحالات — التعبئة والنص</span></h4>
+          <div class="swatches">
+            <div class="sw"><b style="background:#14C289"></b><em><span class="en">Available</span><span class="ar">متاح</span></em><i>#14C289</i></div>
+            <div class="sw"><b style="background:#3B6FE0"></b><em><span class="en">Assigned</span><span class="ar">مُسلَّم</span></em><i>#3B6FE0</i></div>
+            <div class="sw"><b style="background:#7C5CE0"></b><em><span class="en">Reserved</span><span class="ar">محجوز</span></em><i>#7C5CE0</i></div>
+            <div class="sw"><b style="background:#F2A63B"></b><em><span class="en">Maintenance</span><span class="ar">صيانة</span></em><i>#F2A63B</i></div>
+            <div class="sw"><b style="background:#E5533D"></b><em><span class="en">Damaged</span><span class="ar">تالف</span></em><i>#E5533D</i></div>
+            <div class="sw"><b style="background:#B03A8C"></b><em><span class="en">Lost</span><span class="ar">مفقود</span></em><i>#B03A8C</i></div>
+            <div class="sw"><b style="background:#7A849F"></b><em><span class="en">Retired</span><span class="ar">خارج الخدمة</span></em><i>#7A849F</i></div>
+          </div>
+          <p style="margin:14px 0 0;font-size:12px;color:var(--muted);line-height:1.55">
+            <span class="en">Chip labels use darkened ink variants in light mode — mint and amber at full saturation miss 4.5:1 on a 12&percnt; tint. Dark mode uses the raw hue.</span>
+            <span class="ar">تستخدم نصوص الشرائح تدرجات أغمق في الوضع الفاتح، لأن النعناعي والكهرماني بكامل تشبعهما لا يبلغان نسبة 4.5:1 فوق تعبئة بـ12&percnt;. أما الوضع الداكن فيستخدم اللون الأصلي.</span>
+          </p>
+        </div>
+
+        <div class="tok">
+          <h4><span class="en">Type — Space Grotesk + IBM Plex Sans Arabic</span><span class="ar">الخطوط — Space Grotesk و IBM Plex Sans Arabic</span></h4>
+          <div class="ramp">
+            <div><p style="font-size:24px;font-weight:700;letter-spacing:-0.6px">Headline medium</p><code>24 / 700</code></div>
+            <div><p style="font-size:20px;font-weight:700;letter-spacing:-0.4px">Headline small</p><code>20 / 700</code></div>
+            <div><p style="font-size:17px;font-weight:700;letter-spacing:-0.2px">Title large</p><code>17 / 700</code></div>
+            <div><p style="font-size:15px;font-weight:600">Title medium</p><code>15 / 600</code></div>
+            <div><p style="font-size:14px;font-weight:400;color:var(--muted)">Body medium — secondary copy</p><code>14 / 400</code></div>
+            <div><p style="font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--muted)">Label small</p><code>11 / 700</code></div>
+            <div style="border-top:1px solid var(--line);padding-top:12px">
+              <p style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:19px;font-weight:600;direction:rtl">إدارة أصول تقنية المعلومات</p>
+              <code>AR 19 / 600</code>
+            </div>
+            <div>
+              <p style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;font-weight:400;color:var(--muted);direction:rtl">ماك بوك برو M4 — مُسلَّم إلى أحمد محمد</p>
+              <code>AR 14 / 400</code>
+            </div>
+          </div>
+          <p style="margin:16px 0 0;font-size:12px;color:var(--muted);line-height:1.55">
+            <span class="en"><b style="color:var(--ink)">Weight ceiling: 700.</b> The bundled Space Grotesk is a variable font with a <code>wght</code> axis of 300–700. Asking for <code>w800</code> gets a synthesised faux-bold, so <code>AppTypography.boldest</code> is the hard stop.</span>
+            <span class="ar"><b style="color:var(--ink)">سقف الوزن: ٧٠٠.</b> خط Space Grotesk المضمَّن متغيّر بمحور <code>wght</code> من ٣٠٠ إلى ٧٠٠. وطلب <code>w800</code> يُنتج ثقلًا مصطنعًا، لذا فإن <code>AppTypography.boldest</code> هو الحد الأقصى.</span>
+          </p>
+          <p style="margin:12px 0 0;font-size:12px;color:var(--muted);line-height:1.55">
+            <span class="en">Space Grotesk ships <b style="color:var(--ink)">zero Arabic glyphs</b>, so IBM Plex Sans Arabic is registered as a per-glyph <code>fontFamilyFallback</code>. Mixed strings resolve correctly inside one <code>TextStyle</code> — no locale branching in widget code.</span>
+            <span class="ar">لا يحتوي Space Grotesk على <b style="color:var(--ink)">أي حرف عربي</b>، لذا سُجِّل IBM Plex Sans Arabic كبديل لكل حرف عبر <code>fontFamilyFallback</code>. فتُعرض النصوص المختلطة بشكل صحيح داخل <code>TextStyle</code> واحد دون تفريع حسب اللغة.</span>
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /.stage -->
+
+  <footer>
+    <span>
+      <span class="en">Sijil IT — screen book, revision 2</span>
+      <span class="ar">سِجل IT — دليل الشاشات، المراجعة الثانية</span>
+    </span>
+    <span>
+      <span class="en">10 screens · light &amp; dark · English &amp; العربية</span>
+      <span class="ar">١٠ شاشات · فاتح وداكن · العربية والإنجليزية</span>
+    </span>
+    <span>
+      <span class="en">Sample records throughout — no real employee or asset data.</span>
+      <span class="ar">جميع البيانات المعروضة نموذجية — لا تتضمن بيانات موظفين أو أصول حقيقية.</span>
+    </span>
+  </footer>
+
+</div><!-- /.wrap -->
+
+<script>
+  (function () {
+    var stage = document.getElementById('stage');
+    var body = document.body;
+
+    function bind(segId, apply) {
+      var seg = document.getElementById(segId);
+      if (!seg) return;
+      seg.addEventListener('click', function (event) {
+        var button = event.target.closest('button');
+        if (!button || !seg.contains(button)) return;
+        Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+          b.setAttribute('aria-pressed', String(b === button));
+        });
+        apply(button);
+      });
+    }
+
+    // Phone theme is independent of the viewer's own theme: someone can
+    // inspect the app's dark mode from a light browser.
+    bind('themeSeg', function (button) {
+      stage.setAttribute('data-ui', button.dataset.ui);
+    });
+
+    // Language flips copy and, for Arabic, the reading direction of every
+    // mockup at once.
+    bind('langSeg', function (button) {
+      var lang = button.dataset.lang;
+      body.setAttribute('data-lang', lang);
+      body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+      body.setAttribute('lang', lang);
+    });
+
+    body.setAttribute('data-lang', 'en');
+    body.setAttribute('lang', 'en');
+  })();
+</script>

@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../constants/storage_keys.dart';
+import '../../network/odoo/odoo_connection.dart';
+
+/// Non-secret settings: connection details, theme, locale.
+///
+/// Deliberately separate from [CredentialVault] so it is structurally
+/// impossible to write a password here by accident (spec §25).
+class AppPreferences {
+  const AppPreferences(this._prefs);
+
+  final SharedPreferences _prefs;
+
+  static Future<AppPreferences> create() async =>
+      AppPreferences(await SharedPreferences.getInstance());
+
+  // ── Odoo connection ──────────────────────────────────────────────────────
+
+  /// The saved connection, or null when the app has never been configured.
+  OdooConnection? readConnection() {
+    final url = _prefs.getString(PrefKeys.odooBaseUrl);
+    final database = _prefs.getString(PrefKeys.odooDatabase);
+    final username = _prefs.getString(PrefKeys.odooUsername);
+
+    if (url == null || database == null || username == null) return null;
+
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+
+    return OdooConnection(
+      baseUrl: uri,
+      database: database,
+      username: username,
+      authMode: OdooAuthMode.fromName(_prefs.getString(PrefKeys.authMode)),
+    );
+  }
+
+  Future<void> saveConnection(OdooConnection connection) async {
+    await _prefs.setString(PrefKeys.odooBaseUrl, connection.baseUrl.toString());
+    await _prefs.setString(PrefKeys.odooDatabase, connection.database);
+    await _prefs.setString(PrefKeys.odooUsername, connection.username);
+    await _prefs.setString(PrefKeys.authMode, connection.authMode.name);
+  }
+
+  Future<void> clearConnection() async {
+    await _prefs.remove(PrefKeys.odooBaseUrl);
+    await _prefs.remove(PrefKeys.odooDatabase);
+    await _prefs.remove(PrefKeys.odooUsername);
+    await _prefs.remove(PrefKeys.authMode);
+    await _prefs.remove(PrefKeys.odooUserId);
+    await _prefs.remove(PrefKeys.odooServerVersion);
+  }
+
+  int? get userId => _prefs.getInt(PrefKeys.odooUserId);
+
+  Future<void> setUserId(int? value) async {
+    if (value == null) {
+      await _prefs.remove(PrefKeys.odooUserId);
+    } else {
+      await _prefs.setInt(PrefKeys.odooUserId, value);
+    }
+  }
+
+  String? get serverVersion => _prefs.getString(PrefKeys.odooServerVersion);
+
+  Future<void> setServerVersion(String? value) async {
+    if (value == null) {
+      await _prefs.remove(PrefKeys.odooServerVersion);
+    } else {
+      await _prefs.setString(PrefKeys.odooServerVersion, value);
+    }
+  }
+
+  // ── Appearance ───────────────────────────────────────────────────────────
+
+  ThemeMode get themeMode => switch (_prefs.getString(PrefKeys.themeMode)) {
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
+
+  Future<void> setThemeMode(ThemeMode mode) =>
+      _prefs.setString(PrefKeys.themeMode, mode.name);
+
+  String? get localeCode => _prefs.getString(PrefKeys.locale);
+
+  Future<void> setLocaleCode(String? code) async {
+    if (code == null) {
+      await _prefs.remove(PrefKeys.locale);
+    } else {
+      await _prefs.setString(PrefKeys.locale, code);
+    }
+  }
+
+  // ── Metadata sync bookkeeping ────────────────────────────────────────────
+
+  DateTime? get lastMetadataSync {
+    final raw = _prefs.getString(PrefKeys.lastMetadataSync);
+    return raw == null ? null : DateTime.tryParse(raw);
+  }
+
+  Future<void> setLastMetadataSync(DateTime value) =>
+      _prefs.setString(PrefKeys.lastMetadataSync, value.toIso8601String());
+}

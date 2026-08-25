@@ -1,0 +1,316 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #F5F7FB;
+      color: #16255C;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #14C289; }
+    a:hover { color: #0F9E73; }
+    svg { display: block; }
+  </style>
+</helmet>
+
+<div style="width: 880px; min-height: 940px; background: #F5F7FB; padding: 28px 30px 30px;">
+
+  <!-- header -->
+  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 22px;">
+    <img src="sijil-monogram.png" alt="Sijil" style="width: 44px; height: 44px; border-radius: 13px;">
+    <div style="flex-grow: 1;">
+      <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Design tokens &amp; components</div>
+      <div style="font-size: 12px; font-weight: 500; color: #6E7799; margin-top: 3px;">Every value below is already in <span style="font-weight: 700;">lib/app/theme/</span> &mdash; nothing here needs to be re-derived in Flutter.</div>
+    </div>
+    <div style="border-radius: 999px; background: #16255C; padding: 7px 14px;">
+      <span style="font-size: 11px; font-weight: 800; color: #2FE3A8; letter-spacing: 0.5px;">MATERIAL 3</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+
+    <!-- LEFT COLUMN -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <!-- palette -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Brand palette &mdash; AppColors</div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px;">
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #16255C;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">navy</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#16255C</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #2C4494;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">navy500</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#2C4494</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #6E7799;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">navy300</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#6E7799</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #D7DCE9;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">navy100</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#D7DCE9</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #2FE3A8;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">mint</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#2FE3A8</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #14C289;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">mint600</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#14C289</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #D3F9EC;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">mint100</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#D3F9EC</div>
+          </div>
+          <div>
+            <div style="height: 46px; border-radius: 11px; background: #F5F7FB; border: 1px solid #E4E8F2;"></div>
+            <div style="font-size: 10px; font-weight: 800; margin-top: 5px;">surface</div>
+            <div style="font-size: 9.5px; font-weight: 500; color: #98A1BC;">#F5F7FB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- status chips -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 4px;">Asset status &mdash; StatusChip</div>
+        <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC; margin-bottom: 13px; line-height: 1.5;">Tint at 12&percnt;, border at 28&percnt;, 7&nbsp;px dot, pill radius. Colour is never the only signal &mdash; each chip keeps its label.</div>
+
+        <div style="display: flex; flex-direction: column; gap: 9px;">
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(20,194,137,0.12); border: 1px solid rgba(20,194,137,0.28); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #14C289;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #0F9E73; letter-spacing: 0.4px;">AVAILABLE</span>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#14C289</span> &middot; derived: no employee_id, not scrapped</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(59,111,224,0.12); border: 1px solid rgba(59,111,224,0.28); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #3B6FE0;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #3B6FE0; letter-spacing: 0.4px;">ASSIGNED</span>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#3B6FE0</span> &middot; derived: employee_id is set</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(124,92,224,0.12); border: 1px solid rgba(124,92,224,0.28); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #7C5CE0;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #7C5CE0; letter-spacing: 0.4px;">RESERVED</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7C5CE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/></svg>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#7C5CE0</span> &middot; local overlay, marked on device</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(242,166,59,0.14); border: 1px solid rgba(242,166,59,0.30); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #F2A63B;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #C97F17; letter-spacing: 0.4px;">MAINTENANCE</span>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#F2A63B</span> &middot; derived: open maintenance request</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(229,83,61,0.12); border: 1px solid rgba(229,83,61,0.28); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #E5533D;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #C93E29; letter-spacing: 0.4px;">DAMAGED</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C93E29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/></svg>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#E5533D</span> &middot; local overlay + chatter note</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(176,58,140,0.12); border: 1px solid rgba(176,58,140,0.28); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #B03A8C;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #B03A8C; letter-spacing: 0.4px;">LOST</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B03A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/></svg>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#B03A8C</span> &middot; local overlay + chatter note</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 11px;">
+            <div style="flex: none; width: 132px; display: flex;">
+              <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(122,132,159,0.14); border: 1px solid rgba(122,132,159,0.30); padding: 4px 11px;">
+                <div style="width: 7px; height: 7px; border-radius: 999px; background: #7A849F;"></div>
+                <span style="font-size: 10px; font-weight: 800; color: #67718D; letter-spacing: 0.4px;">RETIRED</span>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 500; color: #6E7799;"><span style="font-weight: 700; color: #16255C;">#7A849F</span> &middot; derived: scrap_date is set</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- warranty chips -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Warranty &mdash; WarrantyChip</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(20,194,137,0.12); padding: 4px 11px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></svg>
+            <span style="font-size: 10.5px; font-weight: 700; color: #0F9E73;">Warranty valid</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(59,111,224,0.12); padding: 4px 11px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3B6FE0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></svg>
+            <span style="font-size: 10.5px; font-weight: 700; color: #3B6FE0;">Expires in 61 days</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(242,166,59,0.14); padding: 4px 11px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C97F17" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></svg>
+            <span style="font-size: 10.5px; font-weight: 700; color: #C97F17;">Expires in 13 days</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(229,83,61,0.12); padding: 4px 11px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C93E29" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></svg>
+            <span style="font-size: 10.5px; font-weight: 700; color: #C93E29;">Expired 12 days ago</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <!-- typography -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Type ramp &mdash; Plus Jakarta Sans</div>
+
+        <div style="display: flex; flex-direction: column; gap: 11px;">
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 24px; font-weight: 700; letter-spacing: -0.4px;">Headline medium</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">24 / 700</div>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 20px; font-weight: 700; letter-spacing: -0.2px;">Headline small</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">20 / 700</div>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 17px; font-weight: 700;">Title large</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">17 / 700</div>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 15px; font-weight: 600;">Title medium</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">15 / 600</div>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 14px; font-weight: 400; color: #6E7799;">Body medium &mdash; secondary copy</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">14 / 400</div>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="flex-grow: 1; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #6E7799;">Label small</div>
+            <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">11 / 700</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- buttons -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Buttons &mdash; 52&nbsp;px, radius 12</div>
+
+        <div style="display: flex; flex-direction: column; gap: 9px;">
+          <div style="height: 52px; background: #16255C; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Filled &mdash; primary action</span>
+          </div>
+          <div style="height: 52px; background: #2FE3A8; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 14px; font-weight: 800; color: #16255C;">Accent &mdash; confirm workflow</span>
+          </div>
+          <div style="display: flex; gap: 9px;">
+            <div style="flex-grow: 1; height: 52px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 14px; font-weight: 700;">Outlined</span>
+            </div>
+            <div style="flex-grow: 1; height: 52px; background: #EEF1F8; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 14px; font-weight: 700; color: #B9C0D4;">Disabled</span>
+            </div>
+            <div style="flex: none; width: 56px; height: 52px; background: #2FE3A8; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- inputs -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Inputs &mdash; 50&nbsp;px, radius 12</div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="height: 50px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; padding: 0 14px;">
+            <span style="font-size: 14px; font-weight: 500; color: #98A1BC;">Rest &mdash; placeholder</span>
+          </div>
+          <div style="height: 50px; background: #FFFFFF; border: 1.6px solid #16255C; border-radius: 12px; display: flex; align-items: center; padding: 0 14px;">
+            <span style="font-size: 14px; font-weight: 600;">Focused &mdash; typed value</span>
+            <div style="width: 1.5px; height: 18px; background: #16255C; margin-left: 2px;"></div>
+          </div>
+          <div>
+            <div style="height: 50px; background: #FFFFFF; border: 1.6px solid #E5533D; border-radius: 12px; display: flex; align-items: center; padding: 0 14px;">
+              <span style="font-size: 14px; font-weight: 600;">company-prod</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px; padding-left: 2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E5533D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16h.01"/></svg>
+              <span style="font-size: 11px; font-weight: 600; color: #E5533D;">That database is unavailable. Confirm the name.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- scales -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 17px 18px 16px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 13px;">Spacing &amp; radius</div>
+
+        <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 14px;">
+          <div style="text-align: center;"><div style="width: 4px; height: 26px; background: #2FE3A8; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">4</div></div>
+          <div style="text-align: center;"><div style="width: 8px; height: 26px; background: #2FE3A8; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">8</div></div>
+          <div style="text-align: center;"><div style="width: 12px; height: 26px; background: #2FE3A8; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">12</div></div>
+          <div style="text-align: center;"><div style="width: 16px; height: 26px; background: #14C289; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">16</div></div>
+          <div style="text-align: center;"><div style="width: 20px; height: 26px; background: #14C289; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">20</div></div>
+          <div style="text-align: center;"><div style="width: 24px; height: 26px; background: #16255C; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">24</div></div>
+          <div style="text-align: center;"><div style="width: 32px; height: 26px; background: #16255C; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">32</div></div>
+          <div style="text-align: center;"><div style="width: 48px; height: 26px; background: #16255C; border-radius: 2px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">48</div></div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <div style="text-align: center;"><div style="width: 44px; height: 34px; background: #EEF1F8; border: 1px solid #E4E8F2; border-radius: 8px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">sm 8</div></div>
+          <div style="text-align: center;"><div style="width: 44px; height: 34px; background: #EEF1F8; border: 1px solid #E4E8F2; border-radius: 12px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">md 12</div></div>
+          <div style="text-align: center;"><div style="width: 44px; height: 34px; background: #EEF1F8; border: 1px solid #E4E8F2; border-radius: 16px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">lg 16</div></div>
+          <div style="text-align: center;"><div style="width: 44px; height: 34px; background: #EEF1F8; border: 1px solid #E4E8F2; border-radius: 20px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">xl 20</div></div>
+          <div style="text-align: center;"><div style="width: 44px; height: 34px; background: #EEF1F8; border: 1px solid #E4E8F2; border-radius: 999px;"></div><div style="font-size: 9px; font-weight: 700; color: #6E7799; margin-top: 5px;">pill</div></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

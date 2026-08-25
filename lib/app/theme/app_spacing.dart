@@ -24,6 +24,10 @@ abstract final class AppRadii {
   static const double md = 12;
   static const double lg = 16;
   static const double xl = 20;
+
+  /// The glass cards on the dashboard and the scanner well. Obsidian leans on
+  /// a softer corner than the previous flat-card design did.
+  static const double xxl = 24;
   static const double pill = 999;
 }
 

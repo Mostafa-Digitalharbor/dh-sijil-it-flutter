@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #F5F7FB;
+      color: #16255C;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #14C289; }
+    a:hover { color: #0F9E73; }
+    svg { display: block; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; background: #F5F7FB; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 44px; flex: none;"></div>
+
+  <!-- app bar -->
+  <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 12px 8px;">
+    <div style="width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+    </div>
+    <div style="flex-grow: 1; font-size: 13px; font-weight: 700; color: #6E7799;">Asset details</div>
+    <div style="width: 38px; height: 38px; border-radius: 12px; border: 1px solid #E4E8F2; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M13.5 13.5h3v3M20.5 17v3.5H17"/></svg>
+    </div>
+    <div style="width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="#16255C"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 0 16px; overflow: hidden;">
+
+    <!-- hero -->
+    <div style="flex: none; background: #16255C; border-radius: 20px; padding: 16px 17px 15px;">
+      <div style="display: flex; align-items: flex-start; gap: 13px;">
+        <div style="flex: none; width: 46px; height: 46px; border-radius: 14px; background: rgba(255,255,255,0.10); display: flex; align-items: center; justify-content: center;">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#2FE3A8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9H4z"/><path d="M2 18h20"/></svg>
+        </div>
+        <div style="flex-grow: 1; min-width: 0;">
+          <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.4px; color: #FFFFFF; line-height: 1.2;">MacBook&nbsp;Pro M4</div>
+          <div style="font-size: 11px; font-weight: 600; color: #9AA6CE; margin-top: 4px;">Laptop &middot; Apple &middot; 14-inch, 48&nbsp;GB</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 7px; margin-top: 14px;">
+        <div style="display: flex; align-items: center; gap: 6px; border-radius: 999px; background: rgba(59,111,224,0.22); border: 1px solid rgba(94,143,246,0.45); padding: 4px 10px;">
+          <div style="width: 6px; height: 6px; border-radius: 999px; background: #7FA6F5;"></div>
+          <span style="font-size: 10px; font-weight: 800; color: #A9C4FA; letter-spacing: 0.4px;">ASSIGNED</span>
+        </div>
+        <div style="display: flex; align-items: center; border-radius: 999px; background: rgba(255,255,255,0.08); padding: 4px 10px;">
+          <span style="font-size: 10px; font-weight: 700; color: #C6CFE8; letter-spacing: 0.6px;">DH-LAP-0027</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- primary actions -->
+    <div style="flex: none; display: flex; gap: 9px;">
+      <div style="flex-grow: 1; height: 46px; background: #2FE3A8; border-radius: 13px; display: flex; align-items: center; justify-content: center; gap: 7px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14H4v5"/><path d="M4 14a8 8 0 1 0 2.3-5.6"/></svg>
+        <span style="font-size: 13px; font-weight: 800; color: #16255C;">Return</span>
+      </div>
+      <div style="flex-grow: 1; height: 46px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 13px; display: flex; align-items: center; justify-content: center; gap: 7px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5a5 5 0 0 0-6.4 6.4L3 15v6h6l5.1-5.1a5 5 0 0 0 6.4-6.4l-3.3 3.3-2.8-2.8z"/></svg>
+        <span style="font-size: 13px; font-weight: 700;">Maintain</span>
+      </div>
+      <div style="flex: none; width: 46px; height: 46px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 13px; display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/></svg>
+      </div>
+    </div>
+
+    <!-- device information -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 13px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 12px;">Device information</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Manufacturer</div>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 2px;">Apple</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Model</div>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 2px;">MacBook Pro 14&Prime;</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Serial number</div>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 2px; letter-spacing: 0.4px;">C02XK1YZQ6L4</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Category</div>
+          <div style="font-size: 13px; font-weight: 700; margin-top: 2px;">Laptop</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ownership -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 13px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 11px;">Ownership</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="flex: none; width: 40px; height: 40px; border-radius: 999px; background: #16255C; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 13px; font-weight: 800; color: #FFFFFF;">AM</span>
+        </div>
+        <div style="flex-grow: 1;">
+          <div style="font-size: 13.5px; font-weight: 700;">Ahmed Mohamed</div>
+          <div style="font-size: 11px; font-weight: 500; color: #6E7799; margin-top: 1px;">IT Department &middot; Systems Engineer</div>
+        </div>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B9C0D4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid #F0F3F9;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <span style="font-size: 11.5px; font-weight: 500; color: #6E7799;">Assigned</span>
+        <span style="font-size: 11.5px; font-weight: 700;">23 Aug 2026</span>
+        <span style="font-size: 11.5px; font-weight: 500; color: #98A1BC;">&middot; 0 days</span>
+      </div>
+    </div>
+
+    <!-- warranty -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 14px;">
+      <div style="display: flex; align-items: center; margin-bottom: 11px;">
+        <div style="flex-grow: 1; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799;">Warranty</div>
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(242,166,59,0.14); padding: 3px 9px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C97F17" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/></svg>
+          <span style="font-size: 10px; font-weight: 800; color: #C97F17;">Expires in 43 days</span>
+        </div>
+      </div>
+      <div style="height: 7px; border-radius: 999px; background: #F0F3F9; overflow: hidden;">
+        <div style="width: 88%; height: 7px; border-radius: 999px; background: linear-gradient(90deg, #14C289 0%, #F2A63B 100%);"></div>
+      </div>
+      <div style="display: flex; margin-top: 8px;">
+        <div style="flex-grow: 1; font-size: 10.5px; font-weight: 600; color: #6E7799;">Started 05 Oct 2023</div>
+        <div style="font-size: 10.5px; font-weight: 700;">Ends 05 Oct 2026</div>
+      </div>
+    </div>
+
+    <!-- collapsed further sections -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 0 15px;">
+      <div style="display: flex; align-items: center; gap: 10px; height: 46px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v12H4z"/><path d="M4 11h16M9 15h3"/></svg>
+        <div style="flex-grow: 1; font-size: 13px; font-weight: 700;">Purchase &amp; vendor</div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C0D4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- bottom navigation -->
+  <div style="flex: none; height: 86px; background: #FFFFFF; border-top: 1px solid #E4E8F2; padding: 9px 6px 0; display: flex;">
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Dashboard</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; border-radius: 999px; background: #D3F9EC; display: flex; align-items: center; justify-content: center; color: #16255C;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9H4z"/><path d="M2 18h20"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 800; color: #16255C;">Assets</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Scan</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Employees</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="#6E7799"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">More</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

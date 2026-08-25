@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #F5F7FB;
+      color: #16255C;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #14C289; }
+    a:hover { color: #0F9E73; }
+    svg { display: block; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; background: #F5F7FB; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 44px; flex: none;"></div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; padding: 20px 24px 0; overflow: hidden;">
+
+    <img src="sijil-lockup.png" alt="Sijil IT" style="width: 158px; height: auto; margin-bottom: 26px;">
+
+    <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.7px; line-height: 1.15;">Connect to Odoo</div>
+    <div style="font-size: 13px; font-weight: 500; color: #6E7799; line-height: 1.5; margin-top: 7px; text-wrap: pretty;">
+      Point Sijil&nbsp;IT at your Odoo instance. Nothing is installed on the server &mdash; no addon, no middleware.
+    </div>
+
+    <!-- server url -->
+    <div style="margin-top: 24px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; color: #6E7799; margin-bottom: 6px;">Server URL</div>
+      <div style="height: 50px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+        <div style="flex-grow: 1; font-size: 14px; font-weight: 600;">https://company.odoo.com</div>
+        <div style="display: flex; align-items: center; gap: 4px; background: #D3F9EC; border-radius: 999px; padding: 3px 8px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></svg>
+          <span style="font-size: 9px; font-weight: 800; color: #0F9E73; letter-spacing: 0.3px;">TLS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- database -->
+    <div style="margin-top: 14px;">
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <div style="flex-grow: 1; font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; color: #6E7799;">Database</div>
+        <div style="font-size: 10px; font-weight: 800; color: #14C289;">Detect</div>
+      </div>
+      <div style="height: 50px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        <div style="flex-grow: 1; font-size: 14px; font-weight: 600;">company-production</div>
+      </div>
+    </div>
+
+    <!-- username -->
+    <div style="margin-top: 14px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; color: #6E7799; margin-bottom: 6px;">Username</div>
+      <div style="height: 50px; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        <div style="flex-grow: 1; font-size: 14px; font-weight: 600;">admin@company.com</div>
+      </div>
+    </div>
+
+    <!-- credential, focused state -->
+    <div style="margin-top: 14px;">
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+        <div style="flex-grow: 1; font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; color: #16255C;">Credential</div>
+        <div style="display: flex; background: #E9EDF6; border-radius: 999px; padding: 2px;">
+          <div style="font-size: 10px; font-weight: 700; color: #6E7799; padding: 4px 10px;">Password</div>
+          <div style="font-size: 10px; font-weight: 800; color: #16255C; background: #FFFFFF; border-radius: 999px; padding: 4px 10px;">API key</div>
+        </div>
+      </div>
+      <div style="height: 50px; background: #FFFFFF; border: 1.6px solid #16255C; border-radius: 12px; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="14" r="4"/><path d="m11 11 8-8 2 2-2 2 2 2-3 3-2-2-2 2"/></svg>
+        <div style="flex-grow: 1; font-size: 15px; font-weight: 700; letter-spacing: 2px;">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
+      </div>
+    </div>
+
+    <!-- connection test result -->
+    <div style="margin-top: 16px; display: flex; align-items: center; gap: 10px; background: #D3F9EC; border-radius: 12px; padding: 11px 13px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.4 12 2.5 2.5 4.7-5.2"/></svg>
+      <div style="flex-grow: 1; font-size: 11px; font-weight: 700; color: #0F9E73; line-height: 1.35;">
+        Reachable &mdash; Odoo 18.0<span style="font-weight: 600; opacity: 0.85;">&nbsp;&middot; Maintenance and Employees detected</span>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1;"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px;">
+      <div style="height: 52px; border: 1px solid #E4E8F2; background: #FFFFFF; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>
+        <span style="font-size: 14px; font-weight: 700;">Test connection</span>
+      </div>
+      <div style="height: 52px; background: #16255C; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+        <span style="font-size: 14px; font-weight: 700; color: #FFFFFF;">Save &amp; sign in</span>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 6px; padding-top: 2px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></svg>
+        <span style="font-size: 10.5px; font-weight: 600; color: #6E7799;">Stored in your device keychain, never in plain text</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="height: 18px; flex: none;"></div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,853 @@
+{
+  "@@locale": "en",
+  "actionAdd": "Add",
+  "actionApply": "Apply",
+  "actionAssign": "Assign",
+  "actionCall": "Call",
+  "actionCancel": "Cancel",
+  "actionChange": "Change",
+  "actionClear": "Clear",
+  "actionClose": "Close",
+  "actionDelete": "Delete",
+  "actionDetectDatabases": "Detect databases",
+  "actionDone": "Done",
+  "actionEdit": "Edit",
+  "actionEmail": "Email",
+  "actionGoToDashboard": "Go to dashboard",
+  "actionMaintain": "Maintain",
+  "actionOpen": "Open",
+  "actionRefresh": "Refresh",
+  "actionRemove": "Remove",
+  "actionRetry": "Try again",
+  "actionReturn": "Return",
+  "actionSave": "Save",
+  "actionSaveAndSignIn": "Save & sign in",
+  "actionSeeAll": "See all",
+  "actionSignIn": "Sign in",
+  "actionSigningIn": "Signing in…",
+  "actionTestConnection": "Test connection",
+  "actionToday": "Today",
+  "appName": "Sijil IT",
+  "appTagline": "IT Asset Management",
+  "assetActionsTitle": "Asset actions",
+  "assetDeleteBody": "It is removed from Odoo for everyone. This cannot be undone.",
+  "assetDeleteConfirm": "Delete this asset?",
+  "assetDeleted": "{asset} deleted",
+  "@assetDeleted": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDetailTitle": "Asset details",
+  "assetEditTitle": "Edit asset",
+  "assetLocalStateNote": "Standard Odoo has no field for this state, so it is recorded in the asset's log — where everyone can see it.",
+  "assetMarkAvailable": "Mark as available",
+  "assetMarkDamaged": "Mark as damaged",
+  "assetMarkLost": "Mark as lost",
+  "assetMarkReserved": "Mark as reserved",
+  "assetNewTitle": "New asset",
+  "assetSaved": "{asset} saved",
+  "@assetSaved": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
+  "assetShowQr": "Show QR code",
+  "assetsSearchHint": "Name, tag, serial, model…",
+  "assetsShowingOf": "Showing {shown} of {total}",
+  "@assetsShowingOf": {
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "assetsTitle": "Assets",
+  "assignAllDepartments": "All departments",
+  "assignConfirm": "Confirm assignment",
+  "assignNotesHint": "Handed over with charger and USB-C hub…",
+  "assignSearchHint": "Search employees…",
+  "assignStepDate": "Assignment date",
+  "assignStepEmployee": "Select employee",
+  "assignStepNotes": "Notes",
+  "assignSuccess": "{asset} assigned to {employee}",
+  "@assignSuccess": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      },
+      "employee": {
+        "type": "String"
+      }
+    }
+  },
+  "assignTitle": "Assign asset",
+  "authModeApiKey": "API key",
+  "authModePassword": "Password",
+  "capabilityActivityLog": "Activity log",
+  "capabilityEmployees": "Employees",
+  "capabilityInventory": "Inventory",
+  "capabilityMaintenance": "Maintenance",
+  "conditionDamaged": "Damaged",
+  "conditionDamagedEffect": "Marks as damaged",
+  "conditionGood": "Good",
+  "conditionGoodEffect": "Back to available",
+  "conditionMinorDamage": "Minor damage",
+  "conditionNeedsMaintenance": "Needs service",
+  "conditionNeedsMaintenanceEffect": "Opens a request",
+  "connectSubtitle": "Point Sijil IT at your Odoo instance. Nothing is installed on the server — no addon, no middleware.",
+  "connectTitle": "Connect to Odoo",
+  "connectionReachable": "Reachable — Odoo {version}",
+  "@connectionReachable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "connectionTesting": "Checking the server…",
+  "credentialStorageNote": "Stored in your device keychain, never as plain text",
+  "dashboardByCategory": "Assets by category",
+  "dashboardInService": "{count} in service",
+  "@dashboardInService": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "dashboardOpenMaintenance": "Open maintenance",
+  "dashboardRecentActivity": "Recent activity",
+  "dashboardTitle": "Dashboard",
+  "dashboardWarrantyDue": "Warranty ends <30 days",
+  "detectFoundCount": "Found {count} databases",
+  "@detectFoundCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "detectPickTitle": "Select a database",
+  "detectUnsupportedBody": "Most production instances disable database listing. Type the name instead — your Odoo administrator can confirm it.",
+  "detectUnsupportedTitle": "This server keeps its database list private",
+  "diagnosticsCopied": "Copied to clipboard",
+  "diagnosticsCopy": "Copy",
+  "diagnosticsEmpty": "No problems recorded",
+  "diagnosticsEmptyBody": "Technical details appear here when something fails.",
+  "employeeAssetsHeld": "Assets held",
+  "employeeAssignedAssets": "Assigned assets",
+  "employeeInService": "In service",
+  "employeeItemCount": "{count} items",
+  "@employeeItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "employeeSearchHint": "Name, department, email…",
+  "employeeSince": "since {date}",
+  "@employeeSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "employeeTitle": "Employee",
+  "employeeWarrantyDue": "Warranty due",
+  "employeesTitle": "Employees",
+  "emptyActivityBody": "Assignments and returns you record appear here.",
+  "emptyAssetsBody": "Assets you add or import into Odoo will appear here.",
+  "emptyAssetsTitle": "No assets yet",
+  "emptyEmployeeAssetsBody": "This employee is not holding any assets.",
+  "emptyEmployeeAssetsTitle": "Nothing assigned",
+  "emptyEmployeesBody": "Employees come from the Odoo Employees app.",
+  "emptyEmployeesTitle": "No employees",
+  "emptyMaintenanceBody": "Requests you open from an asset appear here.",
+  "emptyMaintenanceTitle": "No maintenance requests",
+  "emptySearchBody": "Try a different search term or clear your filters.",
+  "emptySearchTitle": "No matches",
+  "errorAccessDeniedBody": "Your Odoo user is not allowed to do this.",
+  "errorAccessDeniedBodyDetailed": "Your Odoo user is not allowed to {operation} {model} records.",
+  "@errorAccessDeniedBodyDetailed": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAccessDeniedFix": "Ask your Odoo administrator to grant access. Sijil IT never works around Odoo permissions.",
+  "errorAccessDeniedTitle": "You don't have permission",
+  "errorActionEditConnection": "Edit connection",
+  "errorActionSignIn": "Sign in again",
+  "errorBusinessRuleFix": "This rule comes from your Odoo configuration, not from Sijil IT.",
+  "errorBusinessRuleTitle": "Odoo blocked this",
+  "errorCacheBody": "The offline copy on this device could not be opened.",
+  "errorCacheFix": "Clearing the cache from Settings usually fixes this. Nothing in Odoo is affected.",
+  "errorCacheTitle": "Couldn't read local data",
+  "errorDatabaseUnavailableBody": "This server has no database with that name.",
+  "errorDatabaseUnavailableFix": "Database names are case-sensitive. Your Odoo administrator can confirm the exact name.",
+  "errorDatabaseUnavailableTitle": "Database not found",
+  "errorHowToFix": "What to do",
+  "errorInvalidCredentialsBody": "Odoo did not accept this username with this password or API key.",
+  "errorInvalidCredentialsFix": "Check the username, and note that an API key is not the same as your password.",
+  "errorInvalidCredentialsTitle": "Sign-in was rejected",
+  "errorModelUnavailableBody": "This feature needs an Odoo app that is not installed.",
+  "errorModelUnavailableBodyDetailed": "This feature needs the Odoo model {model}, which this instance does not have.",
+  "@errorModelUnavailableBodyDetailed": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "errorModelUnavailableFix": "Your Odoo administrator can install the matching app. Everything else in Sijil IT keeps working.",
+  "errorModelUnavailableTitle": "Not available on your Odoo",
+  "errorNoInternetBody": "This device has no internet connection right now.",
+  "errorNoInternetFix": "Turn on Wi-Fi or mobile data, then try again.",
+  "errorNoInternetTitle": "You're offline",
+  "errorNotAnOdooServerBody": "The address answered, but not with an Odoo XML-RPC response.",
+  "errorNotAnOdooServerFix": "Use the base URL of the instance, without a path — for example https://company.odoo.com",
+  "errorNotAnOdooServerTitle": "That doesn't look like Odoo",
+  "errorRecordNotFoundBody": "It was deleted in Odoo, or it is outside what your user can see.",
+  "errorRecordNotFoundFix": "Go back and refresh the list to see the current records.",
+  "errorRecordNotFoundTitle": "This record is gone",
+  "errorRouteNotFoundBody": "The link you followed points somewhere Sijil IT has no screen for.",
+  "errorRouteNotFoundTitle": "That screen doesn't exist",
+  "errorServerBody": "The server failed while handling the request.",
+  "errorServerFix": "Try again. If it persists, send the details from Settings → Diagnostics to your administrator.",
+  "errorServerTitle": "Odoo reported an error",
+  "errorServerUnreachableBody": "The address responded to nothing. The server may be offline, or the URL may be wrong.",
+  "errorServerUnreachableFix": "Check the server URL, and confirm the instance opens in a browser from this network.",
+  "errorServerUnreachableTitle": "Can't reach your Odoo server",
+  "errorSessionExpiredBody": "Odoo no longer recognises this session.",
+  "errorSessionExpiredFix": "Sign in again to continue where you left off.",
+  "errorSessionExpiredTitle": "Your session ended",
+  "errorTimeoutBody": "Odoo did not answer in time. It may be busy or the connection slow.",
+  "errorTimeoutFix": "Try again in a moment. If it keeps happening, tell your Odoo administrator.",
+  "errorTimeoutTitle": "The server took too long",
+  "errorUnknownBody": "Sijil IT hit a problem it did not expect.",
+  "errorUnknownFix": "Try again. The technical detail is saved under Settings → Diagnostics.",
+  "errorUnknownTitle": "Something went wrong",
+  "errorValidationFix": "Fix the highlighted field and try again.",
+  "errorValidationTitle": "Check what you entered",
+  "fieldApiKeyHint": "Your Odoo API key",
+  "fieldCredential": "Credential",
+  "fieldDatabase": "Database",
+  "fieldDatabaseHint": "company-production",
+  "fieldPasswordHint": "Your Odoo password",
+  "fieldServerUrl": "Server URL",
+  "fieldServerUrlHint": "https://company.odoo.com",
+  "fieldUsername": "Username",
+  "fieldUsernameHint": "you@company.com",
+  "filterCategory": "Category",
+  "filterClearAll": "Clear all",
+  "filterDepartment": "Department",
+  "filterIncludeRetired": "Include retired",
+  "@filterIncludeRetired": {
+    "description": "Filter toggle that adds scrapped assets back into the list."
+  },
+  "filterManufacturer": "Manufacturer",
+  "filterStatus": "Status",
+  "filterWarranty": "Warranty",
+  "filtersLabel": "Filters",
+  "filtersTitle": "Filter assets",
+  "labelAll": "All",
+  "labelAssetName": "Asset name",
+  "labelAssetTag": "Asset tag",
+  "labelAssignedOn": "Assigned",
+  "labelCategory": "Category",
+  "labelHeldDays": "{days} days",
+  "@labelHeldDays": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "labelManufacturer": "Manufacturer",
+  "labelModel": "Model",
+  "labelNone": "None",
+  "labelNotes": "Notes",
+  "labelOdooVersion": "Odoo version",
+  "labelOptional": "optional",
+  "labelPurchaseDate": "Purchase date",
+  "labelPurchaseValue": "Purchase value",
+  "labelSerialNumber": "Serial number",
+  "labelServer": "Server",
+  "labelSignedInAs": "Signed in as",
+  "labelUnassigned": "Unassigned",
+  "labelUnknown": "Not recorded",
+  "labelVendor": "Vendor",
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "languageSystem": "System",
+  "loadingLabel": "Loading…",
+  "loginAclNotice": "Sijil IT works inside your Odoo permissions. You will only see and change what your Odoo user is allowed to.",
+  "loginDifferentServer": "Connecting to a different server?",
+  "loginKeepSignedIn": "Keep me signed in",
+  "loginNeedApiKey": "Need an API key?",
+  "loginSubtitle": "Sign in with your Odoo credentials.",
+  "loginSwitchServer": "Switch",
+  "loginWelcomeBack": "Welcome back",
+  "maintenanceClosed": "Closed {date}",
+  "@maintenanceClosed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceDuration": "Duration",
+  "maintenanceHours": "{hours} h",
+  "@maintenanceHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceNewRequest": "New request",
+  "maintenanceNextScheduled": "Next preventive check",
+  "maintenanceOnlyOpen": "Open only",
+  "maintenanceOverdue": "Overdue",
+  "maintenancePriorityHigh": "High",
+  "maintenancePriorityLow": "Low",
+  "maintenancePriorityNormal": "Normal",
+  "maintenancePriorityVeryLow": "Very low",
+  "maintenanceRequestCreated": "Request opened for {asset}",
+  "@maintenanceRequestCreated": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceRequestHint": "What needs fixing?",
+  "maintenanceRequestTitle": "Maintenance request",
+  "maintenanceRequestedOn": "Requested",
+  "maintenanceScheduled": "Scheduled",
+  "maintenanceSearchHint": "Request or asset…",
+  "maintenanceStage": "Stage",
+  "maintenanceTechnician": "Technician",
+  "maintenanceTitle": "Maintenance",
+  "maintenanceTypeCorrective": "Corrective",
+  "maintenanceTypeField": "Type",
+  "@maintenanceTypeField": {
+    "description": "Label for a maintenance request's corrective/preventive type."
+  },
+  "maintenanceTypePreventive": "Preventive",
+  "moreMaintenanceSubtitle": "Requests and history for your assets",
+  "moreSettingsSubtitle": "Connection, account, appearance and cache",
+  "moreTitle": "More",
+  "navAssets": "Assets",
+  "navDashboard": "Dashboard",
+  "navEmployees": "Employees",
+  "navMore": "More",
+  "navScan": "Scan",
+  "photoCount": "{used} of {max}",
+  "@photoCount": {
+    "placeholders": {
+      "used": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "qrHint": "Print this and stick it on the device. It carries only the asset id.",
+  "qrTitle": "Asset QR code",
+  "returnCondition": "Condition on return",
+  "returnConfirm": "Confirm return",
+  "returnDate": "Return date",
+  "returnHeldFor": "held {days} days",
+  "@returnHeldFor": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "returnNotesHint": "Any damage or missing accessories…",
+  "returnOutcome": "Returns to {status} and the note is posted to Odoo.",
+  "@returnOutcome": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "returnPhotos": "Photos",
+  "returnSuccess": "{asset} returned",
+  "@returnSuccess": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
+  "returnTitle": "Return asset",
+  "scanAgain": "Scan again",
+  "scanCreateAsset": "Create asset",
+  "scanInstruction": "Point at an asset code",
+  "scanInstructionDetail": "QR codes, equipment barcodes and printed serial numbers all work.",
+  "scanMatched": "Matched {payload}",
+  "@scanMatched": {
+    "placeholders": {
+      "payload": {
+        "type": "String"
+      }
+    }
+  },
+  "scanModeBarcode": "Barcode",
+  "scanModeQr": "QR code",
+  "scanNoMatchBody": "Nothing in Odoo matches {code}.",
+  "@scanNoMatchBody": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoMatchTitle": "No asset for that code",
+  "scanPermissionBody": "Sijil IT needs the camera to read asset codes.",
+  "scanPermissionFix": "Turn on camera access for Sijil IT in your device settings.",
+  "scanPermissionTitle": "Camera access is off",
+  "scanTitle": "Scan asset",
+  "scanTorch": "Torch",
+  "sectionActivity": "Activity",
+  "sectionDeviceInformation": "Device information",
+  "sectionMaintenance": "Maintenance",
+  "sectionOwnership": "Ownership",
+  "sectionPurchase": "Purchase & vendor",
+  "sectionWarranty": "Warranty",
+  "settingsAppearance": "Appearance",
+  "settingsCacheKeepStates": "Keep local asset states",
+  "settingsClearCache": "Clear cache",
+  "settingsClearCacheBody": "Odoo keeps everything. Only the offline copy on this device is removed.",
+  "settingsClearCacheConfirm": "Clear cached data?",
+  "settingsClearCacheDone": "Cache cleared",
+  "settingsConnected": "Connected",
+  "settingsConnection": "Odoo connection",
+  "settingsDetected": "Detected on your Odoo",
+  "settingsDiagnostics": "Diagnostics",
+  "settingsDiagnosticsDetail": "Technical log, credentials redacted",
+  "settingsDisconnected": "Not connected",
+  "settingsLanguage": "Language",
+  "settingsLastChecked": "Last checked {time}",
+  "@settingsLastChecked": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsMetadataRefreshed": "Odoo metadata refreshed",
+  "settingsNeverChecked": "Not checked yet",
+  "settingsRefreshMetadata": "Refresh Odoo metadata",
+  "settingsSignOut": "Sign out",
+  "settingsSignOutBody": "Your stored credential is removed from this device.",
+  "settingsSignOutConfirm": "Sign out of Sijil IT?",
+  "settingsTitle": "Settings",
+  "settingsVersion": "Sijil IT {version} (build {build})",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "sortLabel": "Sort",
+  "sortNameAsc": "Name A–Z",
+  "sortNameDesc": "Name Z–A",
+  "sortRecent": "Recently updated",
+  "splashRestoring": "Restoring your session…",
+  "statusAssigned": "Assigned",
+  "statusAvailable": "Available",
+  "statusDamaged": "Damaged",
+  "statusLost": "Lost",
+  "statusMaintenance": "Maintenance",
+  "statusReserved": "Reserved",
+  "statusRetired": "Retired",
+  "statusKeptInLog": "Recorded in the log",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "themeSystem": "System",
+  "timeDaysAgo": "{count} d ago",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "timeHoursAgo": "{count} h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count} min ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "timeYesterday": "yesterday",
+  "@timeYesterday": {
+    "description": "Relative time for the previous calendar day."
+  },
+  "tooltipToggleLanguage": "Switch language",
+  "tooltipToggleTheme": "Switch appearance",
+  "validationEnterAssetName": "Enter a name for this asset.",
+  "validationEnterCredential": "Enter your password or API key.",
+  "validationEnterDatabase": "Enter your Odoo database name.",
+  "validationEnterServerUrl": "Enter your Odoo server URL.",
+  "validationEnterUsername": "Enter your Odoo username.",
+  "validationHttpsRequired": "The server URL must start with https://",
+  "validationInvalidUrl": "That doesn't look like a valid server address.",
+  "warrantyEnds": "Ends {date}",
+  "@warrantyEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyExpiredAgo": "Expired {days} days ago",
+  "@warrantyExpiredAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "warrantyExpiresIn": "Expires in {days} days",
+  "@warrantyExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "warrantyFilterCritical": "Ends within 30 days",
+  "warrantyFilterExpired": "Expired",
+  "warrantyFilterSoon": "Ends within 90 days",
+  "warrantyFilterValid": "Valid",
+  "warrantyStarted": "Started {date}",
+  "@warrantyStarted": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyUnknown": "No warranty date",
+  "warrantyValid": "Warranty valid",
+  "errorFileUnavailableTitle": "Photo could not be read",
+  "@errorFileUnavailableTitle": {
+    "description": "Shown when a picked photo cannot be read back from disk."
+  },
+  "errorFileUnavailableBody": "The phone released the file before it finished uploading. This usually happens when the camera app is closed by the system while another app is in the foreground.",
+  "@errorFileUnavailableBody": {
+    "description": "Shown when a picked photo cannot be read back from disk."
+  },
+  "errorFileUnavailableFix": "Take the photo again and stay in the app until the upload finishes.",
+  "@errorFileUnavailableFix": {
+    "description": "Shown when a picked photo cannot be read back from disk."
+  },
+  "photosTitle": "Photos",
+  "@photosTitle": {
+    "description": "Header of the photo section on a record."
+  },
+  "photosAdd": "Add",
+  "@photosAdd": {
+    "description": "Label on the empty tile that opens the photo picker."
+  },
+  "photosCamera": "Camera",
+  "@photosCamera": {
+    "description": "Button that opens the device camera."
+  },
+  "photosGallery": "Gallery",
+  "@photosGallery": {
+    "description": "Button that opens the device photo gallery."
+  },
+  "photosSavedToOdoo": "Saved to Odoo",
+  "@photosSavedToOdoo": {
+    "description": "Reassures the user the photo left the phone."
+  },
+  "photosEmpty": "No photos yet",
+  "@photosEmpty": {
+    "description": "Empty state of the photo section."
+  },
+  "photosEmptyHint": "Photograph the fault before you start, and the repair when you finish.",
+  "@photosEmptyHint": {
+    "description": "Explains what the photos are for on a maintenance request."
+  },
+  "photosRemoveTitle": "Remove this photo?",
+  "@photosRemoveTitle": {
+    "description": "Confirm dialog title."
+  },
+  "photosRemoveBody": "It will be deleted from Odoo for everyone.",
+  "@photosRemoveBody": {
+    "description": "Confirm dialog body."
+  },
+  "photosRemoveAction": "Remove",
+  "@photosRemoveAction": {
+    "description": "Destructive confirm button."
+  },
+  "photosRemoved": "Photo removed",
+  "@photosRemoved": {
+    "description": "Success snackbar."
+  },
+  "photosAdded": "Photo saved",
+  "@photosAdded": {
+    "description": "Success snackbar."
+  },
+  "photosPosition": "{current} of {total}",
+  "@photosPosition": {
+    "description": "Counter in the full-screen photo viewer.",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "greetingMorning": "Good morning",
+  "@greetingMorning": {
+    "description": "Dashboard greeting before noon."
+  },
+  "greetingAfternoon": "Good afternoon",
+  "@greetingAfternoon": {
+    "description": "Dashboard greeting from noon to 18:00. Arabic has one word for both afternoon and evening."
+  },
+  "greetingEvening": "Good evening",
+  "@greetingEvening": {
+    "description": "Dashboard greeting after 18:00."
+  },
+  "dashboardTrendTitle": "In service, last 12 months",
+  "@dashboardTrendTitle": {
+    "description": "Header of the trend chart. Avoids a separator next to the digits: in Arabic a middot beside Arabic-Indic numerals reorders and reads as part of the number."
+  },
+  "dashboardAssetsUnit": "ASSETS",
+  "@dashboardAssetsUnit": {
+    "description": "Label under the total inside the donut."
+  },
+  "dashboardRareStatuses": "Reserved, damaged or lost",
+  "@dashboardRareStatuses": {
+    "description": "One legend row grouping the three rare statuses."
+  },
+  "historyTitle": "History",
+  "@historyTitle": {
+    "description": "Title of the asset history screen."
+  },
+  "historyEmptyTitle": "Nothing recorded yet",
+  "@historyEmptyTitle": {
+    "description": "Empty state when an asset has no chatter."
+  },
+  "historyEmptyBody": "Assignments, returns and repairs appear here as they happen.",
+  "@historyEmptyBody": {
+    "description": "Explains what will fill the history screen."
+  },
+  "historyRegistered": "Registered",
+  "@historyRegistered": {
+    "description": "The final timeline entry: when the asset was created."
+  },
+  "historySince": "In service since {date}",
+  "@historySince": {
+    "description": "Summary line under the timeline.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "historyHolders": "{count,plural, =0{No holders yet}=1{1 holder}other{{count} holders}}",
+  "@historyHolders": {
+    "description": "How many distinct people have held this asset.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "assetActionHistory": "History",
+  "@assetActionHistory": {
+    "description": "Menu entry on the asset detail screen."
+  },
+  "auditTitle": "Audit",
+  "auditStartTitle": "What are you counting?",
+  "auditStartBody": "A narrow scope gets counted. Everything at once does not.",
+  "auditScopeAll": "Everything",
+  "auditScopeCategory": "One category",
+  "auditScopeDepartment": "One department",
+  "auditPickCategory": "Pick a category",
+  "auditPickDepartment": "Pick a department",
+  "auditBegin": "Start counting",
+  "auditCounting": "Counting",
+  "auditFound": "Found",
+  "auditUnexpected": "Not in scope",
+  "auditMissing": "Not found",
+  "auditKeepScanning": "Keep scanning — no need to stop",
+  "auditJustScanned": "Just scanned",
+  "auditWhereExpected": "Where expected",
+  "auditOutOfScope": "Here, but recorded elsewhere",
+  "auditUnknownCode": "That code matches no asset",
+  "auditFinish": "Finish",
+  "auditResume": "Keep counting",
+  "auditReportTitle": "Count finished",
+  "auditNothingMissing": "Everything in scope was found.",
+  "auditSaveToOdoo": "Save findings to Odoo",
+  "auditSaved": "Findings saved to Odoo",
+  "auditSavedNone": "Nothing to record — no findings.",
+  "auditDiscardTitle": "Leave the count?",
+  "auditDiscardBody": "The scans so far are on this phone only. Leaving loses them.",
+  "auditDiscardConfirm": "Leave",
+  "auditOf": "{done} of {total}",
+  "@auditOf": {
+    "placeholders": {
+      "done": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "moreAuditSubtitle": "Count what is really there",
+  "moreToolsLabel": "Tools",
+  "handoverTitle": "Handover",
+  "handoverSubtitle": "Several assets, one signature",
+  "handoverConfirm": "Confirm handover",
+  "handoverStepRecipient": "Who is receiving",
+  "handoverStepBundle": "What they are receiving",
+  "handoverStepDate": "Handover date",
+  "handoverStepSignature": "Recipient's signature",
+  "handoverStepNotes": "Note",
+  "handoverNotesHint": "Onboarding kit, replacement for a failed laptop…",
+  "handoverSearchPeople": "Search people",
+  "handoverBundleEmpty": "Nothing added yet.",
+  "handoverAddAssets": "Add assets",
+  "handoverBundleFull": "{max} is the most one handover can carry",
+  "@handoverBundleFull": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "handoverRemoveFromBundle": "Remove {asset}",
+  "@handoverRemoveFromBundle": {
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverSignHint": "Sign above",
+  "handoverSignatureRequired": "Sign to confirm receipt",
+  "handoverNeedsRecipient": "Choose who is receiving",
+  "handoverNeedsAssets": "Add at least one asset",
+  "handoverNeedsSignature": "The recipient has to sign",
+  "handoverPickAssets": "Add to the handover",
+  "handoverPickAssetsBody": "Only assets nobody is holding are shown.",
+  "handoverSearchAssets": "Search assets",
+  "handoverAddCount": "Add {count}",
+  "@handoverAddCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "handoverNoAssignableAssets": "Nothing available to hand over right now.",
+  "handoverDone": "Handed over to {employee}",
+  "@handoverDone": {
+    "placeholders": {
+      "employee": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverPartial": "{done} of {total} recorded",
+  "@handoverPartial": {
+    "placeholders": {
+      "done": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "handoverProofSaved": "The signature is on every asset in Odoo.",
+  "handoverSignatureIncomplete": "Recorded, but the signature did not reach every asset.",
+  "handoverRecorded": "Recorded",
+  "handoverRefused": "Odoo refused these",
+  "handoverRetryRefused": "Try these again",
+  "handoverNothingRecorded": "Nothing was recorded",
+  "handoverNothingRecordedBody": "Odoo accepted none of the bundle, so no asset changed hands.",
+  "moreHandoverSubtitle": "Hand several assets to one person",
+  "errorFieldUnavailableTitle": "A field is missing on your Odoo",
+  "errorFieldUnavailableBody": "This screen asked Odoo for a field your instance does not have. Nothing was changed.",
+  "errorFieldUnavailableBodyDetailed": "This screen asked Odoo for the field “{field}”, which your instance does not have. Nothing was changed.",
+  "@errorFieldUnavailableBodyDetailed": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFieldUnavailableFix": "Retrying will not help — the field has to exist first. Sign out and back in if it was just added; otherwise ask your Odoo administrator.",
+  "operationRead": "view",
+  "operationCreate": "create",
+  "operationWrite": "change",
+  "operationDelete": "delete"
+}

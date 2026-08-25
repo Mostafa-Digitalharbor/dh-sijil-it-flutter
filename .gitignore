@@ -39,7 +39,23 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Gradle's own build output. `/build/` above only matches the repo root, so
+# this directory was showing up as 132 KB of untracked artefacts.
+android/build/
+android/.gradle/
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release signing material — never commit these (see .github/workflows/release.yml)
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+*.p12
+*.mobileprovision
+
+# Local Odoo connection scratch files
+.env
+.env.*

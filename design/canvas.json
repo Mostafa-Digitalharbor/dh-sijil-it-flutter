@@ -1,0 +1,41 @@
+{
+  "artboards": [
+    { "file": "Connection.dc.html", "title": "1 · Connect to Odoo", "x": 0, "y": 0, "w": 390, "h": 844 },
+    { "file": "Login.dc.html", "title": "2 · Sign in", "x": 480, "y": 0, "w": 390, "h": 844 },
+    { "file": "Main.dc.html", "title": "3 · Dashboard", "x": 960, "y": 0, "w": 390, "h": 844 },
+    { "file": "AssetList.dc.html", "title": "4 · Assets", "x": 1440, "y": 0, "w": 390, "h": 844 },
+
+    { "file": "AssetDetail.dc.html", "title": "5 · Asset details", "x": 0, "y": 984, "w": 390, "h": 844 },
+    { "file": "AssignAsset.dc.html", "title": "6 · Assign asset", "x": 480, "y": 984, "w": 390, "h": 844 },
+    { "file": "ReturnAsset.dc.html", "title": "7 · Return asset", "x": 960, "y": 984, "w": 390, "h": 844 },
+    { "file": "Scanner.dc.html", "title": "8 · Scan", "x": 1440, "y": 984, "w": 390, "h": 844 },
+
+    { "file": "EmployeeDetail.dc.html", "title": "9 · Employee", "x": 0, "y": 1968, "w": 390, "h": 844 },
+    { "file": "Settings.dc.html", "title": "10 · Settings", "x": 480, "y": 1968, "w": 390, "h": 844 },
+    { "file": "Components.dc.html", "title": "Design tokens", "x": 960, "y": 1968, "w": 880, "h": 1160 }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -196,
+      "w": 560,
+      "text": "Sijil IT — 10 screens + a token sheet.\n\nEvery colour, size, radius and weight is lifted from lib/app/theme (navy #16255C, mint #2FE3A8, surface #F5F7FB, Plus Jakarta Sans, Material 3), so these are buildable as-is.\n\nStatic mockups, light mode. Dark mode falls out of the same tokens — AppTheme.dark is already defined."
+    },
+    {
+      "id": "rows",
+      "x": 1960,
+      "y": 0,
+      "w": 300,
+      "text": "Row 1 — first run and the two core screens.\n\nRow 2 — the asset workflows: detail, assign, return, scan.\n\nRow 3 — people, system settings, and the token sheet to build against."
+    },
+    {
+      "id": "status-note",
+      "x": 1960,
+      "y": 984,
+      "w": 300,
+      "text": "Status is resolved, not stored: Available / Assigned / Maintenance / Retired come from standard Odoo fields.\n\nReserved, Damaged and Lost have no standard field, so they carry the small phone icon meaning \"kept on this device\" — see docs/ARCHITECTURE.md §6."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

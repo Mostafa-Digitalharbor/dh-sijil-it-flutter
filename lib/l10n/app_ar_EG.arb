@@ -1,0 +1,4 @@
+{
+  "@@locale": "ar_EG",
+  "@@comment": "Deliberately empty. gen_l10n makes this class extend the `ar` one, so every string is inherited and nothing is duplicated. It exists only so the app can *resolve* to an Arabic locale that CLDR gives Arabic-Indic digits to: `NumberFormat.decimalPattern('ar').format(124)` returns `124`, while `ar_EG` returns `١٢٤`. Without it, every ICU placeholder in app_ar.arb — and there are seventeen — prints Latin digits directly beside the Arabic-Indic digits written into the copy."
+}

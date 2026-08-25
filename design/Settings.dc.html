@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #F5F7FB;
+      color: #16255C;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #14C289; }
+    a:hover { color: #0F9E73; }
+    svg { display: block; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; background: #F5F7FB; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 44px; flex: none;"></div>
+
+  <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 12px 10px;">
+    <div style="width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+    </div>
+    <div style="flex-grow: 1; font-size: 20px; font-weight: 800; letter-spacing: -0.3px;">Settings</div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 11px; padding: 0 16px; overflow: hidden;">
+
+    <!-- connection -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 13px;">
+      <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <div style="flex-grow: 1; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799;">Odoo connection</div>
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(20,194,137,0.13); padding: 3px 9px;">
+          <div style="width: 6px; height: 6px; border-radius: 999px; background: #14C289;"></div>
+          <span style="font-size: 9.5px; font-weight: 800; color: #0F9E73;">CONNECTED</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px;">
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Server</div>
+          <div style="font-size: 12.5px; font-weight: 700; margin-top: 2px;">company.odoo.com</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Database</div>
+          <div style="font-size: 12.5px; font-weight: 700; margin-top: 2px;">company-production</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Odoo version</div>
+          <div style="font-size: 12.5px; font-weight: 700; margin-top: 2px;">18.0</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 600; color: #98A1BC;">Signed in as</div>
+          <div style="font-size: 12.5px; font-weight: 700; margin-top: 2px;">Mostafa Bader</div>
+        </div>
+      </div>
+
+      <div style="height: 42px; border: 1px solid #E4E8F2; border-radius: 11px; display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16255C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>
+        <span style="font-size: 12.5px; font-weight: 700;">Test connection</span>
+      </div>
+    </div>
+
+    <!-- detected capabilities, spec section 17 -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 13px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 11px;">Detected on your Odoo</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 7px;">
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(20,194,137,0.12); padding: 4px 10px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 5 5L20 7"/></svg>
+          <span style="font-size: 10.5px; font-weight: 700; color: #0F9E73;">Maintenance</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(20,194,137,0.12); padding: 4px 10px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 5 5L20 7"/></svg>
+          <span style="font-size: 10.5px; font-weight: 700; color: #0F9E73;">Employees</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: rgba(20,194,137,0.12); padding: 4px 10px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F9E73" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 5 5L20 7"/></svg>
+          <span style="font-size: 10.5px; font-weight: 700; color: #0F9E73;">Inventory</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; border-radius: 999px; background: #EEF1F8; padding: 4px 10px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#98A1BC" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          <span style="font-size: 10.5px; font-weight: 700; color: #98A1BC;">Accounting assets</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- appearance -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 14px 15px 13px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #6E7799; margin-bottom: 11px;">Appearance</div>
+      <div style="display: flex; background: #F0F3F9; border-radius: 11px; padding: 3px;">
+        <div style="flex-grow: 1; height: 34px; border-radius: 9px; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12px; font-weight: 800;">System</span>
+        </div>
+        <div style="flex-grow: 1; height: 34px; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12px; font-weight: 600; color: #6E7799;">Light</span>
+        </div>
+        <div style="flex-grow: 1; height: 34px; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 12px; font-weight: 600; color: #6E7799;">Dark</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- data -->
+    <div style="flex: none; background: #FFFFFF; border: 1px solid #E4E8F2; border-radius: 16px; padding: 0 15px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; height: 54px; border-bottom: 1px solid #F0F3F9;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        <div style="flex-grow: 1;">
+          <div style="font-size: 13px; font-weight: 700;">Clear cache</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC; margin-top: 1px;">18.4 MB &middot; keeps your local asset states</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C0D4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; height: 54px; border-bottom: 1px solid #F0F3F9;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>
+        <div style="flex-grow: 1;">
+          <div style="font-size: 13px; font-weight: 700;">Refresh Odoo metadata</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC; margin-top: 1px;">Last checked 2 hours ago</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C0D4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; height: 54px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E7799" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none;"><path d="M8 4h8l1 4H7z"/><rect x="5" y="8" width="14" height="12" rx="3"/><path d="M9 13h6"/></svg>
+        <div style="flex-grow: 1;">
+          <div style="font-size: 13px; font-weight: 700;">Diagnostics</div>
+          <div style="font-size: 10.5px; font-weight: 500; color: #98A1BC; margin-top: 1px;">Technical log, credentials redacted</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C0D4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </div>
+
+    </div>
+
+    <!-- sign out -->
+    <div style="flex: none; height: 50px; background: #FFFFFF; border: 1px solid #F3D4CE; border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E5533D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12H4"/><path d="m8 8-4 4 4 4"/><path d="M11 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/></svg>
+      <span style="font-size: 13.5px; font-weight: 700; color: #E5533D;">Sign out</span>
+    </div>
+
+    <div style="flex: none; text-align: center; font-size: 10.5px; font-weight: 600; color: #98A1BC; padding-top: 2px;">Sijil IT 1.0.0 (build 1)</div>
+
+  </div>
+
+  <!-- bottom navigation -->
+  <div style="flex: none; height: 86px; background: #FFFFFF; border-top: 1px solid #E4E8F2; padding: 9px 6px 0; display: flex;">
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Dashboard</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9H4z"/><path d="M2 18h20"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Assets</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Scan</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; display: flex; align-items: center; justify-content: center; color: #6E7799;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 600; color: #6E7799;">Employees</div>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+      <div style="width: 58px; height: 30px; border-radius: 999px; background: #D3F9EC; display: flex; align-items: center; justify-content: center;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="#16255C"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>
+      </div>
+      <div style="font-size: 10px; font-weight: 800; color: #16255C;">More</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
