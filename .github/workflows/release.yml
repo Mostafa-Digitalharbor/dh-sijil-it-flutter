@@ -304,6 +304,63 @@ jobs:
         if: steps.signing.outputs.configured == 'false'
         run: flutter build ios --release --no-codesign
 
+      - name: Check the certificate before Apple sees it
+        if: steps.signing.outputs.configured == 'true'
+        env:
+          CERT_B64: ${{ secrets.IOS_DIST_CERT_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+        # `import-codesign-certs` decodes the base64 with Node's Buffer, which
+        # *silently drops* characters outside the alphabet rather than failing.
+        # A clipboard-mangled secret therefore produces a corrupt .p12 with no
+        # complaint, and the first sign of trouble is `security` reporting
+        # "SecKeychainItemImport: Unable to decode the provided data" — a
+        # message that means "this file is not a PKCS#12", and which a wrong
+        # *password* produces as well. Two very different faults, one opaque
+        # error, and no way to tell them apart from the log.
+        #
+        # So both are checked here, separately, before Apple is involved.
+        run: |
+          RECEIVED=$(printf '%s' "$CERT_B64" | tr -d '[:space:]' | wc -c | tr -d ' ')
+          echo "IOS_DIST_CERT_BASE64: $RECEIVED characters after stripping whitespace"
+
+          if ! printf '%s' "$CERT_B64" | tr -d '[:space:]' \
+               | base64 --decode > /tmp/dist.p12 2>/dev/null; then
+            echo "::error::IOS_DIST_CERT_BASE64 is not valid base64 — it was"
+            echo "::error::truncated or mangled on the way into the secret."
+            echo "::error::Received $RECEIVED characters."
+            exit 1
+          fi
+
+          # A PKCS#12 is DER: it starts with a SEQUENCE tag, 0x30.
+          if [ "$(head -c 1 /tmp/dist.p12 | xxd -p)" != "30" ]; then
+            echo "::error::IOS_DIST_CERT_BASE64 decoded to $(wc -c < /tmp/dist.p12) bytes"
+            echo "::error::that are not a PKCS#12 container. The secret holds"
+            echo "::error::something other than the base64 of the .p12 file."
+            exit 1
+          fi
+
+          # Apple's exports use RC2-40 for the certificate bag, which OpenSSL 3
+          # serves only from the legacy provider while LibreSSL takes it
+          # directly — so which invocation works is a property of the runner,
+          # not of the file. Either succeeding is a pass.
+          if openssl pkcs12 -in /tmp/dist.p12 -noout -passin env:CERT_PASSWORD 2>/dev/null \
+             || openssl pkcs12 -in /tmp/dist.p12 -noout -legacy -passin env:CERT_PASSWORD 2>/dev/null; then
+            echo "Certificate decodes and the password opens it."
+          else
+            # Truncation lands here too: a half-copied file still begins with
+            # 0x30, so it passes the tag check and fails to open. The received
+            # length is the tell, which is why it is printed rather than left
+            # for the reader to infer from a password message.
+            echo "::error::Could not open the certificate. Two possible causes:"
+            echo "::error::  1. IOS_DIST_CERT_BASE64 is truncated. It decoded to"
+            echo "::error::     $(wc -c < /tmp/dist.p12) bytes from $RECEIVED characters;"
+            echo "::error::     a whole file is base64 length = ceil(bytes/3)*4."
+            echo "::error::  2. IOS_DIST_CERT_PASSWORD is wrong. It must hold the"
+            echo "::error::     export password only — no label, no extra text."
+            exit 1
+          fi
+          rm -f /tmp/dist.p12
+
       - name: Import distribution certificate
         if: steps.signing.outputs.configured == 'true'
         uses: apple-actions/import-codesign-certs@v3
