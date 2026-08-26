@@ -216,7 +216,7 @@ jobs:
         if: always()
         run: rm -f android/app/release.jks android/key.properties play-service-account.json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sijil-it-android
           path: |
@@ -388,7 +388,7 @@ jobs:
           rm -f ios/ExportOptions.plist
           git checkout -- ios/Flutter/Release.xcconfig 2>/dev/null || true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.signing.outputs.configured == 'true'
         with:
           name: sijil-it-ios
