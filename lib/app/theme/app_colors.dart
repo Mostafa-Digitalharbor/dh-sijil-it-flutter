@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 /// The **Obsidian** palette (design/v3).
 ///
 /// ## The one idea

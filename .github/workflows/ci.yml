@@ -1,11 +1,14 @@
 name: CI
 
 # Quality gate. Runs on every push and pull request; nothing merges red.
+# Runs on every branch, not a named few. The gate was silently not running on
+# `sijil-mostafa` for the whole build, and 29 files drifted out of `dart format`
+# without anything going red — a quality gate nobody's branch triggers is a
+# quality gate that does not exist.
 on:
   push:
-    branches: [main, develop, "release/**"]
+    branches: ["**"]
   pull_request:
-    branches: [main, develop]
   workflow_dispatch:
 
 concurrency:

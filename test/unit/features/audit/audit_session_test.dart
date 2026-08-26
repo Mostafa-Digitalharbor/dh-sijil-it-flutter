@@ -8,11 +8,8 @@ import 'package:sijil_it/features/audit/domain/entities/audit_session.dart';
 /// the same sticker scanned twice, something scanned that was never in scope,
 /// and the moment "missing" becomes knowable.
 void main() {
-  Asset asset(int id, [String? name]) => Asset(
-    id: id,
-    name: name ?? 'Asset $id',
-    status: AssetStatus.available,
-  );
+  Asset asset(int id, [String? name]) =>
+      Asset(id: id, name: name ?? 'Asset $id', status: AssetStatus.available);
 
   AuditSession sessionOf(List<int> expected) => AuditSession(
     startedAt: DateTime(2026, 8, 24, 9),
@@ -42,10 +39,9 @@ void main() {
 
     test('scanning the same sticker twice does not count it twice', () {
       // What people do when they are not sure the first beep registered.
-      final session = sessionOf([
-        1,
-        2,
-      ]).record(asset(1), at).record(asset(1), at.add(const Duration(seconds: 3)));
+      final session = sessionOf([1, 2])
+          .record(asset(1), at)
+          .record(asset(1), at.add(const Duration(seconds: 3)));
 
       expect(session.foundCount, 1);
       expect(session.results.length, 1);
@@ -74,9 +70,12 @@ void main() {
       expect(session.progress, 1.0);
     });
 
-    test('an empty scope reports zero progress rather than dividing by zero', () {
-      expect(sessionOf(const <int>[]).progress, 0);
-    });
+    test(
+      'an empty scope reports zero progress rather than dividing by zero',
+      () {
+        expect(sessionOf(const <int>[]).progress, 0);
+      },
+    );
   });
 
   group('missing', () {
@@ -93,7 +92,10 @@ void main() {
     });
 
     test('is empty once every expected asset has been seen', () {
-      final session = sessionOf([1, 2]).record(asset(1), at).record(asset(2), at);
+      final session = sessionOf([
+        1,
+        2,
+      ]).record(asset(1), at).record(asset(2), at);
 
       expect(session.missing, isEmpty);
       expect(session.missingCount, 0);
@@ -115,7 +117,9 @@ void main() {
     test('a session is not finished until it is', () {
       expect(sessionOf([1]).isFinished, isFalse);
       expect(
-        sessionOf([1]).copyWith(finishedAt: DateTime(2026, 8, 24, 10)).isFinished,
+        sessionOf([
+          1,
+        ]).copyWith(finishedAt: DateTime(2026, 8, 24, 10)).isFinished,
         isTrue,
       );
     });

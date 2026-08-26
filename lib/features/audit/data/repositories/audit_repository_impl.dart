@@ -52,10 +52,7 @@ class AuditRepositoryImpl with RepositoryGuard implements AuditRepository {
       final page = await _assets.getAssets(
         AssetQuery(
           filters: filters,
-          page: PageRequest(
-            offset: offset,
-            limit: AppConstants.auditPageSize,
-          ),
+          page: PageRequest(offset: offset, limit: AppConstants.auditPageSize),
         ),
       );
 

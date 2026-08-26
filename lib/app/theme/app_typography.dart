@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 /// Type scale for the product (design/v3 "Obsidian").
 ///
 /// ## Three families, three jobs

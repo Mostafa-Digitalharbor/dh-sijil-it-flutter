@@ -299,6 +299,19 @@ class AppL10nEn extends AppL10n {
   String get diagnosticsCopy => 'Copy';
 
   @override
+  String get diagnosticsCrashReporting => 'Crash reporting';
+
+  @override
+  String get diagnosticsCrashOn => 'On — anonymous crash reports are sent';
+
+  @override
+  String get diagnosticsCrashOff => 'Off — nothing leaves this device';
+
+  @override
+  String get diagnosticsCrashDetail =>
+      'Reports never include your password, API key or name.';
+
+  @override
   String get diagnosticsEmpty => 'No problems recorded';
 
   @override

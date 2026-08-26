@@ -59,7 +59,9 @@ class _Resolving extends StatelessWidget {
         const SizedBox(
           width: AppDimens.iconXl,
           height: AppDimens.iconXl,
-          child: CircularProgressIndicator(strokeWidth: AppDimens.progressStroke),
+          child: CircularProgressIndicator(
+            strokeWidth: AppDimens.progressStroke,
+          ),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(

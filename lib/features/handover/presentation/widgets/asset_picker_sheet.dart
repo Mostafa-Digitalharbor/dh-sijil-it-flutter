@@ -151,8 +151,9 @@ class _AssetPickerSheetState extends State<AssetPickerSheet> {
                         )
                       : AppButton(
                           label: l10n.handoverAddCount(_picked.length),
-                          onPressed: () => Navigator.of(context)
-                              .pop(_picked.values.toList()),
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pop(_picked.values.toList()),
                         ),
                 ),
               ],

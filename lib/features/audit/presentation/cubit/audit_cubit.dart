@@ -229,9 +229,7 @@ class AuditCubit extends Cubit<AuditState> {
             startedAt: DateTime.now(),
             scope: state.scope,
             scopeLabel: state.scopeLabel,
-            expected: <int, Asset>{
-              for (final asset in assets) asset.id: asset,
-            },
+            expected: <int, Asset>{for (final asset in assets) asset.id: asset},
           ),
         ),
       ),

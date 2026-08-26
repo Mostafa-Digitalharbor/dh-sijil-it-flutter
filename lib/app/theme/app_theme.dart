@@ -5,6 +5,7 @@ import './app_colors.dart';
 import './app_spacing.dart';
 import './app_typography.dart';
 import 'app_palette.dart';
+
 /// Material 3 themes for the product, built once from the Obsidian tokens.
 ///
 /// Both brightnesses are designed, not derived: the light theme is not an

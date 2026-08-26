@@ -608,6 +608,30 @@ abstract class AppL10n {
   /// **'Copy'**
   String get diagnosticsCopy;
 
+  /// No description provided for @diagnosticsCrashReporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Crash reporting'**
+  String get diagnosticsCrashReporting;
+
+  /// No description provided for @diagnosticsCrashOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On — anonymous crash reports are sent'**
+  String get diagnosticsCrashOn;
+
+  /// No description provided for @diagnosticsCrashOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off — nothing leaves this device'**
+  String get diagnosticsCrashOff;
+
+  /// No description provided for @diagnosticsCrashDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports never include your password, API key or name.'**
+  String get diagnosticsCrashDetail;
+
   /// No description provided for @diagnosticsEmpty.
   ///
   /// In en, this message translates to:

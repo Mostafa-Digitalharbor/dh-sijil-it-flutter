@@ -1,4 +1,3 @@
-
 import '../../../../core/constants/odoo_models.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/guard.dart';
@@ -14,7 +13,9 @@ import '../../domain/entities/maintenance_request.dart';
 import '../../domain/repositories/maintenance_repository.dart';
 
 /// Reads and writes `maintenance.request` (spec §16).
-class MaintenanceRepositoryImpl with RepositoryGuard implements MaintenanceRepository {
+class MaintenanceRepositoryImpl
+    with RepositoryGuard
+    implements MaintenanceRepository {
   @override
   String get guardLabel => 'maintenance repository';
 

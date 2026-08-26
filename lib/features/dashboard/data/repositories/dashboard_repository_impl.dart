@@ -1,4 +1,3 @@
-
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/odoo_models.dart';
 import '../../../../core/error/exceptions.dart';
@@ -22,7 +21,9 @@ import '../../domain/repositories/dashboard_repository.dart';
 /// partition the asset table instead of overlapping — otherwise the tiles
 /// would sum to more than the hero total and the screen would contradict
 /// itself.
-class DashboardRepositoryImpl with RepositoryGuard implements DashboardRepository {
+class DashboardRepositoryImpl
+    with RepositoryGuard
+    implements DashboardRepository {
   @override
   String get guardLabel => 'dashboard repository';
 

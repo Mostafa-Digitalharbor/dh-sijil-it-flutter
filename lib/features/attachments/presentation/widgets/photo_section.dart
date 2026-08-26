@@ -211,7 +211,10 @@ class _Header extends StatelessWidget {
           // same photo because nothing on screen confirmed it stuck.
           Text(
             l10n.photosSavedToOdoo,
-            style: text.bodySmall?.copyWith(fontSize: AppTextSize.nav, color: palette.faint),
+            style: text.bodySmall?.copyWith(
+              fontSize: AppTextSize.nav,
+              color: palette.faint,
+            ),
           ),
       ],
     );

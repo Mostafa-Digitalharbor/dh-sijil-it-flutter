@@ -114,7 +114,8 @@ class HandoverReceipt extends Equatable {
   bool get isTotalFailure => handedOver.isEmpty;
 
   /// True when the assets landed but not all of the proof did.
-  bool get isPartiallySigned => handedOver.isNotEmpty && signedCount < handedOver.length;
+  bool get isPartiallySigned =>
+      handedOver.isNotEmpty && signedCount < handedOver.length;
 
   @override
   List<Object?> get props => <Object?>[

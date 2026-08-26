@@ -132,10 +132,7 @@ class AuditSession extends Equatable {
     );
   }
 
-  AuditSession copyWith({
-    Map<int, AuditEntry>? results,
-    DateTime? finishedAt,
-  }) {
+  AuditSession copyWith({Map<int, AuditEntry>? results, DateTime? finishedAt}) {
     return AuditSession(
       startedAt: startedAt,
       scope: scope,

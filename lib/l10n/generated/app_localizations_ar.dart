@@ -298,6 +298,19 @@ class AppL10nAr extends AppL10n {
   String get diagnosticsCopy => 'نسخ';
 
   @override
+  String get diagnosticsCrashReporting => 'تقارير الأعطال';
+
+  @override
+  String get diagnosticsCrashOn => 'مُفعَّل — تُرسل تقارير أعطال مجهولة الهوية';
+
+  @override
+  String get diagnosticsCrashOff => 'مُعطَّل — لا شيء يغادر هذا الجهاز';
+
+  @override
+  String get diagnosticsCrashDetail =>
+      'لا تتضمن التقارير كلمة المرور أو مفتاح الـ API أو اسمك.';
+
+  @override
   String get diagnosticsEmpty => 'لم تُسجَّل أي مشاكل';
 
   @override

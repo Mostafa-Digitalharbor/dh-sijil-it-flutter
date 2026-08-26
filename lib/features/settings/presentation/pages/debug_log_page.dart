@@ -6,6 +6,8 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/observability/crash_reporter.dart';
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
@@ -69,19 +71,98 @@ class _DebugLogPageState extends State<DebugLogPage> {
           ),
         ],
       ],
-      body: _entries.isEmpty
-          ? EmptyStateView(
-              icon: Icons.verified_outlined,
-              title: l10n.diagnosticsEmpty,
-              message: l10n.diagnosticsEmptyBody,
-            )
-          : AppPageBody(
-              gap: AppSpacing.sm,
-              onRefresh: () async => _refresh(),
+      // The crash-reporting card is pinned above whichever body follows, not
+      // listed inside it: `EmptyStateView` centres itself against the height it
+      // is given and must not be nested in a second scroll view, so the empty
+      // case gets `Expanded` rather than a row in a ListView.
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsetsDirectional.only(
+              start: context.screen.gutter,
+              end: context.screen.gutter,
+              top: AppSpacing.xs,
+            ),
+            child: const _CrashReportingCard(),
+          ),
+          Expanded(
+            child: _entries.isEmpty
+                ? EmptyStateView(
+                    icon: Icons.verified_outlined,
+                    title: l10n.diagnosticsEmpty,
+                    message: l10n.diagnosticsEmptyBody,
+                  )
+                : AppPageBody(
+                    gap: AppSpacing.sm,
+                    onRefresh: () async => _refresh(),
+                    children: <Widget>[
+                      for (final entry in _entries) _EntryCard(entry: entry),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Whether this build sends crash reports anywhere.
+///
+/// Stated in the app rather than only in the handover document, because the
+/// person who needs the answer — an IT manager deciding whether to roll the
+/// app out, or an auditor asked what leaves the device — is holding a phone,
+/// not reading `docs/`. A build with no DSN compiled in says so plainly here,
+/// which is the difference between "we believe it is off" and "it is off".
+class _CrashReportingCard extends StatelessWidget {
+  const _CrashReportingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final theme = Theme.of(context);
+    final isOn = CrashReporter.isEnabled;
+
+    return AppCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Icon(
+            isOn ? Icons.cloud_upload_outlined : Icons.cloud_off_rounded,
+            size: AppDimens.iconLg,
+            color: isOn
+                ? AppColors.statusAssigned
+                : theme.textTheme.bodySmall?.color,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                for (final entry in _entries) _EntryCard(entry: entry),
+                Text(
+                  l10n.diagnosticsCrashReporting,
+                  style: theme.textTheme.titleSmall,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  isOn ? l10n.diagnosticsCrashOn : l10n.diagnosticsCrashOff,
+                  style: theme.textTheme.bodySmall,
+                ),
+                if (isOn) ...<Widget>[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    l10n.diagnosticsCrashDetail,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.7,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
+          ),
+        ],
+      ),
     );
   }
 }

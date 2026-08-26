@@ -24,7 +24,9 @@ import '../../domain/repositories/handover_repository.dart';
 /// So the only thing this class owns is what makes a bundle a bundle: one
 /// date, one note naming every item, one signature, and an honest account of
 /// what happened when Odoo accepted some of it.
-class HandoverRepositoryImpl with RepositoryGuard implements HandoverRepository {
+class HandoverRepositoryImpl
+    with RepositoryGuard
+    implements HandoverRepository {
   const HandoverRepositoryImpl({
     required AssetRepository assets,
     required AttachmentRepository attachments,
@@ -48,48 +50,47 @@ class HandoverRepositoryImpl with RepositoryGuard implements HandoverRepository 
   String get guardLabel => 'handover repository';
 
   @override
-  ResultFuture<HandoverReceipt> submit(HandoverBundle bundle) => guard(() async {
-    final note = AssetNoteVocabulary.handoverDetail(
-      items: bundle.assets.map(_describe).toList(growable: false),
-      fingerprint: bundle.signatureFingerprint,
-      notes: bundle.notes,
-    );
-
-    final handedOver = <Asset>[];
-    final failed = <Asset>[];
-
-    // Sequential, not concurrent. Twelve simultaneous writes against one Odoo
-    // worker is how a bundle turns into a timeout, and a failure halfway
-    // through a `Future.wait` leaves the receipt unable to say which of them
-    // landed — which is the one thing it exists to say.
-    for (final asset in bundle.assets) {
-      final result = await _assets.assign(
-        AssignmentRequest(
-          assetId: asset.id,
-          employeeId: bundle.recipient.id,
-          employeeName: bundle.recipient.name,
-          assignedOn: bundle.handedOverOn,
-          notes: note,
-        ),
+  ResultFuture<HandoverReceipt> submit(HandoverBundle bundle) => guard(
+    () async {
+      final note = AssetNoteVocabulary.handoverDetail(
+        items: bundle.assets.map(_describe).toList(growable: false),
+        fingerprint: bundle.signatureFingerprint,
+        notes: bundle.notes,
       );
 
-      result.fold(
-        (failure) {
+      final handedOver = <Asset>[];
+      final failed = <Asset>[];
+
+      // Sequential, not concurrent. Twelve simultaneous writes against one Odoo
+      // worker is how a bundle turns into a timeout, and a failure halfway
+      // through a `Future.wait` leaves the receipt unable to say which of them
+      // landed — which is the one thing it exists to say.
+      for (final asset in bundle.assets) {
+        final result = await _assets.assign(
+          AssignmentRequest(
+            assetId: asset.id,
+            employeeId: bundle.recipient.id,
+            employeeName: bundle.recipient.name,
+            assignedOn: bundle.handedOverOn,
+            notes: note,
+          ),
+        );
+
+        result.fold((failure) {
           AppLogger.warn(
             'Handover: ${asset.name} refused by Odoo (${failure.kind.name})',
           );
           failed.add(asset);
-        },
-        handedOver.add,
-      );
-    }
+        }, handedOver.add);
+      }
 
-    return HandoverReceipt(
-      handedOver: handedOver,
-      failed: failed,
-      signedCount: await _attachSignature(bundle, handedOver),
-    );
-  });
+      return HandoverReceipt(
+        handedOver: handedOver,
+        failed: failed,
+        signedCount: await _attachSignature(bundle, handedOver),
+      );
+    },
+  );
 
   /// Puts the signature on every asset that actually changed hands.
   ///
@@ -101,7 +102,10 @@ class HandoverRepositoryImpl with RepositoryGuard implements HandoverRepository 
   /// Failures here are counted, never raised. The assignment has already
   /// landed and is the fact; losing the image weakens the proof, and undoing a
   /// correct record to protect a thumbnail would be the wrong trade.
-  Future<int> _attachSignature(HandoverBundle bundle, List<Asset> assets) async {
+  Future<int> _attachSignature(
+    HandoverBundle bundle,
+    List<Asset> assets,
+  ) async {
     final filename =
         'handover-${_stamp(bundle.handedOverOn)}-'
         '${bundle.signatureFingerprint.replaceAll(':', '')}.png';

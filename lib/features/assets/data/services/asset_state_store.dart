@@ -109,7 +109,10 @@ class AssetStateStore {
   /// whole contract: empty means "Odoo says none of these assets has a
   /// recorded state" and must clear the mirror; null means "Odoo was not
   /// reachable" and must leave it alone.
-  Future<Map<int, AssetStatus>?> _readRemote(String model, List<int>? ids) async {
+  Future<Map<int, AssetStatus>?> _readRemote(
+    String model,
+    List<int>? ids,
+  ) async {
     try {
       final bodies = await _chatter.latestBodies(
         model: model,

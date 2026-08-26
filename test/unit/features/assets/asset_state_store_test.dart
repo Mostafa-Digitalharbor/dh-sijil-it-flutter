@@ -49,8 +49,10 @@ void main() {
 
     test('a note somebody typed in the web client is not a status', () {
       expect(AssetNoteVocabulary.statusIn('Sent to the repair shop'), isNull);
-      expect(AssetNoteVocabulary.statusIn('Assigned to Sara on 2026-08-01.'),
-          isNull);
+      expect(
+        AssetNoteVocabulary.statusIn('Assigned to Sara on 2026-08-01.'),
+        isNull,
+      );
     });
 
     test('a status note is classified as a status change in the history', () {
@@ -97,16 +99,19 @@ void main() {
       expect(await store.read(model, 7), AssetStatus.reserved);
     });
 
-    test('a note recording a derivable state clears rather than sets', () async {
-      // "Status set to Available" is how the state gets *removed*; storing it
-      // would leave an overlay claiming something Odoo already proves.
-      final store = AssetStateStore(
-        mirror: _mirrorWith(const <int, AssetStatus>{}),
-        chatter: _ChatterSaying(<int, AssetStatus>{7: AssetStatus.available}),
-      );
+    test(
+      'a note recording a derivable state clears rather than sets',
+      () async {
+        // "Status set to Available" is how the state gets *removed*; storing it
+        // would leave an overlay claiming something Odoo already proves.
+        final store = AssetStateStore(
+          mirror: _mirrorWith(const <int, AssetStatus>{}),
+          chatter: _ChatterSaying(<int, AssetStatus>{7: AssetStatus.available}),
+        );
 
-      expect(await store.read(model, 7), isNull);
-    });
+        expect(await store.read(model, 7), isNull);
+      },
+    );
 
     test('a page is one query, not one per row', () async {
       final chatter = _ChatterSaying(<int, AssetStatus>{
@@ -127,18 +132,21 @@ void main() {
       expect(chatter.calls, 1, reason: 'fifty rows would be fifty round trips');
     });
 
-    test('the mirror is refreshed from what Odoo said, for the next flight', () async {
-      final mirror = _mirrorWith(const <int, AssetStatus>{});
-      final store = AssetStateStore(
-        mirror: mirror,
-        chatter: _ChatterSaying(<int, AssetStatus>{2: AssetStatus.reserved}),
-      );
+    test(
+      'the mirror is refreshed from what Odoo said, for the next flight',
+      () async {
+        final mirror = _mirrorWith(const <int, AssetStatus>{});
+        final store = AssetStateStore(
+          mirror: mirror,
+          chatter: _ChatterSaying(<int, AssetStatus>{2: AssetStatus.reserved}),
+        );
 
-      await store.readAll(model, <int>[1, 2]);
+        await store.readAll(model, <int>[1, 2]);
 
-      expect(await mirror.read(model, 2), AssetStatus.reserved);
-      expect(await mirror.read(model, 1), isNull);
-    });
+        expect(await mirror.read(model, 2), AssetStatus.reserved);
+        expect(await mirror.read(model, 1), isNull);
+      },
+    );
   });
 
   group('fleet counts', () {

@@ -31,7 +31,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 ///   void onCode(String code) => context.read<AuditCubit>().onDetected(code);
 /// }
 /// ```
-mixin CameraLifecycle<T extends StatefulWidget> on State<T>, WidgetsBindingObserver {
+mixin CameraLifecycle<T extends StatefulWidget>
+    on State<T>, WidgetsBindingObserver {
   /// The symbologies the app can act on.
   ///
   /// Deliberately narrow. A wider set makes the detector slower, and it is how

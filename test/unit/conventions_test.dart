@@ -197,6 +197,34 @@ void main() {
     });
   });
 
+  group('secrets never bypass the sanitizer', () {
+    test('nothing in lib prints directly', () {
+      // Every line AppLogger emits goes through LogSanitizer, whose redaction
+      // rules are covered in test/unit/core/security/log_sanitizer_test.dart.
+      // A bare `print` or `debugPrint` goes around that — and the moment
+      // somebody reaches for one is while debugging the very code that handles
+      // credentials, which is exactly how a password reaches a log line and
+      // then survives into a release build.
+      final offenders = <String>[];
+      final bare = RegExp(r'(^|[^A-Za-z0-9_.])(print|debugPrint)\s*\(');
+
+      for (final file in all) {
+        file.forEachLine((line, number, raw) {
+          if (!bare.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use AppLogger, which scrubs secrets before writing.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
   group('layering', () {
     test('no widget imports an Odoo service directly (spec §18)', () {
       final offenders = <String>[];

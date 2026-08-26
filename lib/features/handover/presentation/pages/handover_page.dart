@@ -277,10 +277,7 @@ class _RecipientSection extends StatelessWidget {
           children: <Widget>[
             AppAvatar(name: recipient.name, size: AppDimens.avatarMd),
             const SizedBox(width: AppSpacing.md),
-            AppTitleBlock(
-              title: recipient.name,
-              subtitle: recipient.summary,
-            ),
+            AppTitleBlock(title: recipient.name, subtitle: recipient.summary),
             const SizedBox(width: AppSpacing.sm),
             AppTextAction(
               label: l10n.actionChange,
@@ -443,9 +440,7 @@ class _SignatureSection extends StatelessWidget {
       children: <Widget>[
         LayoutBuilder(
           builder: (context, constraints) {
-            onSized(
-              Size(constraints.maxWidth, AppDimens.signaturePadHeight),
-            );
+            onSized(Size(constraints.maxWidth, AppDimens.signaturePadHeight));
             return SignaturePad(
               controller: controller,
               hint: l10n.handoverSignHint,
@@ -460,8 +455,9 @@ class _SignatureSection extends StatelessWidget {
                   ? _ProofLine(state: state)
                   : Text(
                       l10n.handoverSignatureRequired,
-                      style: Theme.of(context).textTheme.bodySmall
-                          ?.copyWith(color: palette.faint),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: palette.faint),
                     ),
             ),
             AppTextAction(
@@ -507,9 +503,7 @@ class _ProofLine extends StatelessWidget {
           ),
         if (name != null && date != null)
           const Padding(
-            padding: EdgeInsetsDirectional.symmetric(
-              horizontal: AppSpacing.xs,
-            ),
+            padding: EdgeInsetsDirectional.symmetric(horizontal: AppSpacing.xs),
             child: Text('·'),
           ),
         // The date stays Latin and monospaced whatever the language: it is an

@@ -121,7 +121,12 @@ class _Row extends StatelessWidget {
                   child: Icon(event.icon, size: AppDimens.iconSm, color: tone),
                 ),
                 if (!isLast)
-                  Expanded(child: Container(width: AppDimens.timelineRail, color: palette.lineSoft)),
+                  Expanded(
+                    child: Container(
+                      width: AppDimens.timelineRail,
+                      color: palette.lineSoft,
+                    ),
+                  ),
               ],
             ),
           ),

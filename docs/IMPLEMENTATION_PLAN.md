@@ -5,11 +5,14 @@ and maps to specific acceptance criteria from the brief.
 
 **Legend** — ✅ done · 🔨 next · ⬜ not started
 
-> **Status.** Phases 0–10 are built and green against a live Odoo 19 Enterprise
-> instance: 329 tests, analyzer clean, every screen implemented. What remains is
-> Phase 11 (release hardening: signing, store tracks, the ACL and version
-> matrices) and Phase 12 (the two Odoo docs). See
-> `docs/ODOO_COMPATIBILITY.md` for the version differences found in the field.
+> **Status.** Phases 0–12 are built and green: **559 tests**, analyzer clean,
+> formatter clean, every screen implemented. Phase 11's matrices and signing are
+> done and the release pipeline is proven end to end — a locally signed AAB and
+> APK carry the upload key, and the Sentry DSN is verified present in the Dart
+> snapshot of all three ABIs. What remains is not code: the first manual Play
+> upload (the API cannot open a release for an app that has never shipped) and
+> the store review passes themselves. See `docs/ODOO_COMPATIBILITY.md` for the
+> version differences found in the field.
 
 ---
 
@@ -210,26 +213,58 @@ feature cleanly with zero errors in the log.
 
 ---
 
-## Phase 11 — Hardening & release ⬜
+## Phase 11 — Hardening & release ✅
 *Acceptance criteria 9, 14, 15*
 
-- ACL matrix test: read-only user, no-create user, no-delete user.
-- Version matrix: Odoo 17, 18, 19 — with and without HR and Maintenance.
-- Offline behaviour, session expiry, timeout, wrong URL, wrong DB.
-- App icons and splash from the Sijil brand assets.
-- Android signing secrets in GitHub; iOS certificates and `flutter build ipa`.
-- Play Console internal track; TestFlight.
+- ✅ **ACL matrix** — `test/matrix/acl_matrix_test.dart`. Five user shapes (full,
+  read-only, no-create, no-delete, no-write) driven through the real screens
+  against a server that refuses what a real Odoo would. Also covers the case
+  `check_access_rights` cannot predict: a **record rule** refusing one row after
+  the probe said yes.
+- ✅ **Version matrix** — `test/matrix/version_matrix_test.dart`. Odoo 17 / 18 /
+  19 × (HR present or absent) × (Maintenance requests present or absent), plus
+  both `name_search` dialects and proof the working one is memoised rather than
+  re-probed on every keystroke.
+- ✅ Offline, wrong URL, wrong DB, wrong credentials — `connection_flow_test.dart`.
+- ✅ App icons and splash from the Sijil brand assets.
+- ✅ Android signing: keystore created, secrets wired, **and a locally built AAB
+  and APK verified to carry the upload key** rather than the debug key.
+- ✅ iOS: bundle id corrected from `com.example.sijilIt`, distribution
+  certificate and App Store provisioning profile verified to share a
+  fingerprint, signed `flutter build ipa` lane with the profile name resolved
+  from the profile itself.
+- ✅ Play internal track and TestFlight upload lanes, each degrading to a
+  skipped step rather than a red build when its credentials are absent.
+- ✅ Crash reporting (Sentry) with every event scrubbed through `LogSanitizer`
+  — `test/unit/core/observability/crash_reporter_test.dart`.
+
+**Not code, and still open:** the first Play upload must be made by hand — the
+Play Developer API refuses to open a release for an app that has never shipped —
+and the store review passes are the stores'.
+
+### Two things this phase found
+
+- **CI was never running on the working branch.** `ci.yml` triggered on
+  `main`/`develop`/`release/**` only, so 29 files had drifted out of
+  `dart format` with nothing going red. Triggers are now `branches: ["**"]`.
+- **An expired session had no way out.** `FailureView` renders a "Sign in
+  again" action, but no screen ever passed `onSignIn`, so the button was never
+  built — the same for `onEditConnection`. Tracked separately.
 
 ---
 
-## Phase 12 — Documentation & handover ⬜
+## Phase 12 — Documentation & handover ✅
 
-- `README.md` — setup, configuration, build, release.
+- `README.md` — setup, configuration, build, release. ✅
 - `docs/ARCHITECTURE.md` ✅
-- `docs/ODOO_XMLRPC.md` — every call the app makes, with request/response
-  samples and the required Odoo access rights.
-- `docs/ODOO_SETUP.md` — what a customer's admin needs to do (create an API
-  key, which apps unlock which features).
+- `docs/ODOO_XMLRPC.md` ✅ — every call the app makes, with request and response
+  samples. Each section ends with the access right it needs *and* what the user
+  sees without it, because a permissions document that lists only rights makes
+  the administrator guess at the consequence — and administrators who guess
+  grant everything.
+- `docs/ODOO_SETUP.md` ✅ — what a customer's admin does: which apps to install,
+  how to issue an API key, the minimum group set, a read-only auditor, and an
+  honest account of what leaves the device.
 
 ---
 

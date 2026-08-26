@@ -1,4 +1,3 @@
-
 import '../../../../core/constants/odoo_models.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/guard.dart';
@@ -19,7 +18,9 @@ import '../../domain/repositories/employee_repository.dart';
 /// Employees app is not an error state — it is a smaller product, and the
 /// capability gate makes that a `modelUnavailable` failure the UI already
 /// knows how to render as an explanation rather than a crash.
-class EmployeeRepositoryImpl with RepositoryGuard implements EmployeeRepository {
+class EmployeeRepositoryImpl
+    with RepositoryGuard
+    implements EmployeeRepository {
   @override
   String get guardLabel => 'employee repository';
 

@@ -185,9 +185,10 @@ class _SummaryLine extends StatelessWidget {
           ),
           Text(
             l10n.historyHolders(history.holderCount),
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontSize: AppTextSize.label, color: palette.mint),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontSize: AppTextSize.label,
+              color: palette.mint,
+            ),
           ),
         ],
       ),

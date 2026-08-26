@@ -20,11 +20,8 @@ import 'package:sijil_it/features/handover/presentation/cubit/handover_cubit.dar
 
 /// The rules the screen enforces before it will let anything be written.
 void main() {
-  Asset asset(int id) => Asset(
-    id: id,
-    name: 'Asset $id',
-    status: AssetStatus.available,
-  );
+  Asset asset(int id) =>
+      Asset(id: id, name: 'Asset $id', status: AssetStatus.available);
 
   const recipient = Employee(id: 5, name: 'Nour Adel');
 
@@ -65,17 +62,20 @@ void main() {
       expect(state.canSubmit, isFalse);
     });
 
-    test('signed, chosen and dated is submittable, with nothing left to say', () {
-      final state = HandoverState(
-        recipient: recipient,
-        bundle: <Asset>[asset(1)],
-        handedOverOn: DateTime(2026, 8, 25),
-        isSigned: true,
-      );
+    test(
+      'signed, chosen and dated is submittable, with nothing left to say',
+      () {
+        final state = HandoverState(
+          recipient: recipient,
+          bundle: <Asset>[asset(1)],
+          handedOverOn: DateTime(2026, 8, 25),
+          isSigned: true,
+        );
 
-      expect(state.canSubmit, isTrue);
-      expect(state.blocker, isNull);
-    });
+        expect(state.canSubmit, isTrue);
+        expect(state.blocker, isNull);
+      },
+    );
 
     test('a submission in flight cannot be started twice', () {
       final state = HandoverState(
@@ -177,19 +177,22 @@ void main() {
     });
   });
 
-  test('submitting without a signature is refused before it reaches Odoo', () async {
-    final handovers = _AcceptsEverything();
-    final cubit = cubitWith(handovers: handovers)..start();
-    cubit
-      ..addToBundle(asset(1))
-      ..chooseRecipient(recipient);
+  test(
+    'submitting without a signature is refused before it reaches Odoo',
+    () async {
+      final handovers = _AcceptsEverything();
+      final cubit = cubitWith(handovers: handovers)..start();
+      cubit
+        ..addToBundle(asset(1))
+        ..chooseRecipient(recipient);
 
-    await cubit.submit(null);
+      await cubit.submit(null);
 
-    expect(handovers.submitted, isEmpty);
-    expect(cubit.state.receipt, isNull);
-    addTearDown(cubit.close);
-  });
+      expect(handovers.submitted, isEmpty);
+      expect(cubit.state.receipt, isNull);
+      addTearDown(cubit.close);
+    },
+  );
 }
 
 class _AcceptsEverything implements HandoverRepository {
@@ -219,11 +222,7 @@ class _Refuses implements HandoverRepository {
     final ok = bundle.assets.where((a) => !ids.contains(a.id)).toList();
 
     return Right<Failure, HandoverReceipt>(
-      HandoverReceipt(
-        handedOver: ok,
-        failed: failed,
-        signedCount: ok.length,
-      ),
+      HandoverReceipt(handedOver: ok, failed: failed, signedCount: ok.length),
     );
   }
 }

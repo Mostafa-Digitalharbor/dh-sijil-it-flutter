@@ -37,10 +37,16 @@ void main() {
   };
 
   test('every English string has an Arabic one, and nothing extra', () {
-    expect(en.keys.toSet().difference(ar.keys.toSet()), isEmpty,
-        reason: 'these would render in English on an Arabic device');
-    expect(ar.keys.toSet().difference(en.keys.toSet()), isEmpty,
-        reason: 'an Arabic string with no English key is unreachable');
+    expect(
+      en.keys.toSet().difference(ar.keys.toSet()),
+      isEmpty,
+      reason: 'these would render in English on an Arabic device',
+    );
+    expect(
+      ar.keys.toSet().difference(en.keys.toSet()),
+      isEmpty,
+      reason: 'an Arabic string with no English key is unreachable',
+    );
   });
 
   test('no Arabic value is an untranslated copy of the English', () {
@@ -56,10 +62,12 @@ void main() {
   test('every Arabic value actually contains Arabic', () {
     final arabicScript = RegExp(r'[؀-ۿ]');
     final offenders = ar.entries
-        .where((e) =>
-            !identicalOnPurpose.contains(e.key) &&
-            e.value.trim().isNotEmpty &&
-            !arabicScript.hasMatch(e.value))
+        .where(
+          (e) =>
+              !identicalOnPurpose.contains(e.key) &&
+              e.value.trim().isNotEmpty &&
+              !arabicScript.hasMatch(e.value),
+        )
         .map((e) => '${e.key}: ${e.value}')
         .toList();
 
@@ -77,8 +85,9 @@ void main() {
     /// Arabic carries `=2` and `few`, English does not.
     String holders(String text) {
       final names = <String>{
-        for (final match
-            in RegExp(r'\{(\w+)\s*,\s*(?:plural|select)\s*,').allMatches(text))
+        for (final match in RegExp(
+          r'\{(\w+)\s*,\s*(?:plural|select)\s*,',
+        ).allMatches(text))
           match.group(1)!,
         for (final match in RegExp(r'\{(\w+)\}').allMatches(text))
           match.group(1)!,
@@ -123,19 +132,23 @@ void main() {
       }
     }
 
-    expect(undeclared, isEmpty,
-        reason: 'these render Latin digits in Arabic:\n${undeclared.join('\n')}');
+    expect(
+      undeclared,
+      isEmpty,
+      reason: 'these render Latin digits in Arabic:\n${undeclared.join('\n')}',
+    );
   });
 
   test('every key the code calls exists in the template', () {
     final called = <String>{};
     final callSite = RegExp(r'\b_?[lL]10n\.([a-z]\w*)');
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.dart'))
-        .where((f) => !f.path.contains('generated'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.dart'))
+            .where((f) => !f.path.contains('generated'))) {
       called.addAll(
         callSite.allMatches(file.readAsStringSync()).map((m) => m.group(1)!),
       );
@@ -144,8 +157,11 @@ void main() {
     // Members of AppL10n itself rather than message keys.
     called.removeAll(<String>{'localeName', 'lookup', 'delegate', 'of'});
 
-    expect(called.difference(en.keys.toSet()), isEmpty,
-        reason: 'called but never defined');
+    expect(
+      called.difference(en.keys.toSet()),
+      isEmpty,
+      reason: 'called but never defined',
+    );
   });
 
   test('no user-facing English is typed into a widget', () {
@@ -160,11 +176,12 @@ void main() {
     final words = RegExp(r'[A-Za-z]{3,}\s+[A-Za-z]{3,}');
     final offenders = <String>[];
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.dart'))
-        .where((f) => !f.path.contains('generated'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.dart'))
+            .where((f) => !f.path.contains('generated'))) {
       final source = file.readAsStringSync();
       for (final line in source.split('\n')) {
         final trimmed = line.trimLeft();
@@ -180,7 +197,10 @@ void main() {
       }
     }
 
-    expect(offenders, isEmpty,
-        reason: 'move these into the ARB files:\n${offenders.join('\n')}');
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'move these into the ARB files:\n${offenders.join('\n')}',
+    );
   });
 }

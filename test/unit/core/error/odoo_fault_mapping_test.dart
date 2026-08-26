@@ -32,8 +32,11 @@ void main() {
       );
 
       expect(failure.kind, FailureKind.fieldUnavailable);
-      expect(failure.serverMessage, 'x_sijil_status',
-          reason: 'the user needs to know which field');
+      expect(
+        failure.serverMessage,
+        'x_sijil_status',
+        reason: 'the user needs to know which field',
+      );
     });
 
     test('a field that does not exist inside a search domain', () {
@@ -72,8 +75,11 @@ void main() {
         contains('Missing required value'),
         reason: "Odoo's sentence is better than anything we would write",
       );
-      expect(failure.isBlocking, isFalse,
-          reason: 'a form error belongs in a snackbar, not over the screen');
+      expect(
+        failure.isBlocking,
+        isFalse,
+        reason: 'a form error belongs in a snackbar, not over the screen',
+      );
     });
 
     test('a database name that does not exist', () {
@@ -83,8 +89,11 @@ void main() {
       );
 
       expect(failure.kind, FailureKind.databaseUnavailable);
-      expect(failure.action, FailureAction.editConnection,
-          reason: 'the fix is one field on the connection screen');
+      expect(
+        failure.action,
+        FailureAction.editConnection,
+        reason: 'the fix is one field on the connection screen',
+      );
     });
 
     test('a method this Odoo version does not have', () {
@@ -138,21 +147,29 @@ void main() {
       ar = await AppL10n.delegate.load(const Locale('ar', 'EG'));
     });
 
-    test('every failure kind has a title, a cause and a fix, in both languages',
-        () {
-      // The contract the presenter promises. An empty string here is a screen
-      // that says something happened and leaves the user with nowhere to go.
-      for (final kind in FailureKind.values) {
-        for (final l10n in <AppL10n>[en, ar]) {
-          final presented = FailurePresenter.present(l10n, Failure(kind: kind));
+    test(
+      'every failure kind has a title, a cause and a fix, in both languages',
+      () {
+        // The contract the presenter promises. An empty string here is a screen
+        // that says something happened and leaves the user with nowhere to go.
+        for (final kind in FailureKind.values) {
+          for (final l10n in <AppL10n>[en, ar]) {
+            final presented = FailurePresenter.present(
+              l10n,
+              Failure(kind: kind),
+            );
 
-          expect(presented.title.trim(), isNotEmpty, reason: kind.name);
-          expect(presented.body.trim(), isNotEmpty, reason: kind.name);
-          expect(presented.fix.trim(), isNotEmpty,
-              reason: '${kind.name} leaves the user with no next step');
+            expect(presented.title.trim(), isNotEmpty, reason: kind.name);
+            expect(presented.body.trim(), isNotEmpty, reason: kind.name);
+            expect(
+              presented.fix.trim(),
+              isNotEmpty,
+              reason: '${kind.name} leaves the user with no next step',
+            );
+          }
         }
-      }
-    });
+      },
+    );
 
     test('a kind that offers an action always labels it', () {
       for (final kind in FailureKind.values) {
@@ -188,10 +205,7 @@ void main() {
     test('a raw exception that is not an AppException is still handled', () {
       // Nothing may reach a Cubit as an exception; a TypeError from a
       // malformed Odoo row has to come out the other side as a Failure.
-      final failure = ErrorMapper.map(
-        TypeError(),
-        StackTrace.current,
-      );
+      final failure = ErrorMapper.map(TypeError(), StackTrace.current);
 
       expect(failure.kind, FailureKind.unknown);
       expect(FailurePresenter.present(en, failure).fix.trim(), isNotEmpty);
@@ -207,8 +221,11 @@ void main() {
       expect(presented.body, 'Cannot scrap an assigned asset.');
       expect(presented.body, isNot(contains('Traceback')));
       expect(presented.body, isNot(contains('odoo.exceptions')));
-      expect(presented.technicalDetails, contains('Traceback'),
-          reason: 'kept for Settings → Diagnostics, shown nowhere else');
+      expect(
+        presented.technicalDetails,
+        contains('Traceback'),
+        reason: 'kept for Settings → Diagnostics, shown nowhere else',
+      );
     });
   });
 }

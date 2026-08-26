@@ -230,10 +230,7 @@ class HandoverCubit extends Cubit<HandoverState> {
       result.fold(
         (_) => emit(state.copyWith(isSearchingAssets: false)),
         (page) => emit(
-          state.copyWith(
-            isSearchingAssets: false,
-            available: page.items,
-          ),
+          state.copyWith(isSearchingAssets: false, available: page.items),
         ),
       );
     });
@@ -249,9 +246,7 @@ class HandoverCubit extends Cubit<HandoverState> {
   }
 
   void removeFromBundle(int assetId) => emit(
-    state.copyWith(
-      bundle: state.bundle.where((a) => a.id != assetId).toList(),
-    ),
+    state.copyWith(bundle: state.bundle.where((a) => a.id != assetId).toList()),
   );
 
   // ── The rest of the form ─────────────────────────────────────────────────

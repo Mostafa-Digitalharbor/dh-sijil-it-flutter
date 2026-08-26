@@ -33,24 +33,28 @@ void main() {
 
   final signature = Uint8List.fromList(<int>[137, 80, 78, 71, 13, 10, 26, 10]);
 
-  HandoverBundle bundleOf(List<Asset> assets, {String? notes}) => HandoverBundle(
-    recipient: recipient,
-    assets: assets,
-    handedOverOn: DateTime(2026, 8, 25),
-    signature: signature,
-    notes: notes,
-  );
+  HandoverBundle bundleOf(List<Asset> assets, {String? notes}) =>
+      HandoverBundle(
+        recipient: recipient,
+        assets: assets,
+        handedOverOn: DateTime(2026, 8, 25),
+        signature: signature,
+        notes: notes,
+      );
 
   group('the bundle', () {
-    test('fingerprints the signature, and the same bytes give the same one', () {
-      // It is printed on the receipt and written into the note so the two can
-      // be matched by eye. Two runs disagreeing would make it worthless.
-      final first = bundleOf(<Asset>[asset(1)]).signatureFingerprint;
-      final second = bundleOf(<Asset>[asset(1)]).signatureFingerprint;
+    test(
+      'fingerprints the signature, and the same bytes give the same one',
+      () {
+        // It is printed on the receipt and written into the note so the two can
+        // be matched by eye. Two runs disagreeing would make it worthless.
+        final first = bundleOf(<Asset>[asset(1)]).signatureFingerprint;
+        final second = bundleOf(<Asset>[asset(1)]).signatureFingerprint;
 
-      expect(first, second);
-      expect(first, matches(RegExp(r'^[0-9A-F]{2}:[0-9A-F]{2}$')));
-    });
+        expect(first, second);
+        expect(first, matches(RegExp(r'^[0-9A-F]{2}:[0-9A-F]{2}$')));
+      },
+    );
 
     test('a different signature fingerprints differently', () {
       final other = HandoverBundle(
@@ -115,30 +119,37 @@ void main() {
   });
 
   group('submitting', () {
-    test('assigns every asset to the recipient and attaches the proof', () async {
-      final assets = _RecordingAssets();
-      final attachments = _RecordingAttachments();
-      final repository = HandoverRepositoryImpl(
-        assets: assets,
-        attachments: attachments,
-        model: 'maintenance.equipment',
-      );
+    test(
+      'assigns every asset to the recipient and attaches the proof',
+      () async {
+        final assets = _RecordingAssets();
+        final attachments = _RecordingAttachments();
+        final repository = HandoverRepositoryImpl(
+          assets: assets,
+          attachments: attachments,
+          model: 'maintenance.equipment',
+        );
 
-      final result = await repository.submit(
-        bundleOf(<Asset>[asset(1), asset(2), asset(3)]),
-      );
+        final result = await repository.submit(
+          bundleOf(<Asset>[asset(1), asset(2), asset(3)]),
+        );
 
-      final receipt = result.getOrElse(() => throw StateError('failed'));
-      expect(receipt.handedOver.length, 3);
-      expect(receipt.failed, isEmpty);
-      expect(receipt.isComplete, isTrue);
-      expect(receipt.signedCount, 3, reason: 'every asset carries the receipt');
-      expect(
-        assets.requests.map((r) => r.employeeId).toSet(),
-        <int>{5},
-        reason: 'one bundle, one recipient',
-      );
-    });
+        final receipt = result.getOrElse(() => throw StateError('failed'));
+        expect(receipt.handedOver.length, 3);
+        expect(receipt.failed, isEmpty);
+        expect(receipt.isComplete, isTrue);
+        expect(
+          receipt.signedCount,
+          3,
+          reason: 'every asset carries the receipt',
+        );
+        expect(
+          assets.requests.map((r) => r.employeeId).toSet(),
+          <int>{5},
+          reason: 'one bundle, one recipient',
+        );
+      },
+    );
 
     test('every asset gets the same note, naming the whole bundle', () async {
       final assets = _RecordingAssets();
@@ -207,40 +218,46 @@ void main() {
       expect(attachments.records, <int>[1]);
     });
 
-    test('a failed upload weakens the proof without undoing the record', () async {
-      // The assignment is the fact and the image is the evidence. Rolling back
-      // a correct record to protect a thumbnail would be the wrong trade.
-      final repository = HandoverRepositoryImpl(
-        assets: _RecordingAssets(),
-        attachments: _RecordingAttachments(failAll: true),
-        model: 'maintenance.equipment',
-      );
+    test(
+      'a failed upload weakens the proof without undoing the record',
+      () async {
+        // The assignment is the fact and the image is the evidence. Rolling back
+        // a correct record to protect a thumbnail would be the wrong trade.
+        final repository = HandoverRepositoryImpl(
+          assets: _RecordingAssets(),
+          attachments: _RecordingAttachments(failAll: true),
+          model: 'maintenance.equipment',
+        );
 
-      final result = await repository.submit(
-        bundleOf(<Asset>[asset(1), asset(2)]),
-      );
+        final result = await repository.submit(
+          bundleOf(<Asset>[asset(1), asset(2)]),
+        );
 
-      final receipt = result.getOrElse(() => throw StateError('failed'));
-      expect(receipt.handedOver.length, 2);
-      expect(receipt.signedCount, 0);
-      expect(receipt.isPartiallySigned, isTrue);
-    });
+        final receipt = result.getOrElse(() => throw StateError('failed'));
+        expect(receipt.handedOver.length, 2);
+        expect(receipt.signedCount, 0);
+        expect(receipt.isPartiallySigned, isTrue);
+      },
+    );
 
-    test('a bundle Odoo refused entirely is knowable from the receipt', () async {
-      final repository = HandoverRepositoryImpl(
-        assets: _RecordingAssets(refuse: <int>{1, 2}),
-        attachments: _RecordingAttachments(),
-        model: 'maintenance.equipment',
-      );
+    test(
+      'a bundle Odoo refused entirely is knowable from the receipt',
+      () async {
+        final repository = HandoverRepositoryImpl(
+          assets: _RecordingAssets(refuse: <int>{1, 2}),
+          attachments: _RecordingAttachments(),
+          model: 'maintenance.equipment',
+        );
 
-      final result = await repository.submit(
-        bundleOf(<Asset>[asset(1), asset(2)]),
-      );
+        final result = await repository.submit(
+          bundleOf(<Asset>[asset(1), asset(2)]),
+        );
 
-      final receipt = result.getOrElse(() => throw StateError('failed'));
-      expect(receipt.isTotalFailure, isTrue);
-      expect(receipt.isComplete, isFalse, reason: 'nothing landed');
-    });
+        final receipt = result.getOrElse(() => throw StateError('failed'));
+        expect(receipt.isTotalFailure, isTrue);
+        expect(receipt.isComplete, isFalse, reason: 'nothing landed');
+      },
+    );
   });
 }
 
@@ -272,8 +289,9 @@ class _RecordingAssets implements AssetRepository {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not part of this test');
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(
+    '${invocation.memberName} is not part of this test',
+  );
 }
 
 class _RecordingAttachments implements AttachmentRepository {
@@ -303,6 +321,7 @@ class _RecordingAttachments implements AttachmentRepository {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not part of this test');
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(
+    '${invocation.memberName} is not part of this test',
+  );
 }

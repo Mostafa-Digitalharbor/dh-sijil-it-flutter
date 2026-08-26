@@ -59,6 +59,14 @@ dependencies:
   url_launcher: ^6.3.1
   logger: ^2.5.0
 
+  # ── Crash reporting ──────────────────────────────────────────────────────
+  #
+  # Every event is scrubbed through LogSanitizer before it leaves the device
+  # (core/observability/crash_reporter.dart). Off unless a DSN is compiled in,
+  # so a developer build never reports and a customer can be handed a build
+  # that reports nowhere.
+  sentry_flutter: ^9.27.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

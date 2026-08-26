@@ -95,9 +95,10 @@ class IdentifierLine extends StatelessWidget {
         if (note != null && note.isNotEmpty) ...<Widget>[
           Text(
             ' · ',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: tone, fontSize: AppTextSize.label),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: tone,
+              fontSize: AppTextSize.label,
+            ),
           ),
           Flexible(
             flex: 2,
@@ -105,9 +106,10 @@ class IdentifierLine extends StatelessWidget {
               note,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: tone, fontSize: AppTextSize.label),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: tone,
+                fontSize: AppTextSize.label,
+              ),
             ),
           ),
         ],

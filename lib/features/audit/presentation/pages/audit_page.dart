@@ -70,7 +70,8 @@ class _AuditView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AuditCubit, AuditState>(
       listenWhen: (a, b) =>
-          a.committedNotes != b.committedNotes || a.unknownCode != b.unknownCode,
+          a.committedNotes != b.committedNotes ||
+          a.unknownCode != b.unknownCode,
       listener: (context, state) {
         final l10n = AppL10n.of(context);
         if (state.committedNotes != null) {
@@ -187,7 +188,8 @@ class _SetupView extends StatelessWidget {
 
         if (state.scope == AuditScope.category)
           AppButton.outlined(
-            label: _scopeValue(l10n, AuditScope.category) ??
+            label:
+                _scopeValue(l10n, AuditScope.category) ??
                 l10n.auditPickCategory,
             icon: Icons.category_rounded,
             onPressed: () => _pick(
@@ -200,7 +202,8 @@ class _SetupView extends StatelessWidget {
           ),
         if (state.scope == AuditScope.department)
           AppButton.outlined(
-            label: _scopeValue(l10n, AuditScope.department) ??
+            label:
+                _scopeValue(l10n, AuditScope.department) ??
                 l10n.auditPickDepartment,
             icon: Icons.apartment_rounded,
             onPressed: () => _pick(
@@ -476,9 +479,9 @@ class _Viewfinder extends StatelessWidget {
               child: Text(
                 l10n.auditKeepScanning,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.cameraInk,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.cameraInk),
               ),
             ),
           ],
@@ -509,7 +512,10 @@ class _AuditBrackets extends StatelessWidget {
             Alignment.bottomLeft,
             Alignment.bottomRight,
           ])
-            Align(alignment: corner, child: _Corner(corner: corner)),
+            Align(
+              alignment: corner,
+              child: _Corner(corner: corner),
+            ),
         ],
       ),
     );
@@ -605,23 +611,20 @@ class _ScanRow extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     if (entry.asset.assetTag != null) ...<Widget>[
-                      MonoText.tag(
-                        entry.asset.assetTag!,
-                        color: palette.faint,
-                      ),
+                      MonoText.tag(entry.asset.assetTag!, color: palette.faint),
                       Text(
                         ' · ',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: palette.faint,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: palette.faint),
                       ),
                     ],
                     Expanded(
                       child: Text(
                         found ? l10n.auditWhereExpected : l10n.auditOutOfScope,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: palette.faint,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: palette.faint),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -726,9 +729,7 @@ class _ReportView extends StatelessWidget {
                       ? Icons.check_rounded
                       : Icons.cloud_upload_rounded,
                   isBusy: state.isCommitting,
-                  onPressed: state.committedNotes != null
-                      ? null
-                      : cubit.commit,
+                  onPressed: state.committedNotes != null ? null : cubit.commit,
                 ),
               ),
             ],

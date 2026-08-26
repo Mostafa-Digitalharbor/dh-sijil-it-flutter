@@ -22,20 +22,23 @@ void main() {
   bool isArabicIndic(String s) => s.split('').any(arabicIndic.contains);
   bool hasLatinDigits(String s) => RegExp(r'[0-9]').hasMatch(s);
 
-  test('the Arabic the app resolves to is the one with Arabic-Indic digits', () {
-    // Guards the ordering in supportedLocales: Flutter picks the first entry
-    // matching the language, so ar_EG has to come before bare ar.
-    final arabic = AppSettingsCubit.supportedLocales
-        .where((l) => l.languageCode == 'ar')
-        .toList();
+  test(
+    'the Arabic the app resolves to is the one with Arabic-Indic digits',
+    () {
+      // Guards the ordering in supportedLocales: Flutter picks the first entry
+      // matching the language, so ar_EG has to come before bare ar.
+      final arabic = AppSettingsCubit.supportedLocales
+          .where((l) => l.languageCode == 'ar')
+          .toList();
 
-    expect(arabic, isNotEmpty);
-    expect(
-      arabic.first.countryCode,
-      'EG',
-      reason: 'plain `ar` formats numbers in Latin — see app_ar_EG.arb',
-    );
-  });
+      expect(arabic, isNotEmpty);
+      expect(
+        arabic.first.countryCode,
+        'EG',
+        reason: 'plain `ar` formats numbers in Latin — see app_ar_EG.arb',
+      );
+    },
+  );
 
   test('NumberFormat gives Arabic-Indic digits for the resolved locale', () {
     final locale = AppSettingsCubit.supportedLocales
@@ -120,7 +123,9 @@ void main() {
       // app_ar_EG.arb is deliberately empty; if someone starts adding strings
       // to it the two Arabic files drift apart silently.
       final content = File('lib/l10n/app_ar_EG.arb').readAsStringSync();
-      final keys = RegExp(r'"(?!@)([A-Za-z][A-Za-z0-9_]*)"\s*:').allMatches(content);
+      final keys = RegExp(
+        r'"(?!@)([A-Za-z][A-Za-z0-9_]*)"\s*:',
+      ).allMatches(content);
 
       expect(
         keys,
@@ -140,20 +145,19 @@ void main() {
     //
     // Counts go through AppNumber; identifiers go through MonoText. Nothing
     // goes through string interpolation.
-    final interpolated = RegExp(
-      r"""'\$\{?([A-Za-z_][\w.]*(?:\(\))?)\}?'""",
-    );
+    final interpolated = RegExp(r"""'\$\{?([A-Za-z_][\w.]*(?:\(\))?)\}?'""");
     final numeric = RegExp(
       'count|total|length|number|days|remaining|size|index',
       caseSensitive: false,
     );
     final offenders = <String>[];
 
-    for (final file in Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.dart'))
-        .where((f) => !f.path.contains('generated'))) {
+    for (final file
+        in Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.dart'))
+            .where((f) => !f.path.contains('generated'))) {
       final lines = file.readAsStringSync().split('\n');
       for (var i = 0; i < lines.length; i++) {
         final line = lines[i].trimLeft();
@@ -174,31 +178,35 @@ void main() {
     );
   });
 
-  test('Arabic copy in the ARB uses Arabic-Indic, matching what is computed', () {
-    // The rule is only worth anything if both halves agree. This catches the
-    // reverse drift: someone typing Latin digits into an Arabic string.
-    final content = File('lib/l10n/app_ar.arb').readAsStringSync();
-    final offenders = <String>[];
+  test(
+    'Arabic copy in the ARB uses Arabic-Indic, matching what is computed',
+    () {
+      // The rule is only worth anything if both halves agree. This catches the
+      // reverse drift: someone typing Latin digits into an Arabic string.
+      final content = File('lib/l10n/app_ar.arb').readAsStringSync();
+      final offenders = <String>[];
 
-    for (final line in content.split('\n')) {
-      final match = RegExp(r'^\s*"([A-Za-z][A-Za-z0-9_]*)"\s*:\s*"(.*)",?$')
-          .firstMatch(line);
-      if (match == null) continue;
-      final value = match.group(2)!;
-      // Identifiers, URLs and format patterns legitimately carry Latin digits.
-      if (value.contains('http') || value.contains('{')) continue;
-      if (RegExp(r'[0-9]').hasMatch(value) &&
-          RegExp(r'[؀-ۿ]').hasMatch(value)) {
-        offenders.add('${match.group(1)}: $value');
+      for (final line in content.split('\n')) {
+        final match = RegExp(
+          r'^\s*"([A-Za-z][A-Za-z0-9_]*)"\s*:\s*"(.*)",?$',
+        ).firstMatch(line);
+        if (match == null) continue;
+        final value = match.group(2)!;
+        // Identifiers, URLs and format patterns legitimately carry Latin digits.
+        if (value.contains('http') || value.contains('{')) continue;
+        if (RegExp(r'[0-9]').hasMatch(value) &&
+            RegExp(r'[؀-ۿ]').hasMatch(value)) {
+          offenders.add('${match.group(1)}: $value');
+        }
       }
-    }
 
-    expect(
-      offenders,
-      isEmpty,
-      reason:
-          'Arabic strings mixing Latin digits with Arabic text:\n'
-          '${offenders.join('\n')}',
-    );
-  });
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Arabic strings mixing Latin digits with Arabic text:\n'
+            '${offenders.join('\n')}',
+      );
+    },
+  );
 }
