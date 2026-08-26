@@ -480,12 +480,49 @@ jobs:
 
       - name: Upload to TestFlight
         if: steps.asc.outputs.configured == 'true'
-        uses: apple-actions/upload-testflight-build@v3
-        with:
-          app-path: ${{ steps.ipa.outputs.path }}
-          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          api-private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          KEY_B64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+          IPA: ${{ steps.ipa.outputs.path }}
+        # `altool` is invoked directly rather than through an action, because
+        # the key has to reach it as a *file* in a directory altool searches,
+        # named `AuthKey_<key id>.p8`. An action that takes the key as a string
+        # input has to guess whether that string is PEM or base64, and guessing
+        # wrong produces "(-39) does not contain a valid authentication key" —
+        # which reads like a bad key rather than a bad encoding.
+        #
+        # The secret stays base64 on purpose: a PEM is multi-line, and newlines
+        # are exactly what a value does not reliably survive on its way through
+        # a clipboard into a secret box.
+        run: |
+          set -euo pipefail
+
+          mkdir -p ~/private_keys
+          KEY_FILE=~/private_keys/AuthKey_${KEY_ID}.p8
+          if ! printf '%s' "$KEY_B64" | tr -d '[:space:]' \
+               | base64 --decode > "$KEY_FILE" 2>/dev/null; then
+            echo "::error::APP_STORE_CONNECT_PRIVATE_KEY_BASE64 is not valid base64."
+            echo "::error::Expected length: 344 characters."
+            exit 1
+          fi
+
+          # Checked before altool sees it, because altool reports every problem
+          # with this file — wrong encoding, wrong key, empty — as the same -39.
+          if ! head -1 "$KEY_FILE" | grep -q 'BEGIN PRIVATE KEY'; then
+            echo "::error::The decoded App Store Connect key is not a PEM private"
+            echo "::error::key. The secret must hold the base64 of the .p8 file"
+            echo "::error::Apple issued, not the file's text and not a key id."
+            rm -f "$KEY_FILE"
+            exit 1
+          fi
+
+          echo "Uploading $IPA to TestFlight as key $KEY_ID"
+          trap 'rm -f "$KEY_FILE"' EXIT
+          xcrun altool --upload-app --type ios \
+            --file "$IPA" \
+            --apiKey "$KEY_ID" \
+            --apiIssuer "$ISSUER"
 
       - name: Remove signing material
         if: always()
