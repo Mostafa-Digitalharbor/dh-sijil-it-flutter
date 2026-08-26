@@ -138,12 +138,29 @@ jobs:
       - name: Restore signing keystore
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        # Whitespace is stripped before decoding rather than after failing on
+        # it. These secrets are pasted by a human through a clipboard, and a
+        # stray newline is the single most common thing to survive that trip —
+        # `base64 --decode` answers it with "invalid input" and no indication
+        # of which secret, thirty minutes into a build.
         run: |
           if [ -z "$KEYSTORE_B64" ]; then
             echo "::error::ANDROID_KEYSTORE_BASE64 is not configured."
             exit 1
           fi
-          echo "$KEYSTORE_B64" | base64 --decode > android/app/release.jks
+          if ! printf '%s' "$KEYSTORE_B64" | tr -d '[:space:]' \
+               | base64 --decode > android/app/release.jks 2>/dev/null; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is not valid base64 — it was"
+            echo "::error::truncated or mangled on the way into the secret."
+            echo "::error::Expected length: 5880 characters."
+            exit 1
+          fi
+          # A keystore is a ZIP-family container; an empty or half-copied
+          # secret decodes to something, just not to this.
+          if [ ! -s android/app/release.jks ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 decoded to an empty file."
+            exit 1
+          fi
 
       - name: Write key.properties
         run: |
@@ -191,14 +208,39 @@ jobs:
         id: play
         env:
           PLAY_JSON_B64: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}
+        # Also accepts the raw JSON, not only base64. Somebody will eventually
+        # paste the service-account file's contents straight in — it is a text
+        # file, so pasting it is the obvious move — and failing that on a
+        # technicality helps nobody.
         run: |
           if [ -z "$PLAY_JSON_B64" ]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "::notice::Play upload skipped — GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 is unset."
-          else
-            echo "$PLAY_JSON_B64" | base64 --decode > play-service-account.json
-            echo "configured=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          case "$(printf '%s' "$PLAY_JSON_B64" | head -c 1)" in
+            '{') printf '%s' "$PLAY_JSON_B64" > play-service-account.json ;;
+            *)
+              if ! printf '%s' "$PLAY_JSON_B64" | tr -d '[:space:]' \
+                   | base64 --decode > play-service-account.json 2>/dev/null; then
+                echo "::error::GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 is neither"
+                echo "::error::valid base64 nor raw JSON — it was truncated or"
+                echo "::error::mangled on the way into the secret."
+                echo "::error::Expected length: 3132 characters."
+                exit 1
+              fi ;;
+          esac
+
+          # Validated here rather than trusted, because the next thing to touch
+          # this file is an action whose failure message is about Google's API
+          # rather than about the file it was handed.
+          if ! python3 -c "import json,sys; d=json.load(open('play-service-account.json')); sys.exit(0 if d.get('type')=='service_account' else 1)"; then
+            echo "::error::The decoded file is not a Google service-account key."
+            exit 1
+          fi
+          echo "Service account: $(python3 -c "import json;print(json.load(open('play-service-account.json'))['client_email'])")"
+          echo "configured=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload to Play internal track
         if: steps.play.outputs.configured == 'true'
@@ -279,7 +321,14 @@ jobs:
           set -euo pipefail
           DEST="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$DEST"
-          echo "$PROFILE_B64" | base64 --decode > /tmp/profile.mobileprovision
+
+          if ! printf '%s' "$PROFILE_B64" | tr -d '[:space:]' \
+               | base64 --decode > /tmp/profile.mobileprovision 2>/dev/null; then
+            echo "::error::IOS_PROVISIONING_PROFILE_BASE64 is not valid base64 —"
+            echo "::error::it was truncated or mangled on the way into the secret."
+            echo "::error::Expected length: 16348 characters."
+            exit 1
+          fi
 
           # Read the profile's own name and UUID rather than hard-coding them.
           # A hard-coded profile name is the most common reason an otherwise
