@@ -5,7 +5,7 @@ and maps to specific acceptance criteria from the brief.
 
 **Legend** — ✅ done · 🔨 next · ⬜ not started
 
-> **Status.** Phases 0–12 are built and green: **559 tests**, analyzer clean,
+> **Status.** Phases 0–12 are built and green: **568 tests**, analyzer clean,
 > formatter clean, every screen implemented. Phase 11's matrices and signing are
 > done and the release pipeline is proven end to end — a locally signed AAB and
 > APK carry the upload key, and the Sentry DSN is verified present in the Dart
@@ -249,7 +249,10 @@ and the store review passes are the stores'.
   `dart format` with nothing going red. Triggers are now `branches: ["**"]`.
 - **An expired session had no way out.** `FailureView` renders a "Sign in
   again" action, but no screen ever passed `onSignIn`, so the button was never
-  built — the same for `onEditConnection`. Tracked separately.
+  built — the same for `onEditConnection`, which every connection failure names
+  in its copy. Both now default to the app-level behaviour and a caller can
+  still override either; `test/widget/failure_actions_test.dart` asserts that a
+  user can act on every failure whose wording promises they can.
 
 ---
 

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../app/theme/app_colors.dart';
@@ -7,6 +10,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../core/error/failure_presenter.dart';
 import '../../core/error/failures.dart';
 import '../../core/responsive/responsive.dart';
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'app_button.dart';
 import 'app_card.dart';
@@ -260,6 +264,22 @@ class EmptyStateView extends StatelessWidget {
 ///
 /// The user never sees a stack trace or an Odoo fault string; the technical
 /// detail goes to Settings → Diagnostics instead (spec §22).
+///
+/// ## Why two of the three actions have a default
+///
+/// [onRetry] differs per screen — only the caller knows what to re-run — so it
+/// stays required-if-wanted. The other two do not: "sign in again" and "fix the
+/// connection" mean the same thing on every screen in the app, and asking each
+/// of the twelve call sites to say so was a rule nobody followed. Every one of
+/// them passed `onRetry` and none passed the others, so an expired session
+/// rendered "Your session expired. Sign in again." above **no button at all** —
+/// the guard below turns a null handler into no action, which is the right
+/// behaviour for a handler that genuinely has no meaning and the wrong one
+/// here. Same for a wrong server URL: the copy said to fix the connection and
+/// offered no way to reach it.
+///
+/// So those two now fall back to the app-level behaviour, and a caller can
+/// still override either.
 class FailureView extends StatelessWidget {
   const FailureView({
     required this.failure,
@@ -271,13 +291,17 @@ class FailureView extends StatelessWidget {
 
   final Failure failure;
   final VoidCallback? onRetry;
+
+  /// Overrides the default, which returns to the connection screen.
   final VoidCallback? onEditConnection;
+
+  /// Overrides the default, which signs out and lets the router route.
   final VoidCallback? onSignIn;
 
   @override
   Widget build(BuildContext context) {
     final presented = FailurePresenter.present(AppL10n.of(context), failure);
-    final handler = _handlerFor(presented.action);
+    final handler = _handlerFor(context, presented.action);
 
     return _CenteredMessage(
       icon: presented.icon,
@@ -297,12 +321,37 @@ class FailureView extends StatelessWidget {
     );
   }
 
-  VoidCallback? _handlerFor(FailureAction action) => switch (action) {
-    FailureAction.retry => onRetry,
-    FailureAction.editConnection => onEditConnection,
-    FailureAction.signIn => onSignIn,
-    FailureAction.none => null,
-  };
+  VoidCallback? _handlerFor(BuildContext context, FailureAction action) =>
+      switch (action) {
+        FailureAction.retry => onRetry,
+        FailureAction.editConnection =>
+          onEditConnection ??
+              _authAction(context, (auth) => auth.forgetConnection()),
+        FailureAction.signIn =>
+          onSignIn ?? _authAction(context, (auth) => auth.signOut()),
+        FailureAction.none => null,
+      };
+
+  /// Binds an [AuthCubit] method to a button, or returns null when there is no
+  /// cubit to bind to.
+  ///
+  /// Null rather than a throwing callback because this widget is rendered by a
+  /// dozen screens and by tests that pump one in isolation; a missing provider
+  /// should cost the button, not the frame. Neither method needs the result —
+  /// both end by emitting a state the router is already listening to, so the
+  /// navigation happens without this widget knowing where the user lands.
+  static VoidCallback? _authAction(
+    BuildContext context,
+    Future<void> Function(AuthCubit) run,
+  ) {
+    final AuthCubit auth;
+    try {
+      auth = context.read<AuthCubit>();
+    } on Object {
+      return null;
+    }
+    return () => unawaited(run(auth));
+  }
 
   IconData? _iconFor(FailureAction action) => switch (action) {
     FailureAction.retry => Icons.refresh_rounded,
