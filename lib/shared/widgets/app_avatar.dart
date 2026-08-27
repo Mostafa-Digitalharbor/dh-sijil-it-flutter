@@ -113,7 +113,7 @@ class AppLeadingTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(
-          size >= AppDimens.tileMd ? AppRadii.md : AppRadii.sm + 2,
+          size >= AppDimens.tileMd ? AppRadii.md : AppRadii.tile,
         ),
       ),
       child: Icon(icon, size: size * 0.48, color: foreground),

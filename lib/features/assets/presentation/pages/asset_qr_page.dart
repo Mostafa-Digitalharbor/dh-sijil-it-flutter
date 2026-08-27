@@ -15,7 +15,8 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/async_data_view.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../domain/entities/asset.dart';
 import '../cubit/asset_detail_cubit.dart';
 
@@ -56,15 +57,14 @@ class _AssetQrView extends StatelessWidget {
           compactTitle: true,
           showBack: true,
           onBack: () => context.go(AppRoutes.assetDetailPath(assetId)),
-          body: switch (state) {
-            _ when state.isLoading && asset == null => const SkeletonList(),
-            _ when state.hasFailed && asset == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => context.read<AssetDetailCubit>().load(assetId),
-            ),
-            _ when asset == null => const SizedBox.shrink(),
-            _ => _QrBody(asset: asset),
-          },
+          body: AsyncDataView<Asset>(
+            status: state.status,
+            data: asset,
+            failure: state.failure,
+            onRetry: () => context.read<AssetDetailCubit>().load(assetId),
+            loadingView: const SkeletonDetail(hasActions: false),
+            builder: (_, asset) => _QrBody(asset: asset),
+          ),
         );
       },
     );

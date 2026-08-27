@@ -2,7 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_palette.dart';
+import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 
 /// One band of a [StatusDonut].
@@ -256,7 +258,7 @@ class _SparklinePainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: <Color>[
-            tone.withValues(alpha: 0.34),
+            tone.withValues(alpha: AppOpacities.sparklineArea),
             tone.withValues(alpha: 0),
           ],
         ).createShader(Offset.zero & size),
@@ -266,7 +268,7 @@ class _SparklinePainter extends CustomPainter {
       line,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.2
+        ..strokeWidth = AppDimens.sparklineStroke
         ..strokeJoin = StrokeJoin.round
         ..strokeCap = StrokeCap.round
         ..color = tone,
@@ -274,10 +276,14 @@ class _SparklinePainter extends CustomPainter {
 
     canvas.drawCircle(
       points.last,
-      8,
-      Paint()..color = tone.withValues(alpha: 0.22),
+      AppDimens.sparklineHaloRadius,
+      Paint()..color = tone.withValues(alpha: AppOpacities.sparklineHalo),
     );
-    canvas.drawCircle(points.last, 4, Paint()..color = tone);
+    canvas.drawCircle(
+      points.last,
+      AppDimens.sparklinePoint,
+      Paint()..color = tone,
+    );
   }
 
   @override
@@ -345,7 +351,7 @@ class ProgressRing extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 2),
+                padding: const EdgeInsetsDirectional.only(top: AppSpacing.xxs),
                 child: Text(
                   secondary,
                   maxLines: 1,

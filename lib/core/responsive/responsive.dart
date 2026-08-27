@@ -82,6 +82,13 @@ class ResponsiveInfo {
     ScreenSize.expanded => 6,
   };
 
+  /// [tileColumns], narrowed when the user has turned text size well up.
+  ///
+  /// Three 110-pt tiles with a scaled label is where the dashboard used to
+  /// overflow. Dropping to two costs a row and keeps the number the tile
+  /// exists to show.
+  int get statTileColumns => isLargeText ? _largeTextTileColumns : tileColumns;
+
   /// Columns for a card grid (asset rows on a tablet).
   int get cardColumns => switch (size) {
     ScreenSize.compact => 1,
@@ -101,6 +108,10 @@ class ResponsiveInfo {
   /// True when the user has turned text size well up: dense rows should
   /// reflow to a column rather than clip.
   bool get isLargeText => textScale > 1.15;
+
+  /// How narrow [statTileColumns] goes. Two rather than one: a single column
+  /// of stat tiles stops reading as a dashboard and starts reading as a list.
+  static const int _largeTextTileColumns = 2;
 
   /// Pick a value per size class without writing a switch at the call site.
   T pick<T>({required T compact, T? medium, T? expanded}) => switch (size) {

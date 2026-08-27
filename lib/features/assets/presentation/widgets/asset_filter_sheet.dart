@@ -335,7 +335,7 @@ class _Group extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(title.toUpperCase(), style: theme.textTheme.labelSmall),
-          const SizedBox(height: AppSpacing.sm + 1),
+          const SizedBox(height: AppSpacing.gridGap),
           child,
         ],
       ),

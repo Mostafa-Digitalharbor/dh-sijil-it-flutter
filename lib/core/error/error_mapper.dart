@@ -19,6 +19,10 @@ abstract final class ErrorMapper {
         kind: FailureKind.serverUnreachable,
         technicalDetails: error.technicalDetails ?? error.message,
       ),
+      InsecureConnectionException() => Failure(
+        kind: FailureKind.insecureConnection,
+        technicalDetails: error.message,
+      ),
       TimeoutException() => Failure(
         kind: FailureKind.timeout,
         technicalDetails: error.technicalDetails,

@@ -6,10 +6,18 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- enableOnBackInvokedCallback: Android 13+ predictive back. Without it
+         the platform logs "OnBackInvokedCallback is not enabled for the
+         application" on every launch and falls back to the legacy
+         KEYCODE_BACK path, so the screens that intercept back — the sign-in
+         screen, and every form that asks before discarding — get neither the
+         back preview nor the system animation the rest of the OS uses.
+         Flutter routes its `PopScope` through the new API from 3.24 on. -->
     <application
         android:label="Sijil IT"
         android:name="${applicationName}"
         android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -33,6 +41,19 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Fetch the barcode model when the app installs, not on first scan.
+
+             The model is no longer compiled into the APK (see
+             `dev.steenbakker.mobile_scanner.useUnbundled` in
+             android/gradle.properties), which saves 4 MB per device but leaves
+             Play Services to supply it. Without this line it is fetched lazily,
+             so the very first scan a technician attempts — usually standing in
+             front of the asset, often on office Wi-Fi they have not joined yet
+             — is the one that waits for a download. With it, Play Services has
+             the model before the app is ever opened. -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

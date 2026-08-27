@@ -96,11 +96,26 @@ class DioXmlRpcClient implements XmlRpcClient {
     }
   }
 
+  /// Whether the OS refused the request because it was not encrypted.
+  static bool _isCleartextBlock(DioException e) {
+    final text = '${e.message} ${e.error}'.toLowerCase();
+    return text.contains('cleartext') ||
+        text.contains('app transport security') ||
+        text.contains('nsapptransportsecurity');
+  }
+
   app.AppException _mapDioException(DioException e) {
     return switch (e.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
       DioExceptionType.receiveTimeout => const app.TimeoutException(),
+      // Both platforms report a blocked cleartext request as a plain
+      // connection error, so the text is the only thing that distinguishes
+      // "your server is down" from "this app will never send that URL".
+      // Android says CLEARTEXT communication ... not permitted; iOS says the
+      // resource load was blocked by App Transport Security.
+      DioExceptionType.connectionError when _isCleartextBlock(e) =>
+        const app.InsecureConnectionException(),
       DioExceptionType.connectionError => app.ConnectionException(
         'Could not reach the Odoo server.',
         technicalDetails: '${e.message}',

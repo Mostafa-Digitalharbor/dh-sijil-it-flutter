@@ -9,6 +9,7 @@ import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/network/odoo/odoo_connection.dart';
 import '../../../../core/responsive/responsive.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/utils/l10n_lookup.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_logo.dart';
@@ -16,10 +17,20 @@ import '../../../../shared/widgets/app_segmented.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../cubit/auth_cubit.dart';
 
-/// Signs the user in against the already-configured Odoo instance (spec §3).
+/// Second of the two first-run screens: *who you are* (spec §3).
 ///
-/// Shows the saved connection rather than asking for it again — changing
-/// servers is a deliberate, separate action.
+/// Takes the server and database as settled — the previous screen chose them,
+/// and the summary card at the top says which — and asks only for the pair
+/// that changes: the username and the password or API key.
+///
+/// ## Going back
+///
+/// The three auth screens are swapped by the router's redirect rather than
+/// pushed onto a stack, so there is no route to pop. Back is therefore a state
+/// change: [AuthCubit.editConnection] returns to `configuring`, the redirect
+/// notices, and the server screen comes back with its fields intact. The
+/// system back gesture is wired to the same call, because a back button that
+/// works and a back swipe that closes the app is worse than neither.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -28,22 +39,64 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _username = TextEditingController();
   final TextEditingController _secret = TextEditingController();
+
+  /// Which credential the user says they are typing.
+  ///
+  /// Local to this screen rather than part of the saved connection until a
+  /// sign-in succeeds: it is a statement about the secret being entered now,
+  /// and the secret never leaves this widget.
+  OdooAuthMode _authMode = OdooAuthMode.password;
+
   bool _obscure = true;
   bool _keepSignedIn = true;
 
+  /// Validation keys for the two fields, or null when they are fine.
+  String? _usernameError;
+  String? _secretError;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Prefilled once, here, rather than on every build from the Bloc value:
+    // assigning to a `TextEditingController` notifies its field, and doing
+    // that during a build is how a "markNeedsBuild during build" crash gets
+    // written. Once is also all that is correct — a rebuild mid-typing must
+    // not put the old username back under the cursor.
+    //
+    // Empty after the server screen, filled after a sign-out: the connection
+    // is already in state by the time the router mounts this page, because
+    // that state is what routed here.
+    final connection = context.read<AuthCubit>().state.connection;
+    if (connection != null) {
+      _username.text = connection.username;
+      _authMode = connection.authMode;
+    }
+  }
+
   @override
   void dispose() {
+    _username.dispose();
     _secret.dispose();
     super.dispose();
   }
 
   void _submit(OdooConnection connection) {
-    if (_secret.text.isEmpty) return;
+    final username = _username.text.trim();
+    final secret = _secret.text;
+
+    setState(() {
+      _usernameError = username.isEmpty ? _ValidationKeys.username : null;
+      _secretError = secret.isEmpty ? _ValidationKeys.credential : null;
+    });
+    if (_usernameError != null || _secretError != null) return;
+
     FocusScope.of(context).unfocus();
     context.read<AuthCubit>().signIn(
-      connection: connection,
-      secret: _secret.text,
+      connection: connection.copyWith(username: username, authMode: _authMode),
+      secret: secret,
     );
   }
 
@@ -57,60 +110,98 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context, state) {
         final connection = state.connection;
 
-        // The router only routes here with a saved connection, so this is a
+        // The router only routes here with a connection, so this is a
         // defensive fallback rather than a reachable state.
         if (connection == null) return const SizedBox.shrink();
 
-        return Scaffold(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.navy,
-          body: Column(
-            children: [
-              _BrandBand(
-                subtitle: l10n.loginSubtitle,
-                title: l10n.loginWelcomeBack,
-              ),
-              Expanded(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(AppRadii.xl + 6),
+        return PopScope(
+          // Handled here instead of popping: there is nothing on the stack
+          // below this screen, so the default would close the app.
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) _back(context);
+          },
+          child: Scaffold(
+            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.navy,
+            body: Column(
+              children: [
+                _BrandBand(
+                  subtitle: l10n.loginSubtitle,
+                  title: l10n.loginWelcomeBack,
+                  onBack: () => _back(context),
+                ),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(AppRadii.sheetTop),
+                      ),
                     ),
-                  ),
-                  child: SafeArea(
-                    top: false,
-                    child: _LoginForm(
-                      connection: connection,
-                      state: state,
-                      secret: _secret,
-                      obscure: _obscure,
-                      keepSignedIn: _keepSignedIn,
-                      onToggleObscure: () =>
-                          setState(() => _obscure = !_obscure),
-                      onToggleKeep: (value) =>
-                          setState(() => _keepSignedIn = value),
-                      onSubmit: () => _submit(connection),
+                    child: SafeArea(
+                      top: false,
+                      child: _LoginForm(
+                        connection: connection,
+                        state: state,
+                        username: _username,
+                        secret: _secret,
+                        authMode: _authMode,
+                        obscure: _obscure,
+                        keepSignedIn: _keepSignedIn,
+                        usernameError: _usernameError,
+                        secretError: _secretError,
+                        onAuthMode: (mode) => setState(() {
+                          _authMode = mode;
+                          _secretError = null;
+                        }),
+                        onToggleObscure: () =>
+                            setState(() => _obscure = !_obscure),
+                        onToggleKeep: (value) =>
+                            setState(() => _keepSignedIn = value),
+                        onUsernameChanged: (_) {
+                          if (_usernameError != null) {
+                            setState(() => _usernameError = null);
+                          }
+                        },
+                        onSecretChanged: (_) {
+                          if (_secretError != null) {
+                            setState(() => _secretError = null);
+                          }
+                        },
+                        onSubmit: () => _submit(connection),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
     );
   }
+
+  void _back(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    context.read<AuthCubit>().editConnection();
+  }
 }
 
 /// The navy header — the only full-bleed brand moment in the app.
 class _BrandBand extends StatelessWidget {
-  const _BrandBand({required this.title, required this.subtitle});
+  const _BrandBand({
+    required this.title,
+    required this.subtitle,
+    required this.onBack,
+  });
 
   final String title;
   final String subtitle;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
     final screen = context.screen;
 
@@ -120,13 +211,29 @@ class _BrandBand extends StatelessWidget {
         padding: EdgeInsetsDirectional.only(
           start: screen.gutter + AppSpacing.sm,
           end: screen.gutter + AppSpacing.sm,
-          top: AppSpacing.xxl,
+          top: AppSpacing.md,
           bottom: AppSpacing.xxxl,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Unbordered and transparent: a bordered box would read as a
+            // control floating on the brand band rather than part of it. The
+            // glyph mirrors itself in Arabic, so back always points the way
+            // the user came from.
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: AppIconButton(
+                icon: Icons.arrow_back_rounded,
+                tooltip: l10n.loginBackToServer,
+                bordered: false,
+                color: Colors.white,
+                onPressed: onBack,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+
             // The band is navy in both themes; the mark follows the band, not
             // the theme.
             const AppLogo.monogram(
@@ -158,21 +265,35 @@ class _LoginForm extends StatelessWidget {
   const _LoginForm({
     required this.connection,
     required this.state,
+    required this.username,
     required this.secret,
+    required this.authMode,
     required this.obscure,
     required this.keepSignedIn,
+    required this.usernameError,
+    required this.secretError,
+    required this.onAuthMode,
     required this.onToggleObscure,
     required this.onToggleKeep,
+    required this.onUsernameChanged,
+    required this.onSecretChanged,
     required this.onSubmit,
   });
 
   final OdooConnection connection;
   final AuthState state;
+  final TextEditingController username;
   final TextEditingController secret;
+  final OdooAuthMode authMode;
   final bool obscure;
   final bool keepSignedIn;
+  final String? usernameError;
+  final String? secretError;
+  final ValueChanged<OdooAuthMode> onAuthMode;
   final VoidCallback onToggleObscure;
   final ValueChanged<bool> onToggleKeep;
+  final ValueChanged<String> onUsernameChanged;
+  final ValueChanged<String> onSecretChanged;
   final VoidCallback onSubmit;
 
   @override
@@ -202,23 +323,29 @@ class _LoginForm extends StatelessWidget {
 
                 AppTextField(
                   label: l10n.fieldUsername,
-                  controller: TextEditingController(text: connection.username),
-                  enabled: false,
+                  hint: l10n.fieldUsernameHint,
                   icon: Icons.person_outline_rounded,
+                  controller: username,
+                  onChanged: onUsernameChanged,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
                   textDirection: TextDirection.ltr,
+                  autofillHints: const [AutofillHints.username],
+                  errorText: l10n.lookup(usernameError),
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
                 AppTextField(
-                  label: connection.authMode == OdooAuthMode.apiKey
-                      ? l10n.authModeApiKey
-                      : l10n.authModePassword,
-                  hint: connection.authMode == OdooAuthMode.apiKey
+                  label: l10n.fieldCredential,
+                  hint: authMode == OdooAuthMode.apiKey
                       ? l10n.fieldApiKeyHint
                       : l10n.fieldPasswordHint,
-                  icon: Icons.lock_outline_rounded,
+                  icon: authMode == OdooAuthMode.apiKey
+                      ? Icons.vpn_key_outlined
+                      : Icons.lock_outline_rounded,
                   controller: secret,
                   obscure: obscure,
+                  onChanged: onSecretChanged,
                   onToggleObscure: onToggleObscure,
                   textInputAction: TextInputAction.done,
                   textDirection: TextDirection.ltr,
@@ -227,6 +354,26 @@ class _LoginForm extends StatelessWidget {
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'\s')),
                   ],
+                  errorText: l10n.lookup(secretError),
+                  // A password and an API key go to the same Odoo endpoint but
+                  // are different things to look up, so the choice sits on the
+                  // field it describes rather than in a settings screen.
+                  action: AppSegmented<OdooAuthMode>(
+                    compact: true,
+                    semanticLabel: l10n.fieldCredential,
+                    value: authMode,
+                    onChanged: onAuthMode,
+                    options: [
+                      SegmentOption(
+                        value: OdooAuthMode.password,
+                        label: l10n.authModePassword,
+                      ),
+                      SegmentOption(
+                        value: OdooAuthMode.apiKey,
+                        label: l10n.authModeApiKey,
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
 
@@ -260,6 +407,26 @@ class _LoginForm extends StatelessWidget {
                   onPressed: state.isBusy ? null : onSubmit,
                 ),
 
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.lock_outline_rounded,
+                      size: AppDimens.iconSm,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Flexible(
+                      child: Text(
+                        l10n.credentialStorageNote,
+                        style: theme.textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+
                 const SizedBox(height: AppSpacing.xl),
                 AppCard(
                   child: Row(
@@ -279,25 +446,6 @@ class _LoginForm extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: AppSpacing.xl),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        l10n.loginDifferentServer,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    AppTextAction(
-                      label: l10n.loginSwitchServer,
-                      onPressed: () =>
-                          context.read<AuthCubit>().forgetConnection(),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -320,7 +468,7 @@ class _LoginForm extends StatelessWidget {
   }
 }
 
-/// The saved server, shown so the user knows what they are signing into.
+/// The chosen server, shown so the user knows what they are signing into.
 class _ConnectionSummary extends StatelessWidget {
   const _ConnectionSummary({required this.connection});
 
@@ -341,6 +489,9 @@ class _ConnectionSummary extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
+            // A host and a database name are identifiers, not prose. Left to
+            // the ambient direction, an Arabic layout would render
+            // `dh-sijil.odoo.com` with its parts reordered.
             child: Directionality(
               textDirection: TextDirection.ltr,
               child: Column(
@@ -364,9 +515,12 @@ class _ConnectionSummary extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
+          // The same destination as the band's back arrow, offered again on
+          // the thing it changes — a user reading the summary and finding the
+          // database wrong should not have to look for the way back.
           AppTextAction(
             label: l10n.actionChange,
-            onPressed: () => context.read<AuthCubit>().forgetConnection(),
+            onPressed: () => context.read<AuthCubit>().editConnection(),
           ),
         ],
       ),
@@ -428,4 +582,16 @@ class _FailureBanner extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Sentinel keys this screen resolves through `AppL10n`.
+///
+/// Same discipline as the Cubits': the widget decides *what* is wrong and the
+/// lookup decides how to say it, so neither the check nor the message has to
+/// know about the other's language.
+abstract final class _ValidationKeys {
+  static const String username = 'validationEnterUsername';
+  static const String credential = 'validationEnterCredential';
+
+  const _ValidationKeys._();
 }

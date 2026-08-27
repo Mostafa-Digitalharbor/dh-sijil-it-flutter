@@ -5,6 +5,7 @@ import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_palette.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Visual weight of a button, in descending order of emphasis.
 enum AppButtonVariant {
@@ -302,6 +303,35 @@ class AppTextAction extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The × that dismisses a modal form.
+///
+/// Four screens — the asset form, assign, return and handover — each spelled
+/// out the same five lines: the rounded close glyph, the "Close" tooltip, and
+/// `bordered: false` so it reads as chrome rather than as an action. The only
+/// thing that differed between them was the callback.
+///
+/// It is a widget rather than a named constructor on [AppIconButton] because
+/// the tooltip has to be translated, and that needs a `BuildContext` the
+/// constructor does not have.
+///
+/// Deliberately *not* used by the scanner, whose close button is drawn white
+/// on a live camera feed and carries its own colours.
+class AppCloseButton extends StatelessWidget {
+  const AppCloseButton({required this.onPressed, super.key});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppIconButton(
+      icon: Icons.close_rounded,
+      tooltip: AppL10n.of(context).actionClose,
+      bordered: false,
+      onPressed: onPressed,
     );
   }
 }

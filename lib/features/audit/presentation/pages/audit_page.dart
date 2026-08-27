@@ -573,7 +573,7 @@ class _ScanRow extends StatelessWidget {
     final read = context.ink(tone);
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm + 2),
+      padding: const EdgeInsets.all(AppSpacing.dense),
       decoration: BoxDecoration(
         color: tone.withValues(alpha: AppOpacities.overlaySoft),
         border: Border.all(
@@ -596,7 +596,7 @@ class _ScanRow extends StatelessWidget {
               color: read,
             ),
           ),
-          const SizedBox(width: AppSpacing.sm + 2),
+          const SizedBox(width: AppSpacing.dense),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,7 +607,7 @@ class _ScanRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 1),
+                const SizedBox(height: AppDimens.hairline),
                 Row(
                   children: <Widget>[
                     if (entry.asset.assetTag != null) ...<Widget>[
@@ -751,7 +751,7 @@ class _MissingRow extends StatelessWidget {
     const tone = AppColors.statusDamaged;
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm + 2),
+      padding: const EdgeInsets.all(AppSpacing.dense),
       decoration: BoxDecoration(
         color: palette.raised,
         border: Border.all(color: palette.lineSoft),
@@ -772,7 +772,7 @@ class _MissingRow extends StatelessWidget {
               color: context.ink(tone),
             ),
           ),
-          const SizedBox(width: AppSpacing.sm + 2),
+          const SizedBox(width: AppSpacing.dense),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

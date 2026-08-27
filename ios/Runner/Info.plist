@@ -10,6 +10,23 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Sijil IT</string>
+	<!--
+	  The icon set inside Assets.xcassets, named explicitly.
+
+	  Xcode normally writes this key itself: `actool` injects it into the built
+	  Info.plist from ASSETCATALOG_COMPILER_APPICON_NAME. "Normally" is the
+	  problem — it is the one part of the icon pipeline that leaves no trace in
+	  the repository, so when App Store Connect showed the placeholder tile
+	  instead of the mark there was nothing to inspect. Writing it here makes
+	  the setting reviewable, and makes it survive a project file that has
+	  already been damaged once (see the note in project.pbxproj).
+
+	  App Store Connect reads this key to find the icon for TestFlight and for
+	  the product page. Without it the build still installs and still shows its
+	  icon on the home screen, which is exactly why the gap is easy to miss.
+	-->
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

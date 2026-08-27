@@ -52,7 +52,7 @@ class AppSegmented<T> extends StatelessWidget {
         decoration: BoxDecoration(
           color: trackColor,
           borderRadius: BorderRadius.circular(
-            compact ? AppRadii.pill : AppRadii.md - 1,
+            compact ? AppRadii.pill : AppRadii.thumb,
           ),
         ),
         child: Row(
@@ -98,7 +98,7 @@ class _Segment<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(
-      compact ? AppRadii.pill : AppRadii.sm + 1,
+      compact ? AppRadii.pill : AppRadii.control,
     );
 
     return Semantics(
@@ -124,12 +124,12 @@ class _Segment<T> extends StatelessWidget {
                   if (option.icon != null) ...[
                     Icon(
                       option.icon,
-                      size: AppDimens.iconSm + 1,
+                      size: AppDimens.iconSegment,
                       color: selected
                           ? theme.colorScheme.onSurface
                           : theme.colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: AppSpacing.xs + 2),
+                    const SizedBox(width: AppSpacing.snug),
                   ],
                   Flexible(
                     child: FittedBox(
@@ -198,7 +198,7 @@ class AppCheckRow extends StatelessWidget {
                     color: value
                         ? (isDark ? AppColors.mint : AppColors.navy)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppRadii.sm - 2),
+                    borderRadius: BorderRadius.circular(AppRadii.xs),
                     border: value
                         ? null
                         : Border.all(color: theme.colorScheme.outlineVariant),
@@ -206,12 +206,12 @@ class AppCheckRow extends StatelessWidget {
                   child: value
                       ? Icon(
                           Icons.check_rounded,
-                          size: AppDimens.iconSm - 1,
+                          size: AppDimens.iconControl,
                           color: isDark ? AppColors.navy : Colors.white,
                         )
                       : null,
                 ),
-                const SizedBox(width: AppSpacing.sm + 2),
+                const SizedBox(width: AppSpacing.dense),
                 Expanded(
                   child: Text(
                     label,

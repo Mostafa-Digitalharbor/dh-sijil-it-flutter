@@ -122,7 +122,7 @@ class _Destination extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadii.md),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 2),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.snug),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -186,7 +186,7 @@ class _PrimaryDestination extends StatelessWidget {
                 height: AppDimens.navFab,
                 child: Icon(
                   item.icon,
-                  size: AppDimens.iconMd + 2,
+                  size: AppDimens.iconLg,
                   color: palette.onMint,
                 ),
               ),

@@ -112,6 +112,16 @@ abstract final class AppConfirmDialog {
         final theme = Theme.of(dialogContext);
 
         return AlertDialog(
+          // Every message this dialog is given today is one or two short
+          // sentences, and none of them clips. This is here for the next one.
+          //
+          // `AlertDialog` hands its content a bounded box and clips the
+          // remainder rather than scrolling it, so the margin is whatever is
+          // left after the title, the buttons and the user's text scale — and
+          // on the one screen where somebody is agreeing to something
+          // irreversible, "it fits at the moment" is not the property worth
+          // relying on. Scrolling costs nothing when the content already fits.
+          scrollable: true,
           title: Text(title, style: theme.textTheme.titleLarge),
           content: Text(message, style: theme.textTheme.bodyMedium),
           shape: RoundedRectangleBorder(
@@ -166,7 +176,11 @@ abstract final class AppDatePicker {
           firstDate ?? DateTime(now.year - AppConstants.datePickerYearsBack),
       lastDate:
           lastDate ??
-          DateTime(now.year + AppConstants.datePickerYearsForward, 12, 31),
+          DateTime(
+            now.year + AppConstants.datePickerYearsForward,
+            AppConstants.decemberMonth,
+            AppConstants.decemberLastDay,
+          ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../core/responsive/responsive.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -164,7 +165,7 @@ class InlineFact extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: AppSpacing.lg - 1,
+          size: AppDimens.iconFact,
           color: theme.colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: AppSpacing.sm),

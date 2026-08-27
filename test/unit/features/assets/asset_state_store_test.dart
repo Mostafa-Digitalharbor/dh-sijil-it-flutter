@@ -229,6 +229,7 @@ class _ChatterSaying implements OdooChatterService {
     required String model,
     required int id,
     int limit = 60,
+    int offset = 0,
   }) async => const <ChatterEntry>[];
 }
 

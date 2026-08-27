@@ -145,32 +145,10 @@ abstract final class AppTheme {
         space: 1,
       ),
 
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: palette.navBar,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: Colors.transparent,
-        elevation: 0,
-        height: 68,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => textTheme.labelSmall?.copyWith(
-            letterSpacing: 0,
-            fontSize: 11,
-            color: states.contains(WidgetState.selected)
-                ? palette.mint
-                : palette.faint,
-          ),
-        ),
-        iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(
-            size: 22,
-            color: states.contains(WidgetState.selected)
-                ? palette.mint
-                : palette.faint,
-          ),
-        ),
-      ),
-
+      // No `navigationBarTheme`. The bottom bar is `AppNavBar`, not Material's
+      // `NavigationBar` — see that widget's "Why not NavigationBar" note — and
+      // a theme for a widget the app never builds is four magic numbers that
+      // cannot be verified by looking at the running app.
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: palette.ground,
         surfaceTintColor: Colors.transparent,

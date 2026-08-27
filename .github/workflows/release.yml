@@ -463,6 +463,58 @@ jobs:
           echo "Built $IPA"
           echo "path=$IPA" >> "$GITHUB_OUTPUT"
 
+      # The icon that App Store Connect shows for a TestFlight build comes
+      # from CFBundleIconName in the *built* Info.plist, and from the compiled
+      # Assets.car beside it. Neither is in the repository: Xcode writes the
+      # key itself from ASSETCATALOG_COMPILER_APPICON_NAME, and `actool`
+      # produces the archive.
+      #
+      # That is exactly why a build once reached TestFlight with the
+      # placeholder tile and nothing in the diff to explain it — the two
+      # settings that produce the icon had been damaged in project.pbxproj and
+      # left no trace anywhere a reviewer would look.
+      #
+      # So the artefact is opened and asked directly, before it is uploaded.
+      - name: Verify the IPA carries its app icon
+        if: steps.signing.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          WORK=$(mktemp -d)
+          unzip -q "${{ steps.ipa.outputs.path }}" -d "$WORK"
+          APP=$(find "$WORK/Payload" -maxdepth 1 -name '*.app' | head -1)
+          if [ -z "$APP" ]; then
+            echo "::error::No .app inside the IPA."
+            exit 1
+          fi
+
+          ICON_NAME=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconName'             "$APP/Info.plist" 2>/dev/null || true)
+          if [ -z "$ICON_NAME" ]; then
+            echo "::error::CFBundleIconName is missing from the built Info.plist."
+            echo "App Store Connect reads that key to find the icon; without it"
+            echo "the build uploads fine and shows the placeholder tile."
+            exit 1
+          fi
+          echo "CFBundleIconName = $ICON_NAME"
+
+          # The catalog has to actually contain it. A correct key pointing at
+          # an icon set that never compiled fails the same way, silently.
+          if [ ! -f "$APP/Assets.car" ]; then
+            echo "::error::Assets.car is missing — the asset catalog did not compile."
+            exit 1
+          fi
+          if ! xcrun assetutil --info "$APP/Assets.car" | grep -q "$ICON_NAME"; then
+            echo "::error::Assets.car contains no icon set named $ICON_NAME."
+            exit 1
+          fi
+
+          # The 1024-pt marketing icon is the one the store listing uses, and
+          # Apple rejects it outright if it carries an alpha channel.
+          if [ ! -f "$APP/AppIcon60x60@2x.png" ]; then
+            echo "::warning::No AppIcon60x60@2x.png beside Assets.car."
+          fi
+          echo "Icon verified in the archive."
+          rm -rf "$WORK"
+
       - name: Check for App Store Connect credentials
         if: steps.signing.outputs.configured == 'true'
         id: asc

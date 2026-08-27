@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/injector.dart';
 import '../../../../app/router/app_routes.dart';
-import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -13,7 +12,10 @@ import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_tiles.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/async_data_view.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
+import '../../../../shared/widgets/skeletons.dart';
+import '../../../assets/domain/entities/asset.dart';
 import '../cubit/assign_asset_cubit.dart';
 import '../widgets/workflow_asset_strip.dart';
 
@@ -85,12 +87,7 @@ class _AssignAssetViewState extends State<_AssignAssetView> {
         return AppScaffold(
           title: l10n.assignTitle,
           compactTitle: true,
-          leading: AppIconButton(
-            icon: Icons.close_rounded,
-            tooltip: l10n.actionClose,
-            bordered: false,
-            onPressed: _close,
-          ),
+          leading: AppCloseButton(onPressed: _close),
           bottomBar: state.asset == null
               ? null
               : AppButton(
@@ -99,16 +96,15 @@ class _AssignAssetViewState extends State<_AssignAssetView> {
                   isBusy: state.isSubmitting,
                   onPressed: state.canSubmit ? cubit.submit : null,
                 ),
-          body: switch (state) {
-            _ when state.isLoading && state.asset == null =>
-              const SkeletonList(),
-            _ when state.hasFailed && state.asset == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.start(widget.assetId),
-            ),
-            _ when state.asset == null => const SizedBox.shrink(),
-            _ => _AssignForm(state: state, search: _search, notes: _notes),
-          },
+          body: AsyncDataView<Asset>(
+            status: state.status,
+            data: state.asset,
+            failure: state.failure,
+            onRetry: () => cubit.start(widget.assetId),
+            loadingView: const SkeletonForm(fields: 4),
+            builder: (_, __) =>
+                _AssignForm(state: state, search: _search, notes: _notes),
+          ),
         );
       },
     );
@@ -189,7 +185,7 @@ class _EmployeeResults extends StatelessWidget {
     if (state.isSearching && state.candidates.isEmpty) {
       return const Padding(
         padding: EdgeInsetsDirectional.only(top: AppSpacing.md),
-        child: SkeletonBox(height: AppDimens.skeletonRowHeight),
+        child: SkeletonListRow(showChips: false),
       );
     }
 

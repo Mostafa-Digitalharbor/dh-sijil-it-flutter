@@ -5,6 +5,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../core/error/failures.dart';
 import '../../core/responsive/responsive.dart';
 import '../cubit/view_state.dart';
+import 'skeletons.dart';
 import 'state_views.dart';
 
 /// The one infinite-scrolling list in the product.
@@ -30,7 +31,7 @@ class PaginatedListView<T> extends StatefulWidget {
     this.isLoadingMore = false,
     this.header,
     this.onRetry,
-    this.skeletonRowHeight = AppDimens.skeletonRowHeight,
+    this.skeletonHasChips = true,
     super.key,
   });
 
@@ -56,7 +57,12 @@ class PaginatedListView<T> extends StatefulWidget {
 
   final VoidCallback? onRetry;
 
-  final double skeletonRowHeight;
+  /// Whether the placeholder rows carry chips.
+  ///
+  /// Assets and maintenance requests show a status chip; employees do not, and
+  /// their row is correspondingly shorter. Guessing wrong here is the layout
+  /// jump this whole file exists to avoid.
+  final bool skeletonHasChips;
 
   @override
   State<PaginatedListView<T>> createState() => _PaginatedListViewState<T>();
@@ -92,10 +98,12 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    // First load with nothing to show yet: a skeleton, so the layout does not
-    // jump when the rows arrive.
+    // First load with nothing to show yet: rows shaped like the real ones, so
+    // the layout does not jump when they arrive. `showChips` is the caller's,
+    // because a row with a status and a warranty chip is a line taller than
+    // one without and the difference is visible as a shove.
     if (widget.status.isInitialLoad && widget.items.isEmpty) {
-      return SkeletonList(itemHeight: widget.skeletonRowHeight);
+      return SkeletonRowList(showChips: widget.skeletonHasChips);
     }
 
     if (widget.status == ViewStatus.failure &&
@@ -138,7 +146,7 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
         bottom: AppDimens.fabSize + AppSpacing.xxxl,
       ),
       itemCount: headerCount + widget.items.length + footerCount,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm + 1),
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.gridGap),
       itemBuilder: (context, index) {
         if (headerCount == 1 && index == 0) return widget.header!;
 

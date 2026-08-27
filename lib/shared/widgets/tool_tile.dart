@@ -50,7 +50,7 @@ class AppToolTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadii.xl),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md + 1),
+            padding: const EdgeInsets.all(AppSpacing.roomy),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -68,7 +68,7 @@ class AppToolTile extends StatelessWidget {
                     color: context.ink(tone),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm + 1),
+                const SizedBox(height: AppSpacing.gridGap),
                 Text(
                   title,
                   style: text.titleSmall,
@@ -115,7 +115,7 @@ class AppToolGrid extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Expanded(child: left),
-              const SizedBox(width: AppSpacing.sm + 2),
+              const SizedBox(width: AppSpacing.dense),
               // An odd tile keeps its column width instead of stretching to
               // fill the row, so the grid stays a grid.
               Expanded(child: right ?? const SizedBox.shrink()),
@@ -124,7 +124,7 @@ class AppToolGrid extends StatelessWidget {
         ),
       );
       if (i + 2 < children.length) {
-        rows.add(const SizedBox(height: AppSpacing.sm + 2));
+        rows.add(const SizedBox(height: AppSpacing.dense));
       }
     }
     return Column(mainAxisSize: MainAxisSize.min, children: rows);

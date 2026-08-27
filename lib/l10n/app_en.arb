@@ -8,6 +8,7 @@
   "actionChange": "Change",
   "actionClear": "Clear",
   "actionClose": "Close",
+  "actionContinue": "Continue",
   "actionDelete": "Delete",
   "actionDetectDatabases": "Detect databases",
   "actionDone": "Done",
@@ -18,10 +19,13 @@
   "actionOpen": "Open",
   "actionRefresh": "Refresh",
   "actionRemove": "Remove",
+  "actionOpenSettings": "Open settings",
+  "@actionOpenSettings": {
+    "description": "Button on the camera-permission screen. Opens this app's page in the device settings, which is the only place the permission can be turned back on once it has been denied."
+  },
   "actionRetry": "Try again",
   "actionReturn": "Return",
   "actionSave": "Save",
-  "actionSaveAndSignIn": "Save & sign in",
   "actionSeeAll": "See all",
   "actionSignIn": "Sign in",
   "actionSigningIn": "Signing in…",
@@ -130,7 +134,7 @@
   "dashboardRecentActivity": "Recent activity",
   "dashboardTitle": "Dashboard",
   "dashboardWarrantyDue": "Warranty ends <30 days",
-  "detectFoundCount": "Found {count} databases",
+  "detectFoundCount": "{count,plural, =1{Found 1 database} other{Found {count} databases}}",
   "@detectFoundCount": {
     "placeholders": {
       "count": {
@@ -153,7 +157,7 @@
   "employeeAssetsHeld": "Assets held",
   "employeeAssignedAssets": "Assigned assets",
   "employeeInService": "In service",
-  "employeeItemCount": "{count} items",
+  "employeeItemCount": "{count,plural, =0{No items} =1{1 item} other{{count} items}}",
   "@employeeItemCount": {
     "placeholders": {
       "count": {
@@ -210,6 +214,18 @@
   "errorDatabaseUnavailableFix": "Database names are case-sensitive. Your Odoo administrator can confirm the exact name.",
   "errorDatabaseUnavailableTitle": "Database not found",
   "errorHowToFix": "What to do",
+  "errorInsecureConnectionTitle": "This address is not encrypted",
+  "@errorInsecureConnectionTitle": {
+    "description": "Shown when the saved server URL uses http:// rather than https://."
+  },
+  "errorInsecureConnectionBody": "Sijil IT only connects over HTTPS, so your Odoo password is never sent in the clear. The saved address starts with http://.",
+  "@errorInsecureConnectionBody": {
+    "description": "Cause line for a plain-HTTP server URL."
+  },
+  "errorInsecureConnectionFix": "Change the address to https://. If your Odoo has no certificate yet, your administrator can add one — a self-hosted instance on the office network needs it too.",
+  "@errorInsecureConnectionFix": {
+    "description": "The concrete next step for a plain-HTTP server URL."
+  },
   "errorInvalidCredentialsBody": "Odoo did not accept this username with this password or API key.",
   "errorInvalidCredentialsFix": "Check the username, and note that an API key is not the same as your password.",
   "errorInvalidCredentialsTitle": "Sign-in was rejected",
@@ -271,6 +287,16 @@
   "filterManufacturer": "Manufacturer",
   "filterStatus": "Status",
   "filterWarranty": "Warranty",
+  "filtersLabelActive": "Filters ({count})",
+  "@filtersLabelActive": {
+    "description": "The Filters chip when filters are applied, showing how many. A placeholder rather than interpolation so the count follows the locale's numerals.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "filtersLabel": "Filters",
   "filtersTitle": "Filter assets",
   "labelAll": "All",
@@ -278,7 +304,15 @@
   "labelAssetTag": "Asset tag",
   "labelAssignedOn": "Assigned",
   "labelCategory": "Category",
-  "labelHeldDays": "{days} days",
+  "launchNoMailApp": "No email app is set up on this device.",
+  "@launchNoMailApp": {
+    "description": "Shown when the Email button cannot open a mail client — a tablet or kiosk with none installed."
+  },
+  "launchNoPhoneApp": "This device cannot place calls.",
+  "@launchNoPhoneApp": {
+    "description": "Shown when the Call button cannot open a dialler — a Wi-Fi tablet, or an emulator."
+  },
+  "labelHeldDays": "{days,plural, =1{1 day} other{{days} days}}",
   "@labelHeldDays": {
     "placeholders": {
       "days": {
@@ -306,11 +340,10 @@
   "languageSystem": "System",
   "loadingLabel": "Loading…",
   "loginAclNotice": "Sijil IT works inside your Odoo permissions. You will only see and change what your Odoo user is allowed to.",
-  "loginDifferentServer": "Connecting to a different server?",
+  "loginBackToServer": "Back to server settings",
   "loginKeepSignedIn": "Keep me signed in",
   "loginNeedApiKey": "Need an API key?",
   "loginSubtitle": "Sign in with your Odoo credentials.",
-  "loginSwitchServer": "Switch",
   "loginWelcomeBack": "Welcome back",
   "maintenanceClosed": "Closed {date}",
   "@maintenanceClosed": {
@@ -385,7 +418,7 @@
   "returnCondition": "Condition on return",
   "returnConfirm": "Confirm return",
   "returnDate": "Return date",
-  "returnHeldFor": "held {days} days",
+  "returnHeldFor": "{days,plural, =1{held 1 day} other{held {days} days}}",
   "@returnHeldFor": {
     "placeholders": {
       "days": {
@@ -438,6 +471,18 @@
   "scanNoMatchTitle": "No asset for that code",
   "scanPermissionBody": "Sijil IT needs the camera to read asset codes.",
   "scanPermissionFix": "Turn on camera access for Sijil IT in your device settings.",
+  "scanCameraErrorTitle": "The camera could not start",
+  "@scanCameraErrorTitle": {
+    "description": "Shown when the camera fails for a reason other than a denied permission — another app holding it, or hardware the OS would not hand over."
+  },
+  "scanCameraErrorBody": "Another app may be using the camera, or this device did not hand it over.",
+  "@scanCameraErrorBody": {
+    "description": "Cause line for a camera that failed to start."
+  },
+  "scanCameraErrorFix": "Close any other app using the camera, then reopen this screen. Restarting the device clears it if that does not.",
+  "@scanCameraErrorFix": {
+    "description": "The concrete next step for a camera that failed to start."
+  },
   "scanPermissionTitle": "Camera access is off",
   "scanTitle": "Scan asset",
   "scanTorch": "Torch",
@@ -551,7 +596,7 @@
       }
     }
   },
-  "warrantyExpiredAgo": "Expired {days} days ago",
+  "warrantyExpiredAgo": "{days,plural, =1{Expired 1 day ago} other{Expired {days} days ago}}",
   "@warrantyExpiredAgo": {
     "placeholders": {
       "days": {
@@ -560,7 +605,7 @@
       }
     }
   },
-  "warrantyExpiresIn": "Expires in {days} days",
+  "warrantyExpiresIn": "{days,plural, =1{Expires in 1 day} other{Expires in {days} days}}",
   "@warrantyExpiresIn": {
     "placeholders": {
       "days": {
@@ -692,6 +737,10 @@
   "historyEmptyBody": "Assignments, returns and repairs appear here as they happen.",
   "@historyEmptyBody": {
     "description": "Explains what will fill the history screen."
+  },
+  "historyLoadOlder": "Show older",
+  "@historyLoadOlder": {
+    "description": "Button at the end of an asset's timeline when Odoo holds entries older than the ones read so far."
   },
   "historyRegistered": "Registered",
   "@historyRegistered": {

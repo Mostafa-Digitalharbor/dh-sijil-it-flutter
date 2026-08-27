@@ -71,6 +71,7 @@ class _EmployeeListViewState extends State<_EmployeeListView> {
             failure: state.failure,
             hasMore: state.hasMore,
             isLoadingMore: state.isLoadingMore,
+            skeletonHasChips: false,
             onRefresh: () => cubit.load(refresh: true),
             onLoadMore: cubit.loadMore,
             onRetry: cubit.load,

@@ -17,9 +17,11 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_data_views.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_tiles.dart';
+import '../../../../shared/widgets/async_data_view.dart';
 import '../../../../shared/widgets/data_charts.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/greeting_header.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../../shared/widgets/status_legend.dart';
@@ -71,15 +73,14 @@ class _DashboardView extends StatelessWidget {
               onPressed: () => cubit.load(refresh: true),
             ),
           ],
-          body: switch (state) {
-            _ when state.isLoading && summary == null => const SkeletonList(),
-            _ when state.hasFailed && summary == null => FailureView(
-              failure: state.failure!,
-              onRetry: cubit.load,
-            ),
-            _ when summary == null => const SizedBox.shrink(),
-            _ => _DashboardBody(summary: summary),
-          },
+          body: AsyncDataView<DashboardSummary>(
+            status: state.status,
+            data: summary,
+            failure: state.failure,
+            onRetry: cubit.load,
+            loadingView: const SkeletonDashboard(),
+            builder: (_, summary) => _DashboardBody(summary: summary),
+          ),
         );
       },
     );
@@ -197,7 +198,7 @@ class _DistributionCard extends StatelessWidget {
                     label: StatusChip.labelFor(l10n, status),
                     count: summary.countOf(status),
                   ),
-                  const SizedBox(height: AppSpacing.sm - 1),
+                  const SizedBox(height: AppSpacing.tight),
                 ],
                 StatusLegendRow(
                   tone: StatusChip.colorFor(AssetStatus.reserved),
@@ -304,7 +305,7 @@ class _AttentionRow extends StatelessWidget {
           ),
         if (summary.warrantyExpiringCount > 0 &&
             summary.openMaintenanceCount > 0)
-          const SizedBox(width: AppSpacing.sm + 1),
+          const SizedBox(width: AppSpacing.gridGap),
         if (summary.openMaintenanceCount > 0)
           Expanded(
             child: AppAttentionTile(
@@ -355,7 +356,7 @@ class _CategoryBreakdown extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           for (var i = 0; i < summary.categories.length; i++) ...<Widget>[
-            if (i > 0) const SizedBox(height: AppSpacing.sm - 1),
+            if (i > 0) const SizedBox(height: AppSpacing.tight),
             LabeledBar(
               label: summary.categories[i].label,
               value: summary.categories[i].count,

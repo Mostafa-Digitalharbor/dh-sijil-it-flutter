@@ -99,7 +99,7 @@ class _SettingsView extends StatelessWidget {
           showBack: true,
           onBack: () => context.go(AppRoutes.more),
           body: AppPageBody(
-            gap: AppSpacing.md - 1,
+            gap: AppSpacing.cozy,
             children: <Widget>[
               _ConnectionCard(state: state, onTest: cubit.testConnection),
               const _CapabilitiesCard(),

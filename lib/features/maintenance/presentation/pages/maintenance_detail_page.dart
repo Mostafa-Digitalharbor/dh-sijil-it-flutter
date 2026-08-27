@@ -17,8 +17,9 @@ import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_chip.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
+import '../../../../shared/widgets/async_data_view.dart';
 import '../../../../shared/widgets/key_value.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../domain/entities/maintenance_request.dart';
 import '../cubit/maintenance_cubit.dart';
 import '../widgets/maintenance_labels.dart';
@@ -74,15 +75,15 @@ class _MaintenanceDetailView extends StatelessWidget {
           compactTitle: true,
           showBack: true,
           onBack: () => context.go(AppRoutes.maintenancePath),
-          body: switch (state) {
-            _ when state.isLoading && request == null => const SkeletonList(),
-            _ when state.hasFailed && request == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.load(requestId),
-            ),
-            _ when request == null => const SizedBox.shrink(),
-            _ => _RequestBody(request: request, requestId: requestId),
-          },
+          body: AsyncDataView<MaintenanceRequest>(
+            status: state.status,
+            data: request,
+            failure: state.failure,
+            onRetry: () => cubit.load(requestId),
+            loadingView: const SkeletonDetail(hasActions: false),
+            builder: (_, request) =>
+                _RequestBody(request: request, requestId: requestId),
+          ),
         );
       },
     );

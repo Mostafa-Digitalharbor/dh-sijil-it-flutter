@@ -31,7 +31,7 @@ class ReturnPhotoStrip extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: paths.length + (canAdd ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm + 1),
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.gridGap),
         itemBuilder: (context, index) {
           if (index >= paths.length) return _AddTile(onTap: onAdd);
           return _PhotoTile(
@@ -58,7 +58,7 @@ class _PhotoTile extends StatelessWidget {
     return Stack(
       children: <Widget>[
         ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadii.md + 1),
+          borderRadius: BorderRadius.circular(AppRadii.photo),
           child: Image.file(
             File(path),
             width: AppDimens.photoThumb,
@@ -125,7 +125,7 @@ class _AddTile extends StatelessWidget {
       label: l10n.actionAdd,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadii.md + 1),
+        borderRadius: BorderRadius.circular(AppRadii.photo),
         child: DottedBorderBox(
           child: Icon(
             Icons.add_a_photo_outlined,
@@ -158,7 +158,7 @@ class DottedBorderBox extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppRadii.md + 1),
+        borderRadius: BorderRadius.circular(AppRadii.photo),
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
           width: AppDimens.focusedBorder,

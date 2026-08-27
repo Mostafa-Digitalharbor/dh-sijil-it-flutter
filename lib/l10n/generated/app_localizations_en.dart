@@ -33,6 +33,9 @@ class AppL10nEn extends AppL10n {
   String get actionClose => 'Close';
 
   @override
+  String get actionContinue => 'Continue';
+
+  @override
   String get actionDelete => 'Delete';
 
   @override
@@ -63,6 +66,9 @@ class AppL10nEn extends AppL10n {
   String get actionRemove => 'Remove';
 
   @override
+  String get actionOpenSettings => 'Open settings';
+
+  @override
   String get actionRetry => 'Try again';
 
   @override
@@ -70,9 +76,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get actionSave => 'Save';
-
-  @override
-  String get actionSaveAndSignIn => 'Save & sign in';
 
   @override
   String get actionSeeAll => 'See all';
@@ -278,7 +281,13 @@ class AppL10nEn extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return 'Found $countString databases';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $countString databases',
+      one: 'Found 1 database',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -333,7 +342,14 @@ class AppL10nEn extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return '$countString items';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString items',
+      one: '1 item',
+      zero: 'No items',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -445,6 +461,17 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get errorHowToFix => 'What to do';
+
+  @override
+  String get errorInsecureConnectionTitle => 'This address is not encrypted';
+
+  @override
+  String get errorInsecureConnectionBody =>
+      'Sijil IT only connects over HTTPS, so your Odoo password is never sent in the clear. The saved address starts with http://.';
+
+  @override
+  String get errorInsecureConnectionFix =>
+      'Change the address to https://. If your Odoo has no certificate yet, your administrator can add one — a self-hosted instance on the office network needs it too.';
 
   @override
   String get errorInvalidCredentialsBody =>
@@ -621,6 +648,15 @@ class AppL10nEn extends AppL10n {
   String get filterWarranty => 'Warranty';
 
   @override
+  String filtersLabelActive(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Filters ($countString)';
+  }
+
+  @override
   String get filtersLabel => 'Filters';
 
   @override
@@ -642,13 +678,25 @@ class AppL10nEn extends AppL10n {
   String get labelCategory => 'Category';
 
   @override
+  String get launchNoMailApp => 'No email app is set up on this device.';
+
+  @override
+  String get launchNoPhoneApp => 'This device cannot place calls.';
+
+  @override
   String labelHeldDays(int days) {
     final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
       localeName,
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return '$daysString days';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days',
+      one: '1 day',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -710,7 +758,7 @@ class AppL10nEn extends AppL10n {
       'Sijil IT works inside your Odoo permissions. You will only see and change what your Odoo user is allowed to.';
 
   @override
-  String get loginDifferentServer => 'Connecting to a different server?';
+  String get loginBackToServer => 'Back to server settings';
 
   @override
   String get loginKeepSignedIn => 'Keep me signed in';
@@ -720,9 +768,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get loginSubtitle => 'Sign in with your Odoo credentials.';
-
-  @override
-  String get loginSwitchServer => 'Switch';
 
   @override
   String get loginWelcomeBack => 'Welcome back';
@@ -864,7 +909,13 @@ class AppL10nEn extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'held $daysString days';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'held $daysString days',
+      one: 'held 1 day',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -925,6 +976,17 @@ class AppL10nEn extends AppL10n {
   @override
   String get scanPermissionFix =>
       'Turn on camera access for Sijil IT in your device settings.';
+
+  @override
+  String get scanCameraErrorTitle => 'The camera could not start';
+
+  @override
+  String get scanCameraErrorBody =>
+      'Another app may be using the camera, or this device did not hand it over.';
+
+  @override
+  String get scanCameraErrorFix =>
+      'Close any other app using the camera, then reopen this screen. Restarting the device clears it if that does not.';
 
   @override
   String get scanPermissionTitle => 'Camera access is off';
@@ -1147,7 +1209,13 @@ class AppL10nEn extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'Expired $daysString days ago';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Expired $daysString days ago',
+      one: 'Expired 1 day ago',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1157,7 +1225,13 @@ class AppL10nEn extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'Expires in $daysString days';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Expires in $daysString days',
+      one: 'Expires in 1 day',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1270,6 +1344,9 @@ class AppL10nEn extends AppL10n {
   @override
   String get historyEmptyBody =>
       'Assignments, returns and repairs appear here as they happen.';
+
+  @override
+  String get historyLoadOlder => 'Show older';
 
   @override
   String get historyRegistered => 'Registered';

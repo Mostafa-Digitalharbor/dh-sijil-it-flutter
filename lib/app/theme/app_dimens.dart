@@ -32,6 +32,19 @@ abstract final class AppDimens {
   static const double iconLg = 18;
   static const double iconXl = 20;
   static const double iconXxl = 22;
+
+  /// Icons inside small controls. [iconChip] leads a chip; [iconControl] is a
+  /// chip's trailing affordance and a compact segment's glyph; [iconSegment]
+  /// is the glyph in a full-size segment.
+  static const double iconChip = 11;
+  static const double iconControl = 12;
+  static const double iconSegment = 14;
+
+  /// The icon leading a key/value fact row. Between [iconSm] and [iconMd]
+  /// because it sits on the same baseline as `bodySmall`, and either
+  /// neighbour makes the row look mis-set.
+  static const double iconFact = 15;
+
   static const double iconHuge = 32;
   static const double iconDisplay = 40;
 
@@ -55,6 +68,16 @@ abstract final class AppDimens {
   static const double chipHeight = 32;
   static const double stepBadgeSize = 19;
   static const double checkboxSize = 19;
+
+  /// The condition picker's own tile and check indicator. Deliberately a
+  /// point larger than [tileSm] and [checkboxSize]: the picker is a
+  /// walk-around control used one-handed, and it was the one place the shared
+  /// sizes tested too small to hit reliably.
+  static const double conditionTile = 30;
+  static const double conditionCheck = 20;
+
+  /// The × that removes a photograph.
+  static const double photoRemoveButton = 19;
   static const double radioSize = 22;
 
   /// Minimum interactive target. Anything tappable must clear this.
@@ -79,6 +102,11 @@ abstract final class AppDimens {
   static const double statusStripGap = 2;
   static const double dotSize = 7;
   static const double dotSizeSm = 6;
+
+  /// The swatch in the dashboard's status legend. A point larger than
+  /// [dotSize]: the legend's dot is read as a colour sample rather than as a
+  /// marker, and at 7 the tint is too small to name.
+  static const double legendDot = 8;
   static const double hairline = 1;
   static const double focusedBorder = 1.6;
 
@@ -100,6 +128,12 @@ abstract final class AppDimens {
   /// A ratio, not a length, which is why it is not on the spacing scale. Just
   /// over 1 so the falloff clears the corners instead of banding across them.
   static const double glowSpread = 1.1;
+
+  /// The sparkline itself: the stroke, the halo behind its last point, and
+  /// that point's own dot.
+  static const double sparklineStroke = 2.2;
+  static const double sparklineHaloRadius = 8;
+  static const double sparklinePoint = 4;
 
   /// Stroke of a circular progress indicator.
   static const double progressStroke = 2;
@@ -129,6 +163,12 @@ abstract final class AppDimens {
   static const double dialogMaxWidth = 480;
   static const double masterPaneWidth = 380;
   static const double skeletonRowHeight = 84;
+
+  /// Placeholder sizes for the two dashboard cards whose real content is a
+  /// drawing rather than text. Taken from what the ring and the sparkline
+  /// actually settle at, so the page does not jump when the summary lands.
+  static const double donutSkeleton = 116;
+  static const double trendSkeleton = 132;
   static const double barLabelMaxWidth = 88;
   static const double barLabelMinWidth = 56;
   static const double barValueWidth = 28;
@@ -139,6 +179,10 @@ abstract final class AppDimens {
 
   // ── Elevation / blur ─────────────────────────────────────────────────────
   static const double sheetBlur = 14;
+
+  /// The glow behind the scanner's sweep line.
+  static const double glowBlur = 18;
+
   static const double fabShadowBlur = 20;
   static const double fabShadowOffsetY = 8;
 
@@ -227,6 +271,19 @@ abstract final class AppOpacities {
 
   /// Glow around the scanner's sweep line.
   static const double glow = 0.8;
+
+  /// The scrim behind a badge, a remove button and a "+N" overlay, all of
+  /// which sit on top of a photograph the app does not control. Graded rather
+  /// than shared: the overlay covers a whole thumbnail, the badge a corner of
+  /// one, and the button has to stay legible over both.
+  static const double photoOverlay = 0.62;
+  static const double photoBadge = 0.78;
+  static const double photoControl = 0.8;
+
+  /// The area fill under a sparkline, at the top of its gradient, and the
+  /// halo behind its final point.
+  static const double sparklineArea = 0.34;
+  static const double sparklineHalo = 0.22;
 
   /// A destructive control's border, and a chip's secondary icon.
   static const double dangerBorder = 0.35;

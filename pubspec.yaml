@@ -66,6 +66,25 @@ dependencies:
   # so a developer build never reports and a customer can be handed a build
   # that reports nowhere.
   sentry_flutter: ^9.27.0
+  # Used for exactly one call: `openAppSettings()`.
+  #
+  # The scanner's "camera access is off" screen tells the user to turn the
+  # permission back on, and on Android there is no way to re-request it once
+  # they have chosen "Don't allow" — the system dialog never appears again.
+  # Without a button that opens the app's settings page, the instruction is
+  # accurate and unreachable.
+  #
+  # No permission *requests* go through this package: mobile_scanner and
+  # image_picker each ask for their own, which is what keeps the prompt
+  # attached to the action that needs it.
+  #
+  # Held at 12 deliberately. `permission_handler_android` 14 builds with
+  # `kotlin { compilerOptions { jvmTarget } }`, which needs a newer Kotlin
+  # Gradle plugin than android/settings.gradle.kts pins (2.1.0) and fails the
+  # Android build outright. Raising this means raising the Kotlin plugin for
+  # every module in the project at the same time — worth doing on purpose, not
+  # as a side effect of `pub upgrade` on a package used for one function.
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

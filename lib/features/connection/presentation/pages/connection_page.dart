@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/di/injector.dart';
@@ -8,22 +7,34 @@ import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/error/failure_presenter.dart';
 import '../../../../core/error/failures.dart';
-import '../../../../core/network/odoo/odoo_connection.dart';
 import '../../../../core/responsive/responsive.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/l10n_lookup.dart';
 import '../../../../shared/widgets/app_brand_header.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
-import '../../../../shared/widgets/app_segmented.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../domain/entities/connection_probe.dart';
 import '../cubit/connection_form_cubit.dart';
 
-/// First-run screen: collects the Odoo server URL, database, username and
-/// password or API key (spec §3).
+/// First of the two first-run screens: *which Odoo* (spec §3).
+///
+/// ## Why the server and the credential are separate screens
+///
+/// They are separate decisions with separate lifetimes. The server URL and
+/// database are chosen once, by whoever sets the device up, and then never
+/// again; the username and password are typed by whoever is holding the phone,
+/// every time the session lapses. Asking for all four at once made the second
+/// group look as permanent as the first — and put a password field on the very
+/// first screen a user ever sees, before anything had established which server
+/// was about to receive it.
+///
+/// Splitting them also gives "Test connection" something honest to mean. On
+/// one combined screen it sat beside a credential it did not use, so a green
+/// result read as "your details are right" when it only ever meant "something
+/// is answering at this address".
 class ConnectionPage extends StatelessWidget {
   const ConnectionPage({super.key});
 
@@ -49,9 +60,6 @@ class _ConnectionView extends StatefulWidget {
 class _ConnectionViewState extends State<_ConnectionView> {
   late final TextEditingController _url;
   late final TextEditingController _database;
-  late final TextEditingController _username;
-  final TextEditingController _secret = TextEditingController();
-  bool _obscure = true;
 
   @override
   void initState() {
@@ -59,28 +67,28 @@ class _ConnectionViewState extends State<_ConnectionView> {
     final form = context.read<ConnectionFormCubit>().state;
     _url = TextEditingController(text: form.serverUrl);
     _database = TextEditingController(text: form.database);
-    _username = TextEditingController(text: form.username);
   }
 
   @override
   void dispose() {
     _url.dispose();
     _database.dispose();
-    _username.dispose();
-    _secret.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    final cubit = context.read<ConnectionFormCubit>();
-    final connection = cubit.validateForSubmit(secret: _secret.text);
+  /// Carries the two fields to the sign-in screen.
+  ///
+  /// Nothing is written to storage and no request is made: this is a step in a
+  /// form, not a commitment. `AuthCubit` moves to `signedOut`, and the router
+  /// — the app's single auth gate — is what actually navigates.
+  void _continue() {
+    final connection = context
+        .read<ConnectionFormCubit>()
+        .validateForContinue();
     if (connection == null) return;
 
     FocusScope.of(context).unfocus();
-    context.read<AuthCubit>().signIn(
-      connection: connection,
-      secret: _secret.text,
-    );
+    context.read<AuthCubit>().useConnection(connection);
   }
 
   @override
@@ -101,198 +109,115 @@ class _ConnectionViewState extends State<_ConnectionView> {
           builder: (context, form) {
             final cubit = context.read<ConnectionFormCubit>();
 
-            return BlocBuilder<AuthCubit, AuthState>(
-              buildWhen: (a, b) =>
-                  a.isBusy != b.isBusy || a.failure != b.failure,
-              builder: (context, auth) => ListView(
-                padding: EdgeInsetsDirectional.only(
-                  start: screen.gutter + AppSpacing.sm,
-                  end: screen.gutter + AppSpacing.sm,
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.xxl,
-                ),
-                children: [
-                  Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: AppDimens.dialogMaxWidth,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Brand mark centred, with the language and theme
-                          // controls beside it — both reachable before the
-                          // user has an account to configure them from.
-                          const AppBrandHeader(),
-                          const SizedBox(height: AppSpacing.xxl),
+            return ListView(
+              padding: EdgeInsetsDirectional.only(
+                start: screen.gutter + AppSpacing.sm,
+                end: screen.gutter + AppSpacing.sm,
+                top: AppSpacing.md,
+                bottom: AppSpacing.xxl,
+              ),
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppDimens.dialogMaxWidth,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Brand mark centred, with the language and theme
+                        // controls beside it — both reachable before the user
+                        // has an account to configure them from.
+                        const AppBrandHeader(),
+                        const SizedBox(height: AppSpacing.xxl),
 
-                          Text(
-                            l10n.connectTitle,
-                            style: theme.textTheme.headlineMedium,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            l10n.connectSubtitle,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: AppSpacing.xxl),
+                        Text(
+                          l10n.connectTitle,
+                          style: theme.textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          l10n.connectSubtitle,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.xxl),
 
-                          AppTextField(
-                            label: l10n.fieldServerUrl,
-                            hint: l10n.fieldServerUrlHint,
-                            icon: Icons.dns_outlined,
-                            controller: _url,
-                            onChanged: cubit.setServerUrl,
-                            keyboardType: TextInputType.url,
-                            textInputAction: TextInputAction.next,
-                            textDirection: TextDirection.ltr,
-                            autofillHints: const [AutofillHints.url],
-                            errorText: l10n.lookup(
-                              form.errorFor(ConnectionField.serverUrl),
-                            ),
+                        AppTextField(
+                          label: l10n.fieldServerUrl,
+                          hint: l10n.fieldServerUrlHint,
+                          icon: Icons.dns_outlined,
+                          controller: _url,
+                          onChanged: cubit.setServerUrl,
+                          keyboardType: TextInputType.url,
+                          textInputAction: TextInputAction.next,
+                          textDirection: TextDirection.ltr,
+                          autofillHints: const [AutofillHints.url],
+                          errorText: l10n.lookup(
+                            form.errorFor(ConnectionField.serverUrl),
                           ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+
+                        // Detection sits above the field it fills in, so the
+                        // order on screen matches the order of the task.
+                        AppButton.outlined(
+                          label: l10n.actionDetectDatabases,
+                          icon: Icons.travel_explore_rounded,
+                          isCompact: true,
+                          isBusy: form.isDetecting,
+                          onPressed: form.serverUrl.trim().isEmpty
+                              ? null
+                              : cubit.detectDatabases,
+                        ),
+                        if (form.detectOutcome == DetectOutcome.unsupported)
+                          const _DetectUnsupportedNotice(),
+                        const SizedBox(height: AppSpacing.md),
+
+                        AppTextField(
+                          label: l10n.fieldDatabase,
+                          hint: l10n.fieldDatabaseHint,
+                          icon: Icons.storage_outlined,
+                          controller: _database,
+                          onChanged: cubit.setDatabase,
+                          textInputAction: TextInputAction.done,
+                          textDirection: TextDirection.ltr,
+                          onSubmitted: (_) => _continue(),
+                          errorText: l10n.lookup(
+                            form.errorFor(ConnectionField.database),
+                          ),
+                        ),
+
+                        if (form.probe != null) ...[
                           const SizedBox(height: AppSpacing.lg),
-
-                          // Detection sits above the field it fills in, so the
-                          // order on screen matches the order of the task.
-                          AppButton.outlined(
-                            label: l10n.actionDetectDatabases,
-                            icon: Icons.travel_explore_rounded,
-                            isCompact: true,
-                            isBusy: form.isDetecting,
-                            onPressed: form.serverUrl.trim().isEmpty
-                                ? null
-                                : cubit.detectDatabases,
-                          ),
-                          if (form.detectOutcome == DetectOutcome.unsupported)
-                            const _DetectUnsupportedNotice(),
-                          const SizedBox(height: AppSpacing.md),
-
-                          AppTextField(
-                            label: l10n.fieldDatabase,
-                            hint: l10n.fieldDatabaseHint,
-                            icon: Icons.storage_outlined,
-                            controller: _database,
-                            onChanged: cubit.setDatabase,
-                            textInputAction: TextInputAction.next,
-                            textDirection: TextDirection.ltr,
-                            errorText: l10n.lookup(
-                              form.errorFor(ConnectionField.database),
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-
-                          AppTextField(
-                            label: l10n.fieldUsername,
-                            hint: l10n.fieldUsernameHint,
-                            icon: Icons.person_outline_rounded,
-                            controller: _username,
-                            onChanged: cubit.setUsername,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            textDirection: TextDirection.ltr,
-                            autofillHints: const [AutofillHints.username],
-                            errorText: l10n.lookup(
-                              form.errorFor(ConnectionField.username),
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-
-                          AppTextField(
-                            label: l10n.fieldCredential,
-                            hint: form.authMode == OdooAuthMode.apiKey
-                                ? l10n.fieldApiKeyHint
-                                : l10n.fieldPasswordHint,
-                            icon: form.authMode == OdooAuthMode.apiKey
-                                ? Icons.vpn_key_outlined
-                                : Icons.lock_outline_rounded,
-                            controller: _secret,
-                            obscure: _obscure,
-                            onToggleObscure: () =>
-                                setState(() => _obscure = !_obscure),
-                            textInputAction: TextInputAction.done,
-                            textDirection: TextDirection.ltr,
-                            autofillHints: const [AutofillHints.password],
-                            onSubmitted: (_) => _submit(),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                            ],
-                            errorText: l10n.lookup(
-                              form.errorFor(ConnectionField.credential),
-                            ),
-                            action: AppSegmented<OdooAuthMode>(
-                              compact: true,
-                              semanticLabel: l10n.fieldCredential,
-                              value: form.authMode,
-                              onChanged: cubit.setAuthMode,
-                              options: [
-                                SegmentOption(
-                                  value: OdooAuthMode.password,
-                                  label: l10n.authModePassword,
-                                ),
-                                SegmentOption(
-                                  value: OdooAuthMode.apiKey,
-                                  label: l10n.authModeApiKey,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          if (form.probe != null) ...[
-                            const SizedBox(height: AppSpacing.lg),
-                            _ProbeResult(probe: form.probe!),
-                          ],
-                          if (form.failure != null) ...[
-                            const SizedBox(height: AppSpacing.lg),
-                            _InlineFailure(failure: form.failure!),
-                          ],
-                          if (auth.failure != null) ...[
-                            const SizedBox(height: AppSpacing.lg),
-                            _InlineFailure(failure: auth.failure!),
-                          ],
-
-                          const SizedBox(height: AppSpacing.xxl),
-                          AppButton.outlined(
-                            label: form.isProbing
-                                ? l10n.connectionTesting
-                                : l10n.actionTestConnection,
-                            icon: Icons.refresh_rounded,
-                            isBusy: form.isProbing,
-                            onPressed: form.serverUrl.trim().isEmpty
-                                ? null
-                                : cubit.probe,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          AppButton(
-                            label: l10n.actionSaveAndSignIn,
-                            isBusy: auth.isBusy,
-                            onPressed: form.canSubmit ? _submit : null,
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.lock_outline_rounded,
-                                size: AppDimens.iconSm,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Flexible(
-                                child: Text(
-                                  l10n.credentialStorageNote,
-                                  style: theme.textTheme.bodySmall,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
+                          _ProbeResult(probe: form.probe!),
                         ],
-                      ),
+                        if (form.failure != null) ...[
+                          const SizedBox(height: AppSpacing.lg),
+                          _InlineFailure(failure: form.failure!),
+                        ],
+
+                        const SizedBox(height: AppSpacing.xxl),
+                        AppButton.outlined(
+                          label: form.isProbing
+                              ? l10n.connectionTesting
+                              : l10n.actionTestConnection,
+                          icon: Icons.refresh_rounded,
+                          isBusy: form.isProbing,
+                          onPressed: form.serverUrl.trim().isEmpty
+                              ? null
+                              : cubit.probe,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppButton(
+                          label: l10n.actionContinue,
+                          icon: Icons.arrow_forward_rounded,
+                          onPressed: form.canSubmit ? _continue : null,
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         ),

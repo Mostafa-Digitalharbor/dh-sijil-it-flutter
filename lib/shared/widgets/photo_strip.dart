@@ -6,6 +6,8 @@ import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_palette.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../utils/app_number.dart';
 
 /// Photographs attached to a record, with the controls to add and remove them.
 ///
@@ -101,7 +103,9 @@ class _Featured extends StatelessWidget {
                 ? _AddTile(onTap: strip.onAdd, label: strip.addLabel)
                 : _Tile(
                     image: photos.first,
-                    counter: photos.length > 1 ? '1/${photos.length}' : null,
+                    counter: photos.length > 1
+                        ? AppL10n.of(context).photosPosition(1, photos.length)
+                        : null,
                     onTap: strip.onOpen == null ? null : () => strip.onOpen!(0),
                   ),
           ),
@@ -162,7 +166,7 @@ class _Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final shape = BorderRadius.circular(AppRadii.md + 1);
+    final shape = BorderRadius.circular(AppRadii.photo);
 
     return Stack(
       fit: StackFit.expand,
@@ -190,11 +194,13 @@ class _Tile extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: shape,
-                color: palette.sunken.withValues(alpha: 0.62),
+                color: palette.sunken.withValues(
+                  alpha: AppOpacities.photoOverlay,
+                ),
               ),
               child: Center(
                 child: Text(
-                  '+$extra',
+                  AppNumber.plusCount(context, extra!),
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium?.copyWith(color: AppPalette.dark.ink),
@@ -204,7 +210,7 @@ class _Tile extends StatelessWidget {
           ),
         if (counter != null)
           PositionedDirectional(
-            bottom: AppSpacing.xs + 2,
+            bottom: AppSpacing.snug,
             start: AppSpacing.sm,
             child: _Badge(text: counter!),
           ),
@@ -228,13 +234,15 @@ class _Badge extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.palette.sunken.withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(AppRadii.sm - 2),
+        color: context.palette.sunken.withValues(
+          alpha: AppOpacities.photoBadge,
+        ),
+        borderRadius: BorderRadius.circular(AppRadii.xs),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm - 2,
-          vertical: 2,
+        padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: AppSpacing.snug,
+          vertical: AppSpacing.xxs,
         ),
         child: Text(
           text,
@@ -257,14 +265,16 @@ class _RemoveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.palette.sunken.withValues(alpha: 0.8),
+      color: context.palette.sunken.withValues(
+        alpha: AppOpacities.photoControl,
+      ),
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          width: AppDimens.iconSm + 6,
-          height: AppDimens.iconSm + 6,
+          width: AppDimens.photoRemoveButton,
+          height: AppDimens.photoRemoveButton,
           child: Icon(
             Icons.close_rounded,
             size: AppDimens.iconXs,
@@ -285,7 +295,7 @@ class _AddTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final shape = BorderRadius.circular(AppRadii.md + 1);
+    final shape = BorderRadius.circular(AppRadii.photo);
 
     return CustomPaint(
       painter: _DashedBorderPainter(
@@ -309,7 +319,9 @@ class _AddTile extends StatelessWidget {
                 ),
                 if (label != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsetsDirectional.only(
+                      top: AppSpacing.xxs,
+                    ),
                     child: Text(
                       label!,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(

@@ -79,6 +79,11 @@ abstract final class AppConstants {
   static const int datePickerYearsBack = 25;
   static const int datePickerYearsForward = 15;
 
+  /// The last day of the forward window, so the range ends on a year boundary
+  /// rather than on today's date N years out.
+  static const int decemberMonth = 12;
+  static const int decemberLastDay = 31;
+
   /// Return photos are evidence of a scratch, not print artwork. Capping them
   /// keeps one payload with up to five attachments from timing out on a phone.
   static const double photoMaxWidth = 1600;

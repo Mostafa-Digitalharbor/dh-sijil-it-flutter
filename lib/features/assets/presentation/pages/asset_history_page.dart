@@ -10,9 +10,12 @@ import '../../../../app/theme/app_typography.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/cubit/view_state.dart';
 import '../../../../shared/utils/app_date_format.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
+import '../../../../shared/widgets/async_data_view.dart';
 import '../../../../shared/widgets/event_timeline.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../../domain/entities/asset_history.dart';
 import '../cubit/asset_history_cubit.dart';
@@ -65,19 +68,28 @@ class _HistoryView extends StatelessWidget {
           subtitle: assetName,
           compactTitle: true,
           showBack: true,
-          body: switch (state) {
-            _ when state.isLoading && history == null => const SkeletonList(),
-            _ when state.hasFailed && history == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.load(assetId),
-            ),
-            _ when history == null || history.isEmpty => EmptyStateView(
+          body: AsyncDataView<AssetHistory>(
+            status: state.status,
+            // An empty list is data, not absence: it means Odoo answered and
+            // this asset genuinely has no history yet, which is the empty
+            // state below rather than the "record is gone" failure.
+            data: history,
+            failure: state.failure,
+            onRetry: () => cubit.load(assetId),
+            loadingView: const SkeletonTimeline(),
+            emptyView: EmptyStateView(
               icon: Icons.history_rounded,
               title: l10n.historyEmptyTitle,
               message: l10n.historyEmptyBody,
             ),
-            _ => _Timeline(history: history, assetId: assetId),
-          },
+            builder: (_, history) => history.isEmpty
+                ? EmptyStateView(
+                    icon: Icons.history_rounded,
+                    title: l10n.historyEmptyTitle,
+                    message: l10n.historyEmptyBody,
+                  )
+                : _Timeline(history: history, assetId: assetId),
+          ),
         );
       },
     );
@@ -120,6 +132,33 @@ class _Timeline extends StatelessWidget {
           events: events,
           padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
         ),
+        // Older entries, on request rather than on scroll.
+        //
+        // A button and not an infinite scroll: the summary line below closes
+        // the timeline, and a list that silently grew underneath it would keep
+        // pushing the conclusion out of reach. The reader asked a question —
+        // "who had this before" — and gets to decide when to keep going.
+        if (history.hasMore)
+          Center(
+            child: cubit.isLoadingMore
+                ? const Padding(
+                    padding: EdgeInsetsDirectional.all(AppSpacing.md),
+                    child: SizedBox(
+                      width: AppDimens.iconXl,
+                      height: AppDimens.iconXl,
+                      child: CircularProgressIndicator(
+                        strokeWidth: AppDimens.progressStroke,
+                      ),
+                    ),
+                  )
+                : AppButton.outlined(
+                    label: l10n.historyLoadOlder,
+                    icon: Icons.history_toggle_off_rounded,
+                    expand: false,
+                    isCompact: true,
+                    onPressed: cubit.loadMore,
+                  ),
+          ),
         _SummaryLine(history: history),
       ],
     );
@@ -172,7 +211,7 @@ class _SummaryLine extends StatelessWidget {
             size: AppDimens.iconSm,
             color: palette.faint,
           ),
-          const SizedBox(width: AppSpacing.sm + 2),
+          const SizedBox(width: AppSpacing.dense),
           Expanded(
             child: Text(
               since == null

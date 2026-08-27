@@ -27,6 +27,9 @@ class HandoverState extends ViewState {
     this.bundle = const <Asset>[],
     this.available = const <Asset>[],
     this.isSearchingAssets = false,
+    this.assetPage = const PageRequest(),
+    this.hasMoreAssets = false,
+    this.isLoadingMoreAssets = false,
     this.handedOverOn,
     this.notes,
     this.isSigned = false,
@@ -45,6 +48,17 @@ class HandoverState extends ViewState {
   /// the bundle.
   final List<Asset> available;
   final bool isSearchingAssets;
+
+  /// Where the picker has read up to.
+  ///
+  /// The sheet used to read one page and stop. A fleet of any size has more
+  /// than fifty assignable assets, so anything past the first page was
+  /// unreachable — and the sheet gave no sign of it, which is worse than a
+  /// visible cap: the technician searched, did not find the laptop, and
+  /// concluded it was already assigned.
+  final PageRequest assetPage;
+  final bool hasMoreAssets;
+  final bool isLoadingMoreAssets;
 
   final DateTime? handedOverOn;
   final String? notes;
@@ -96,6 +110,9 @@ class HandoverState extends ViewState {
     List<Asset>? bundle,
     List<Asset>? available,
     bool? isSearchingAssets,
+    PageRequest? assetPage,
+    bool? hasMoreAssets,
+    bool? isLoadingMoreAssets,
     DateTime? handedOverOn,
     String? notes,
     bool? isSigned,
@@ -113,6 +130,9 @@ class HandoverState extends ViewState {
     bundle: bundle ?? this.bundle,
     available: available ?? this.available,
     isSearchingAssets: isSearchingAssets ?? this.isSearchingAssets,
+    assetPage: assetPage ?? this.assetPage,
+    hasMoreAssets: hasMoreAssets ?? this.hasMoreAssets,
+    isLoadingMoreAssets: isLoadingMoreAssets ?? this.isLoadingMoreAssets,
     handedOverOn: handedOverOn ?? this.handedOverOn,
     notes: notes ?? this.notes,
     isSigned: isSigned ?? this.isSigned,
@@ -129,6 +149,9 @@ class HandoverState extends ViewState {
     bundle,
     available,
     isSearchingAssets,
+    assetPage,
+    hasMoreAssets,
+    isLoadingMoreAssets,
     handedOverOn,
     notes,
     isSigned,
@@ -204,36 +227,78 @@ class HandoverCubit extends Cubit<HandoverState> {
 
   // ── The bundle ───────────────────────────────────────────────────────────
 
+  /// The filter the picker offers from, kept in one place so the first page
+  /// and every page after it ask the same question.
+  ///
+  /// Exactly the two states an asset can be handed over from. Odoo cannot
+  /// filter on Reserved, so the repository widens the query and narrows the
+  /// page — which is why this asks for both rather than listing everything
+  /// and filtering here.
+  AssetFilters _assetFilters(String term) => AssetFilters(
+    query: term.trim().isEmpty ? null : term.trim(),
+    statuses: const <AssetStatus>{AssetStatus.available, AssetStatus.reserved},
+  );
+
+  String _assetTerm = '';
+
   void searchAssets(String term) {
+    _assetTerm = term;
     _assetSearch.run(() async {
       final ticket = _assetTicket.take();
       emit(state.copyWith(isSearchingAssets: true));
 
+      const first = PageRequest();
       final result = await _getAssets(
-        AssetQuery(
-          filters: AssetFilters(
-            query: term.trim().isEmpty ? null : term.trim(),
-            // Exactly the two states an asset can be handed over from. Odoo
-            // cannot filter on Reserved, so the repository widens the query
-            // and narrows the page — which is why this asks for both rather
-            // than listing everything and filtering here.
-            statuses: const <AssetStatus>{
-              AssetStatus.available,
-              AssetStatus.reserved,
-            },
-          ),
-          page: const PageRequest(),
-        ),
+        AssetQuery(filters: _assetFilters(term), page: first),
       );
       if (_assetTicket.isStale(ticket) || isClosed) return;
 
       result.fold(
         (_) => emit(state.copyWith(isSearchingAssets: false)),
         (page) => emit(
-          state.copyWith(isSearchingAssets: false, available: page.items),
+          state.copyWith(
+            isSearchingAssets: false,
+            available: page.items,
+            assetPage: first,
+            hasMoreAssets: page.hasMore,
+          ),
         ),
       );
     });
+  }
+
+  /// Reads the next page of assignable assets into the picker.
+  ///
+  /// Guarded on three things, all of which happen: a request already in
+  /// flight (the list fires this as it scrolls), a list that has reached the
+  /// end, and a search that has moved on since — the ticket is the same one
+  /// [searchAssets] holds, so a page for "mac" cannot land under "macbook".
+  Future<void> loadMoreAssets() async {
+    if (state.isLoadingMoreAssets || !state.hasMoreAssets) return;
+
+    final ticket = _assetTicket.take();
+    emit(state.copyWith(isLoadingMoreAssets: true));
+
+    final next = state.assetPage.next();
+    final result = await _getAssets(
+      AssetQuery(filters: _assetFilters(_assetTerm), page: next),
+    );
+    if (_assetTicket.isStale(ticket) || isClosed) return;
+
+    result.fold(
+      // A failed page leaves what is already on screen alone: the technician
+      // is mid-bundle, and replacing the list with an error would lose the
+      // selection they have made so far.
+      (_) => emit(state.copyWith(isLoadingMoreAssets: false)),
+      (page) => emit(
+        state.copyWith(
+          isLoadingMoreAssets: false,
+          available: <Asset>[...state.available, ...page.items],
+          assetPage: next,
+          hasMoreAssets: page.hasMore,
+        ),
+      ),
+    );
   }
 
   void addToBundle(Asset asset) {

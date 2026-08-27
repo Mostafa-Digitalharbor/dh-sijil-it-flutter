@@ -14,6 +14,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../cubit/asset_form_cubit.dart';
 
@@ -123,12 +124,7 @@ class _AssetFormViewState extends State<_AssetFormView> {
         return AppScaffold(
           title: state.isEdit ? l10n.assetEditTitle : l10n.assetNewTitle,
           compactTitle: true,
-          leading: AppIconButton(
-            icon: Icons.close_rounded,
-            tooltip: l10n.actionClose,
-            bordered: false,
-            onPressed: _close,
-          ),
+          leading: AppCloseButton(onPressed: _close),
           bottomBar: AppButton(
             label: l10n.actionSave,
             icon: Icons.check_rounded,
@@ -136,7 +132,7 @@ class _AssetFormViewState extends State<_AssetFormView> {
             onPressed: state.canSubmit ? cubit.submit : null,
           ),
           body: switch (state) {
-            _ when state.isLoading => const SkeletonList(),
+            _ when state.isLoading => const SkeletonForm(),
             _ when state.hasFailed && state.draft.name.isEmpty => FailureView(
               failure: state.failure!,
               onRetry: () => cubit.start(widget.assetId),

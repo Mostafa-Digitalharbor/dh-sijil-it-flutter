@@ -28,6 +28,7 @@ import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/state_views.dart';
 import 'app_routes.dart';
+import 'app_transitions.dart';
 import 'home_shell.dart';
 
 /// Builds the app's navigation graph.
@@ -62,11 +63,11 @@ abstract final class AppRouter {
       redirect: (context, state) => _redirect(state: state, auth: auth.state),
 
       routes: [
-        // The three auth screens replace one another through the redirect
-        // above rather than being pushed, so a zoom transition would animate a
-        // navigation the user never performed. NoTransitionPage also stops the
-        // outgoing screen lingering offstage, where it swallows taps aimed at
-        // the screen that replaced it.
+        // Splash and the server screen are *arrivals*: the app resolved where
+        // the user belongs and put them there. Animating them would animate a
+        // navigation the user never performed, and `NoTransitionPage` also
+        // stops the outgoing screen lingering offstage, where it swallows taps
+        // aimed at the screen that replaced it.
         GoRoute(
           path: AppRoutes.splash,
           pageBuilder: (_, state) => NoTransitionPage<void>(
@@ -81,9 +82,15 @@ abstract final class AppRouter {
             child: const ConnectionPage(),
           ),
         ),
+        // Sign-in is the exception, and the only auth screen the user reaches
+        // by pressing something: "Continue" on the server screen. It is one
+        // step deeper in a two-step form and it has a back button, so it gets
+        // the same movement as any other forward navigation — and the back
+        // button plays it in reverse, which is what makes the pair read as a
+        // form rather than as two unrelated screens.
         GoRoute(
           path: AppRoutes.login,
-          pageBuilder: (_, state) => NoTransitionPage<void>(
+          pageBuilder: (_, state) => AppTransitions.forward(
             key: state.pageKey,
             child: const LoginPage(),
           ),
@@ -113,46 +120,69 @@ abstract final class AppRouter {
                     GoRoute(
                       parentNavigatorKey: rootNavigatorKey,
                       path: AppRoutes.assetCreate,
-                      builder: (_, __) => const AssetFormPage(assetId: null),
+                      pageBuilder: (_, state) => AppTransitions.modal(
+                        key: state.pageKey,
+                        child: const AssetFormPage(assetId: null),
+                      ),
                     ),
                     GoRoute(
                       path: AppRoutes.assetDetail,
-                      builder: (_, state) =>
-                          AssetDetailPage(assetId: _intParam(state, 'assetId')),
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: AssetDetailPage(
+                          assetId: _intParam(state, 'assetId'),
+                        ),
+                      ),
                       routes: [
                         GoRoute(
                           parentNavigatorKey: rootNavigatorKey,
                           path: 'edit',
-                          builder: (_, state) => AssetFormPage(
-                            assetId: _intParam(state, 'assetId'),
+                          pageBuilder: (_, state) => AppTransitions.modal(
+                            key: state.pageKey,
+                            child: AssetFormPage(
+                              assetId: _intParam(state, 'assetId'),
+                            ),
                           ),
                         ),
                         GoRoute(
                           parentNavigatorKey: rootNavigatorKey,
                           path: 'history',
-                          builder: (_, state) => AssetHistoryPage(
-                            assetId: _intParam(state, 'assetId'),
-                            assetName: state.uri.queryParameters['name'],
+                          pageBuilder: (_, state) => AppTransitions.forward(
+                            key: state.pageKey,
+                            child: AssetHistoryPage(
+                              assetId: _intParam(state, 'assetId'),
+                              assetName: state.uri.queryParameters['name'],
+                            ),
                           ),
                         ),
                         GoRoute(
                           parentNavigatorKey: rootNavigatorKey,
                           path: 'qr',
-                          builder: (_, state) =>
-                              AssetQrPage(assetId: _intParam(state, 'assetId')),
+                          pageBuilder: (_, state) => AppTransitions.forward(
+                            key: state.pageKey,
+                            child: AssetQrPage(
+                              assetId: _intParam(state, 'assetId'),
+                            ),
+                          ),
                         ),
                         GoRoute(
                           parentNavigatorKey: rootNavigatorKey,
                           path: 'assign',
-                          builder: (_, state) => AssignAssetPage(
-                            assetId: _intParam(state, 'assetId'),
+                          pageBuilder: (_, state) => AppTransitions.modal(
+                            key: state.pageKey,
+                            child: AssignAssetPage(
+                              assetId: _intParam(state, 'assetId'),
+                            ),
                           ),
                         ),
                         GoRoute(
                           parentNavigatorKey: rootNavigatorKey,
                           path: 'return',
-                          builder: (_, state) => ReturnAssetPage(
-                            assetId: _intParam(state, 'assetId'),
+                          pageBuilder: (_, state) => AppTransitions.modal(
+                            key: state.pageKey,
+                            child: ReturnAssetPage(
+                              assetId: _intParam(state, 'assetId'),
+                            ),
                           ),
                         ),
                       ],
@@ -181,14 +211,20 @@ abstract final class AppRouter {
                   routes: [
                     GoRoute(
                       path: AppRoutes.employeeDetail,
-                      builder: (_, state) => EmployeeDetailPage(
-                        employeeId: _intParam(state, 'employeeId'),
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: EmployeeDetailPage(
+                          employeeId: _intParam(state, 'employeeId'),
+                        ),
                       ),
                       routes: [
                         GoRoute(
                           path: 'assets',
-                          builder: (_, state) => EmployeeAssetsPage(
-                            employeeId: _intParam(state, 'employeeId'),
+                          pageBuilder: (_, state) => AppTransitions.forward(
+                            key: state.pageKey,
+                            child: EmployeeAssetsPage(
+                              employeeId: _intParam(state, 'employeeId'),
+                            ),
                           ),
                         ),
                       ],
@@ -207,12 +243,18 @@ abstract final class AppRouter {
                   routes: [
                     GoRoute(
                       path: AppRoutes.maintenance,
-                      builder: (_, __) => const MaintenanceListPage(),
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: const MaintenanceListPage(),
+                      ),
                     ),
                     GoRoute(
                       path: AppRoutes.maintenanceDetail,
-                      builder: (_, state) => MaintenanceDetailPage(
-                        requestId: _intParam(state, 'requestId'),
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: MaintenanceDetailPage(
+                          requestId: _intParam(state, 'requestId'),
+                        ),
                       ),
                     ),
                     GoRoute(
@@ -220,7 +262,10 @@ abstract final class AppRouter {
                       // Full-screen: an audit owns the camera and the tab bar
                       // would be a one-tap way to lose a half-finished count.
                       parentNavigatorKey: rootNavigatorKey,
-                      builder: (_, __) => const AuditPage(),
+                      pageBuilder: (_, state) => AppTransitions.modal(
+                        key: state.pageKey,
+                        child: const AuditPage(),
+                      ),
                     ),
                     GoRoute(
                       path: AppRoutes.handover,
@@ -228,15 +273,24 @@ abstract final class AppRouter {
                       // half-filled bundle with a signature on the pad is not
                       // something a mis-tapped tab should discard.
                       parentNavigatorKey: rootNavigatorKey,
-                      builder: (_, __) => const HandoverPage(),
+                      pageBuilder: (_, state) => AppTransitions.modal(
+                        key: state.pageKey,
+                        child: const HandoverPage(),
+                      ),
                     ),
                     GoRoute(
                       path: AppRoutes.settings,
-                      builder: (_, __) => const SettingsPage(),
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: const SettingsPage(),
+                      ),
                       routes: [
                         GoRoute(
                           path: 'diagnostics',
-                          builder: (_, __) => const DebugLogPage(),
+                          pageBuilder: (_, state) => AppTransitions.forward(
+                            key: state.pageKey,
+                            child: const DebugLogPage(),
+                          ),
                         ),
                       ],
                     ),
@@ -257,8 +311,13 @@ abstract final class AppRouter {
   /// Single auth gate for the whole app.
   ///
   /// Four destinations, decided in one place so no screen ever navigates on
-  /// its own behalf: still resolving → Splash; never configured → Connection;
-  /// configured but signed out → Login; signed in → the requested page.
+  /// its own behalf: still resolving → Splash; choosing a server → Connection;
+  /// server chosen but signed out → Login; signed in → the requested page.
+  ///
+  /// This is also what "Continue" and the login screen's back button do. They
+  /// move `AuthCubit` between `configuring` and `signedOut` and let the
+  /// redirect place the user, so neither screen holds a route name and the
+  /// two-step form cannot disagree with the auth gate about where the user is.
   static String? _redirect({
     required GoRouterState state,
     required AuthState auth,
@@ -277,11 +336,18 @@ abstract final class AppRouter {
         // A sign-in in flight keeps whatever screen started it.
         return null;
 
-      case AuthStatus.unconfigured:
+      case AuthStatus.configuring:
         return location == AppRoutes.connection ? null : AppRoutes.connection;
 
+      // Pinned to the login screen, not "any auth screen".
+      //
+      // The looser test was harmless while the connection screen did the
+      // signing in — a rejected credential emitted `signedOut` and the user
+      // was already where the message belonged. Now that Continue emits it
+      // from the server screen, treating that screen as an acceptable resting
+      // place means the redirect declines to move and the button does nothing.
       case AuthStatus.signedOut:
-        return isAuthScreen ? null : AppRoutes.login;
+        return location == AppRoutes.login ? null : AppRoutes.login;
 
       case AuthStatus.signedIn:
         // Signed in — never leave the user sitting on an auth screen.

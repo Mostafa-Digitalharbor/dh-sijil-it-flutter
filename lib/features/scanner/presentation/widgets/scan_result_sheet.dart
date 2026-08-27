@@ -31,7 +31,7 @@ class ScanResultSheet extends StatelessWidget {
         horizontal: context.screen.gutter,
       ),
       child: AppCard(
-        radius: AppRadii.lg + 2,
+        radius: AppRadii.sheetCard,
         padding: const EdgeInsetsDirectional.all(AppSpacing.md),
         child: switch (state) {
           _ when state.isResolving => const _Resolving(),
@@ -189,7 +189,7 @@ class _NoMatch extends StatelessWidget {
                 onPressed: context.read<ScannerCubit>().reset,
               ),
             ),
-            const SizedBox(width: AppSpacing.sm + 1),
+            const SizedBox(width: AppSpacing.gridGap),
             Expanded(
               child: AppButton(
                 label: l10n.scanCreateAsset,

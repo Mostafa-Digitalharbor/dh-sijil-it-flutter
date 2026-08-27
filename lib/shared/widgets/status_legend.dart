@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_palette.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
@@ -39,14 +40,14 @@ class StatusLegendRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Container(
-            width: AppSpacing.sm,
-            height: AppSpacing.sm,
+            width: AppDimens.legendDot,
+            height: AppDimens.legendDot,
             decoration: BoxDecoration(
               color: tone,
-              borderRadius: BorderRadius.circular(AppSpacing.xs - 1),
+              borderRadius: BorderRadius.circular(AppRadii.swatch),
             ),
           ),
-          const SizedBox(width: AppSpacing.sm - 1),
+          const SizedBox(width: AppSpacing.tight),
           Expanded(
             child: Text(
               label,

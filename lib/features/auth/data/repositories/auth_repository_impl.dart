@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dartz/dartz.dart';
-
 import '../../../../core/constants/odoo_models.dart';
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/error/exceptions.dart';
-import '../../../../core/error/failures.dart';
+import '../../../../core/error/guard.dart';
 import '../../../../core/network/connectivity/network_info.dart';
 import '../../../../core/network/odoo/odoo_auth_service.dart';
 import '../../../../core/network/odoo/odoo_capability_service.dart';
@@ -25,7 +23,7 @@ import '../../domain/repositories/auth_repository.dart';
 ///
 /// Every method funnels its exceptions through [ErrorMapper], so nothing above
 /// this class has to know that Odoo exists, let alone that it speaks XML-RPC.
-class AuthRepositoryImpl implements AuthRepository {
+class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
   const AuthRepositoryImpl({
     required OdooAuthService authService,
     required OdooObjectService objectService,
@@ -55,7 +53,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   ResultFuture<ConnectionProbe> probe(OdooConnection connection) async {
-    return _guard(() async {
+    return guard(() async {
       await _requireNetwork();
 
       final info = await _authService.version(connection);
@@ -75,7 +73,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required OdooConnection connection,
     required String secret,
   }) async {
-    return _guard(() async {
+    return guard(() async {
       await _requireNetwork();
 
       final info = await _authService.version(connection);
@@ -110,7 +108,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   ResultFuture<SignedInUser?> restoreSession() async {
-    return _guard(() async {
+    return guard(() async {
       final connection = _preferences.readConnection();
       final userId = _preferences.userId;
       if (connection == null || userId == null) return null;
@@ -139,7 +137,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   ResultFuture<void> signOut({bool forgetCredential = true}) async {
-    return _guard(() async {
+    return guard(() async {
       await _sessionManager.end(forgetCredential: forgetCredential);
       await _capabilityService.invalidate();
       if (forgetCredential) await _preferences.setUserId(null);
@@ -148,7 +146,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   ResultFuture<OdooCapabilities> refreshCapabilities() async {
-    return _guard(() async {
+    return guard(() async {
       await _capabilityService.invalidate();
       final capabilities = await _capabilityService.probeAll();
       await _preferences.setLastMetadataSync(DateTime.now());
@@ -227,14 +225,6 @@ class AuthRepositoryImpl implements AuthRepository {
     return null;
   }
 
-  /// Runs [body], converting anything thrown into a [Failure].
-  static Future<Either<Failure, T>> _guard<T>(Future<T> Function() body) async {
-    try {
-      return Right(await body());
-    } on Object catch (error, stackTrace) {
-      final failure = ErrorMapper.map(error, stackTrace);
-      AppLogger.warn('AuthRepository -> $failure');
-      return Left(failure);
-    }
-  }
+  @override
+  String get guardLabel => 'AuthRepository';
 }

@@ -24,6 +24,16 @@ class BarSegment {
 /// Zero-value segments are dropped rather than rendered at 0 px, which would
 /// otherwise leave stray gap artefacts between the visible ones.
 class DistributionBar extends StatelessWidget {
+  /// `Expanded.flex` is an int, so the proportions have to be quantised. A
+  /// thousand steps puts the rounding error below a tenth of a percent, which
+  /// is finer than the bar can render on any screen the app runs on.
+  ///
+  /// Doubles as the clamp ceiling: a segment is never given more than the
+  /// whole bar, and — via the floor of 1 — a segment that rounds to nothing
+  /// still draws, because a status with one asset in it disappearing from the
+  /// distribution is worse than a hairline that is technically too wide.
+  static const int _flexResolution = 1000;
+
   const DistributionBar({
     required this.segments,
     this.height = AppDimens.statusStripHeight,
@@ -57,7 +67,9 @@ class DistributionBar extends StatelessWidget {
             for (var i = 0; i < visible.length; i++) ...[
               if (i > 0) const SizedBox(width: AppDimens.statusStripGap),
               Expanded(
-                flex: (visible[i].value / total * 1000).round().clamp(1, 1000),
+                flex: (visible[i].value / total * _flexResolution)
+                    .round()
+                    .clamp(1, _flexResolution),
                 child: ColoredBox(color: visible[i].color),
               ),
             ],
@@ -186,10 +198,10 @@ class AppStatTile extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
-      radius: AppRadii.md + 2,
+      radius: AppRadii.card,
       padding: const EdgeInsetsDirectional.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.md - 2,
+        vertical: AppSpacing.dense,
       ),
       semanticLabel: AppText.labelled(label, value),
       child: Column(
@@ -204,7 +216,7 @@ class AppStatTile extends StatelessWidget {
             )
           else if (icon != null)
             Icon(icon, size: AppDimens.iconMd, color: ink),
-          const SizedBox(height: AppSpacing.sm - 1),
+          const SizedBox(height: AppSpacing.tight),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: AlignmentDirectional.centerStart,
@@ -217,7 +229,7 @@ class AppStatTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.xs - 1),
+          const SizedBox(height: AppSpacing.micro),
           Text(
             label,
             style: theme.textTheme.bodySmall,
@@ -243,9 +255,10 @@ class AppStatGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = context.screen;
-    final columns = screen.isLargeText
-        ? 2
-        : screen.pick(compact: 3, medium: 4, expanded: 6);
+    // Not re-derived here: `statTileColumns` is the same rule the rest of the
+    // app asks for by name, and this grid had quietly grown its own copy of
+    // it — with the breakpoints spelled out a second time.
+    final columns = screen.statTileColumns;
 
     final rows = <Widget>[];
     for (var i = 0; i < tiles.length; i += columns) {
@@ -256,7 +269,7 @@ class AppStatGrid extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (var c = 0; c < columns; c++) ...[
-                if (c > 0) const SizedBox(width: AppSpacing.sm + 1),
+                if (c > 0) const SizedBox(width: AppSpacing.gridGap),
                 Expanded(
                   child: c < slice.length ? slice[c] : const SizedBox.shrink(),
                 ),
@@ -271,7 +284,7 @@ class AppStatGrid extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < rows.length; i++) ...[
-          if (i > 0) const SizedBox(height: AppSpacing.sm + 1),
+          if (i > 0) const SizedBox(height: AppSpacing.gridGap),
           rows[i],
         ],
       ],
@@ -305,12 +318,12 @@ class AppAttentionTile extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
-      radius: AppRadii.md + 2,
+      radius: AppRadii.card,
       backgroundColor: tone.withValues(alpha: AppOpacities.overlay),
       borderColor: tone.withValues(alpha: AppOpacities.chipBorder),
       padding: const EdgeInsetsDirectional.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.md - 2,
+        vertical: AppSpacing.dense,
       ),
       semanticLabel: AppText.labelled(label, value),
       child: Column(
@@ -335,7 +348,7 @@ class AppAttentionTile extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs + 1),
+          const SizedBox(height: AppSpacing.fine),
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -389,7 +402,9 @@ class AppStepHeader extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Text(
-            '$step',
+            // Through AppNumber: `'$step'` is Latin whatever the locale, which
+            // put "1" in the badge above an Arabic heading counting "١".
+            AppNumber.count(context, step),
             style: theme.textTheme.labelSmall?.copyWith(
               color: badgeInk,
               letterSpacing: AppTypography.noTracking,

@@ -33,6 +33,9 @@ class AppL10nAr extends AppL10n {
   String get actionClose => 'إغلاق';
 
   @override
+  String get actionContinue => 'متابعة';
+
+  @override
   String get actionDelete => 'حذف';
 
   @override
@@ -63,6 +66,9 @@ class AppL10nAr extends AppL10n {
   String get actionRemove => 'إزالة';
 
   @override
+  String get actionOpenSettings => 'فتح الإعدادات';
+
+  @override
   String get actionRetry => 'إعادة المحاولة';
 
   @override
@@ -70,9 +76,6 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get actionSave => 'حفظ';
-
-  @override
-  String get actionSaveAndSignIn => 'حفظ وتسجيل الدخول';
 
   @override
   String get actionSeeAll => 'عرض الكل';
@@ -270,7 +273,7 @@ class AppL10nAr extends AppL10n {
   String get dashboardTitle => 'الرئيسية';
 
   @override
-  String get dashboardWarrantyDue => 'ضمان ينتهي خلال ٣٠ يومًا';
+  String get dashboardWarrantyDue => 'ضمان ينتهي خلال 30 يومًا';
 
   @override
   String detectFoundCount(int count) {
@@ -278,7 +281,15 @@ class AppL10nAr extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return 'تم العثور على $countString قاعدة بيانات';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $countString قاعدة بيانات',
+      few: 'تم العثور على $countString قواعد بيانات',
+      two: 'تم العثور على قاعدتي بيانات',
+      one: 'تم العثور على قاعدة بيانات واحدة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -332,7 +343,16 @@ class AppL10nAr extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return '$countString عناصر';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString عنصرًا',
+      few: '$countString عناصر',
+      two: 'عنصران',
+      one: 'عنصر واحد',
+      zero: 'لا توجد عناصر',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -440,6 +460,17 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get errorHowToFix => 'ما العمل';
+
+  @override
+  String get errorInsecureConnectionTitle => 'هذا العنوان غير مُشفَّر';
+
+  @override
+  String get errorInsecureConnectionBody =>
+      'لا يتصل سِجل IT إلا عبر HTTPS، حتى لا تُرسَل كلمة مرور أودو بنص واضح. والعنوان المحفوظ يبدأ بـ‎http://‎.';
+
+  @override
+  String get errorInsecureConnectionFix =>
+      'غيّر العنوان ليبدأ بـ‎https://‎. وإن لم تكن نسخة أودو لديك تحمل شهادة بعد، فبإمكان المسؤول إضافتها — وهذا لازم أيضًا للنسخ المستضافة داخل شبكة المكتب.';
 
   @override
   String get errorInvalidCredentialsBody =>
@@ -615,6 +646,15 @@ class AppL10nAr extends AppL10n {
   String get filterWarranty => 'الضمان';
 
   @override
+  String filtersLabelActive(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'الفلاتر ($countString)';
+  }
+
+  @override
   String get filtersLabel => 'الفلاتر';
 
   @override
@@ -636,13 +676,28 @@ class AppL10nAr extends AppL10n {
   String get labelCategory => 'الفئة';
 
   @override
+  String get launchNoMailApp => 'لا يوجد تطبيق بريد مُعَد على هذا الجهاز.';
+
+  @override
+  String get launchNoPhoneApp => 'هذا الجهاز لا يمكنه إجراء المكالمات.';
+
+  @override
   String labelHeldDays(int days) {
     final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
       localeName,
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return '$daysString يومًا';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString يومًا',
+      few: '$daysString أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+      zero: 'أقل من يوم',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -704,7 +759,7 @@ class AppL10nAr extends AppL10n {
       'يعمل سِجل IT ضمن صلاحياتك في أودو. لن ترى أو تعدّل إلا ما يسمح به حسابك.';
 
   @override
-  String get loginDifferentServer => 'تريد الاتصال بخادم آخر؟';
+  String get loginBackToServer => 'الرجوع إلى إعدادات الخادم';
 
   @override
   String get loginKeepSignedIn => 'أبقني مسجَّلًا';
@@ -714,9 +769,6 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get loginSubtitle => 'سجّل الدخول ببيانات أودو الخاصة بك.';
-
-  @override
-  String get loginSwitchServer => 'تغيير';
 
   @override
   String get loginWelcomeBack => 'أهلًا بعودتك';
@@ -856,7 +908,16 @@ class AppL10nAr extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'بالعهدة $daysString يومًا';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'بالعهدة $daysString يومًا',
+      few: 'بالعهدة $daysString أيام',
+      two: 'بالعهدة يومان',
+      one: 'بالعهدة يوم واحد',
+      zero: 'بالعهدة أقل من يوم',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -917,6 +978,17 @@ class AppL10nAr extends AppL10n {
   @override
   String get scanPermissionFix =>
       'فعّل الوصول إلى الكاميرا لتطبيق سِجل IT من إعدادات جهازك.';
+
+  @override
+  String get scanCameraErrorTitle => 'تعذّر تشغيل الكاميرا';
+
+  @override
+  String get scanCameraErrorBody =>
+      'قد يكون تطبيق آخر يستخدم الكاميرا، أو أن الجهاز لم يُتِح الوصول إليها.';
+
+  @override
+  String get scanCameraErrorFix =>
+      'أغلق أي تطبيق آخر يستخدم الكاميرا ثم افتح هذه الشاشة من جديد، وإن لم يُحلّ الأمر فأعد تشغيل الجهاز.';
 
   @override
   String get scanPermissionTitle => 'الوصول إلى الكاميرا مغلق';
@@ -1071,7 +1143,15 @@ class AppL10nAr extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return 'قبل $countString يوم';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'قبل $countString يومًا',
+      few: 'قبل $countString أيام',
+      two: 'قبل يومين',
+      one: 'قبل يوم',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1080,7 +1160,15 @@ class AppL10nAr extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return 'قبل $countString ساعة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'قبل $countString ساعة',
+      few: 'قبل $countString ساعات',
+      two: 'قبل ساعتين',
+      one: 'قبل ساعة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1092,7 +1180,15 @@ class AppL10nAr extends AppL10n {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return 'قبل $countString دقيقة';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'قبل $countString دقيقة',
+      few: 'قبل $countString دقائق',
+      two: 'قبل دقيقتين',
+      one: 'قبل دقيقة',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1137,7 +1233,15 @@ class AppL10nAr extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'انتهى منذ $daysString يومًا';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'انتهى منذ $daysString يومًا',
+      few: 'انتهى منذ $daysString أيام',
+      two: 'انتهى منذ يومين',
+      one: 'انتهى منذ يوم واحد',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1147,17 +1251,25 @@ class AppL10nAr extends AppL10n {
     );
     final String daysString = daysNumberFormat.format(days);
 
-    return 'ينتهي خلال $daysString يومًا';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'ينتهي خلال $daysString يومًا',
+      few: 'ينتهي خلال $daysString أيام',
+      two: 'ينتهي خلال يومين',
+      one: 'ينتهي خلال يوم واحد',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get warrantyFilterCritical => 'ينتهي خلال ٣٠ يومًا';
+  String get warrantyFilterCritical => 'ينتهي خلال 30 يومًا';
 
   @override
   String get warrantyFilterExpired => 'منتهٍ';
 
   @override
-  String get warrantyFilterSoon => 'ينتهي خلال ٩٠ يومًا';
+  String get warrantyFilterSoon => 'ينتهي خلال 90 يومًا';
 
   @override
   String get warrantyFilterValid => 'ساري';
@@ -1178,11 +1290,11 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get errorFileUnavailableBody =>
-      'الهاتف تخلّص من الملف قبل ما يخلص رفع. ده بيحصل غالبًا لما النظام يقفل تطبيق الكاميرا وهو شغّال في الخلفية.';
+      'تخلّى الهاتف عن الملف قبل اكتمال رفعه. يحدث هذا غالبًا عندما يُغلق النظام تطبيق الكاميرا وهو يعمل في الخلفية.';
 
   @override
   String get errorFileUnavailableFix =>
-      'صوّر الصورة تاني وفضل في التطبيق لحد ما الرفع يخلص.';
+      'التقط الصورة مرة أخرى وابقَ داخل التطبيق حتى يكتمل الرفع.';
 
   @override
   String get photosTitle => 'الصور';
@@ -1203,7 +1315,8 @@ class AppL10nAr extends AppL10n {
   String get photosEmpty => 'مفيش صور لسه';
 
   @override
-  String get photosEmptyHint => 'صوّر العطل قبل ما تبدأ، والإصلاح لما تخلص.';
+  String get photosEmptyHint =>
+      'صوّر العطل قبل أن تبدأ، وصوّر الإصلاح عند الانتهاء.';
 
   @override
   String get photosRemoveTitle => 'تشيل الصورة دي؟';
@@ -1242,7 +1355,7 @@ class AppL10nAr extends AppL10n {
   String get greetingEvening => 'مساء الخير';
 
   @override
-  String get dashboardTrendTitle => 'في الخدمة خلال ١٢ شهر';
+  String get dashboardTrendTitle => 'في الخدمة خلال 12 شهر';
 
   @override
   String get dashboardAssetsUnit => 'أصل';
@@ -1259,6 +1372,9 @@ class AppL10nAr extends AppL10n {
   @override
   String get historyEmptyBody =>
       'التسليمات والاسترجاعات والصيانات هتظهر هنا أول ما تحصل.';
+
+  @override
+  String get historyLoadOlder => 'عرض الأقدم';
 
   @override
   String get historyRegistered => 'تم التسجيل';
@@ -1297,7 +1413,7 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get auditStartBody =>
-      'الجرد المحدود بيخلص. جرد كل حاجة مرة واحدة محدش بيخلصه.';
+      'النطاق المحدود يكتمل. أما جرد كل شيء دفعة واحدة فلا يكتمل.';
 
   @override
   String get auditScopeAll => 'كل الأصول';
@@ -1324,13 +1440,13 @@ class AppL10nAr extends AppL10n {
   String get auditFound => 'موجود';
 
   @override
-  String get auditUnexpected => 'مش في النطاق';
+  String get auditUnexpected => 'خارج النطاق';
 
   @override
-  String get auditMissing => 'مش موجود';
+  String get auditMissing => 'غير موجود';
 
   @override
-  String get auditKeepScanning => 'كمّل مسح — مش محتاج توقف';
+  String get auditKeepScanning => 'واصل المسح — لا داعي للتوقف';
 
   @override
   String get auditJustScanned => 'آخر ما تم مسحه';
@@ -1342,13 +1458,13 @@ class AppL10nAr extends AppL10n {
   String get auditOutOfScope => 'موجود هنا، ومسجّل في مكان تاني';
 
   @override
-  String get auditUnknownCode => 'الكود ده مش تابع لأي أصل';
+  String get auditUnknownCode => 'هذا الرمز لا يطابق أي أصل';
 
   @override
   String get auditFinish => 'إنهاء الجرد';
 
   @override
-  String get auditResume => 'كمّل الجرد';
+  String get auditResume => 'واصل الجرد';
 
   @override
   String get auditReportTitle => 'انتهى الجرد';
@@ -1370,7 +1486,7 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get auditDiscardBody =>
-      'اللي اتمسح لحد دلوقتي على الموبايل بس. لو خرجت هيضيع.';
+      'ما جرى مسحه حتى الآن محفوظ على هذا الهاتف فقط، وسيضيع إن خرجت.';
 
   @override
   String get auditDiscardConfirm => 'اخرج';
@@ -1398,7 +1514,7 @@ class AppL10nAr extends AppL10n {
   String get handoverTitle => 'تسليم';
 
   @override
-  String get handoverSubtitle => 'أكتر من أصل، وتوقيع واحد';
+  String get handoverSubtitle => 'عدة أصول، وتوقيع واحد';
 
   @override
   String get handoverConfirm => 'تأكيد التسليم';
@@ -1407,7 +1523,7 @@ class AppL10nAr extends AppL10n {
   String get handoverStepRecipient => 'مَن المُستلِم';
 
   @override
-  String get handoverStepBundle => 'اللي هيتسلّمه';
+  String get handoverStepBundle => 'ما سيتسلّمه';
 
   @override
   String get handoverStepDate => 'تاريخ التسليم';
@@ -1425,7 +1541,7 @@ class AppL10nAr extends AppL10n {
   String get handoverSearchPeople => 'ابحث عن موظف';
 
   @override
-  String get handoverBundleEmpty => 'ما فيش حاجة مضافة لسّة.';
+  String get handoverBundleEmpty => 'لم تُضف أي أصول بعد.';
 
   @override
   String get handoverAddAssets => 'إضافة أصول';
@@ -1464,7 +1580,7 @@ class AppL10nAr extends AppL10n {
   String get handoverPickAssets => 'إضافة للتسليم';
 
   @override
-  String get handoverPickAssetsBody => 'بتظهر الأصول اللي ما حدش ماسكها بس.';
+  String get handoverPickAssetsBody => 'تظهر الأصول التي لا يحملها أحد فقط.';
 
   @override
   String get handoverSearchAssets => 'ابحث عن أصل';
@@ -1479,7 +1595,7 @@ class AppL10nAr extends AppL10n {
   }
 
   @override
-  String get handoverNoAssignableAssets => 'ما فيش أصول متاحة للتسليم دلوقتي.';
+  String get handoverNoAssignableAssets => 'لا توجد أصول متاحة للتسليم حاليًا.';
 
   @override
   String handoverDone(String employee) {
@@ -1520,26 +1636,26 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get handoverNothingRecordedBody =>
-      'أودو ما قبلش أي حاجة من التسليمة، فما فيش أصل اتغيّر.';
+      'لم يقبل أودو أي أصل من التسليمة، فلم تتغيّر عهدة أي أصل.';
 
   @override
-  String get moreHandoverSubtitle => 'سلّم كذا أصل لشخص واحد';
+  String get moreHandoverSubtitle => 'سلّم عدة أصول لشخص واحد';
 
   @override
-  String get errorFieldUnavailableTitle => 'فيه حقل ناقص في أودو بتاعك';
+  String get errorFieldUnavailableTitle => 'يوجد حقل ناقص في أودو لديك';
 
   @override
   String get errorFieldUnavailableBody =>
-      'الشاشة طلبت من أودو حقل مش موجود عندك. ما اتغيّرش أي حاجة.';
+      'طلبت هذه الشاشة من أودو حقلًا غير موجود في نسختك. لم يتغيّر شيء.';
 
   @override
   String errorFieldUnavailableBodyDetailed(String field) {
-    return 'الشاشة طلبت من أودو الحقل «$field»، ومش موجود عندك. ما اتغيّرش أي حاجة.';
+    return 'طلبت هذه الشاشة من أودو الحقل «$field» وهو غير موجود في نسختك. لم يتغيّر شيء.';
   }
 
   @override
   String get errorFieldUnavailableFix =>
-      'إعادة المحاولة مش هتفيد — لازم الحقل يكون موجود الأول. لو اتضاف دلوقتي، اطلع وادخل تاني؛ وإلا كلّم مسؤول أودو.';
+      'إعادة المحاولة لن تُجدي — يجب أن يوجد الحقل أولًا. إن كان قد أُضيف للتو فسجّل الخروج ثم الدخول، وإلا فراجع مسؤول أودو لديك.';
 
   @override
   String get operationRead => 'عرض';
@@ -1552,9 +1668,4 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get operationDelete => 'حذف';
-}
-
-/// The translations for Arabic, as used in Egypt (`ar_EG`).
-class AppL10nArEg extends AppL10nAr {
-  AppL10nArEg() : super('ar_EG');
 }

@@ -168,12 +168,27 @@ void main() {
     // The rule the ARB files exist to enforce. Catches the literal handed to a
     // Text() or to a label/hint/title parameter — the two shapes a hardcoded
     // sentence actually takes.
+    //
+    // The parameter list is wider than the one this test shipped with, which
+    // watched eight names and so never looked at `semanticLabel` — the string
+    // a blind user hears, and the one place an untranslated label is hardest
+    // for a sighted reviewer to notice.
     final literal = RegExp(
-      r'''(?:Text\(\s*'([^'\\]{3,})'|(?:label|title|hint|tooltip|message'''
-      r'''|subtitle|hintText|labelText|errorText|helperText)'''
-      r''':\s*'([^'\\]{3,})')''',
+      r'''(?:Text\(\s*'([^'\\]{2,})'|(?:label|title|hint|tooltip|message'''
+      r'''|subtitle|hintText|labelText|errorText|helperText|semanticLabel'''
+      r'''|semanticsLabel|actionLabel|confirmLabel|cancelLabel|addLabel)'''
+      r''':\s*'([^'\\]{2,})')''',
     );
-    final words = RegExp(r'[A-Za-z]{3,}\s+[A-Za-z]{3,}');
+
+    // Anything that reads as English words — one is enough.
+    //
+    // The old test required *two*, on the theory that a single token is an
+    // identifier rather than prose. But the buttons are the single tokens:
+    // "Save", "Cancel", "Retry", "Delete". A one-word label is the most
+    // likely thing to be typed straight into a widget precisely because it
+    // looks too small to be worth a key, and it is the word the user taps.
+    final prose = RegExp(r'^[A-Za-z][A-Za-z \-’.,?!]*$');
+    final hasLetters = RegExp(r'[A-Za-z]{2,}');
     final offenders = <String>[];
 
     for (final file
@@ -189,8 +204,7 @@ void main() {
 
         for (final match in literal.allMatches(line)) {
           final value = match.group(1) ?? match.group(2)!;
-          // Two or more words is prose; one token is an identifier or a key.
-          if (words.hasMatch(value)) {
+          if (prose.hasMatch(value) && hasLetters.hasMatch(value)) {
             offenders.add('${file.path}: "$value"');
           }
         }

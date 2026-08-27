@@ -82,7 +82,7 @@ class _Row extends StatelessWidget {
           Text(event.title, style: text.titleSmall),
           if (event.subtitle != null)
             Padding(
-              padding: const EdgeInsets.only(top: 2),
+              padding: const EdgeInsetsDirectional.only(top: AppSpacing.xxs),
               child: Text(
                 event.subtitle!,
                 style: text.bodySmall?.copyWith(color: palette.dim),
@@ -90,7 +90,7 @@ class _Row extends StatelessWidget {
             ),
           if (event.meta != null)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
               child: Text(
                 event.meta!,
                 style: text.bodySmall?.copyWith(
@@ -116,7 +116,7 @@ class _Row extends StatelessWidget {
                   height: AppDimens.timelineRail,
                   decoration: BoxDecoration(
                     color: context.tint(event.tone),
-                    borderRadius: BorderRadius.circular(AppRadii.sm + 1),
+                    borderRadius: BorderRadius.circular(AppRadii.control),
                   ),
                   child: Icon(event.icon, size: AppDimens.iconSm, color: tone),
                 ),

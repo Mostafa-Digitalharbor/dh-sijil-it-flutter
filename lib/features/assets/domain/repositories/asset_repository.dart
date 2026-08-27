@@ -51,7 +51,13 @@ abstract interface class AssetRepository {
   /// Reads the chatter this app has been writing to since the first release,
   /// so it works retroactively on data already in the customer's database —
   /// no new fields, no migration.
-  ResultFuture<AssetHistory> history(int id);
+  /// One page of an asset's service life, newest first.
+  ///
+  /// [offset] pages backwards through the chatter. The asset's creation date
+  /// is attached to the first page only — it closes the timeline, and asking
+  /// for it again on every page would be a second read per page for a value
+  /// that cannot change.
+  ResultFuture<AssetHistory> history(int id, {int offset = 0});
 
   /// Which operations the signed-in user's ACLs permit, so the UI can hide
   /// actions rather than let them fail (spec §21).

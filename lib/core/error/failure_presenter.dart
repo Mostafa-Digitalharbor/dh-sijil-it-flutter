@@ -82,6 +82,11 @@ abstract final class FailurePresenter {
         l10n.errorNotAnOdooServerBody,
         l10n.errorNotAnOdooServerFix,
       ),
+      FailureKind.insecureConnection => (
+        l10n.errorInsecureConnectionTitle,
+        l10n.errorInsecureConnectionBody,
+        l10n.errorInsecureConnectionFix,
+      ),
       FailureKind.timeout => (
         l10n.errorTimeoutTitle,
         l10n.errorTimeoutBody,
@@ -195,6 +200,7 @@ abstract final class FailurePresenter {
     FailureKind.noInternet => Icons.wifi_off_rounded,
     FailureKind.serverUnreachable ||
     FailureKind.notAnOdooServer => Icons.cloud_off_rounded,
+    FailureKind.insecureConnection => Icons.lock_open_rounded,
     FailureKind.timeout => Icons.hourglass_disabled_rounded,
     FailureKind.invalidCredentials ||
     FailureKind.sessionExpired => Icons.key_off_rounded,

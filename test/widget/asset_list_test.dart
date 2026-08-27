@@ -4,6 +4,7 @@ import 'package:sijil_it/app/di/injector.dart';
 import 'package:sijil_it/features/assets/presentation/pages/asset_list_page.dart';
 import 'package:sijil_it/features/assets/presentation/widgets/asset_row.dart';
 import 'package:sijil_it/l10n/generated/app_localizations.dart';
+import 'package:sijil_it/shared/widgets/skeletons.dart';
 import 'package:sijil_it/shared/widgets/state_views.dart';
 
 import '../fake_odoo/fake_odoo_data.dart';
@@ -62,7 +63,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byType(SkeletonList), findsOneWidget);
+      expect(find.byType(SkeletonRowList), findsOneWidget);
       expect(find.byType(AssetRow), findsNothing);
 
       client.delay = Duration.zero;

@@ -15,8 +15,10 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/async_data_view.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../../../shared/widgets/status_chip.dart';
+import '../../../assets/domain/entities/asset.dart';
 import '../../../assets/domain/entities/asset_status.dart';
 import '../../domain/entities/assignment.dart';
 import '../cubit/return_asset_cubit.dart';
@@ -106,12 +108,7 @@ class _ReturnAssetViewState extends State<_ReturnAssetView> {
         return AppScaffold(
           title: l10n.returnTitle,
           compactTitle: true,
-          leading: AppIconButton(
-            icon: Icons.close_rounded,
-            tooltip: l10n.actionClose,
-            bordered: false,
-            onPressed: _close,
-          ),
+          leading: AppCloseButton(onPressed: _close),
           bottomBar: state.asset == null
               ? null
               : AppButton(
@@ -120,20 +117,18 @@ class _ReturnAssetViewState extends State<_ReturnAssetView> {
                   isBusy: state.isSubmitting,
                   onPressed: state.canSubmit ? cubit.submit : null,
                 ),
-          body: switch (state) {
-            _ when state.isLoading && state.asset == null =>
-              const SkeletonList(),
-            _ when state.hasFailed && state.asset == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.start(widget.assetId),
-            ),
-            _ when state.asset == null => const SizedBox.shrink(),
-            _ => _ReturnForm(
+          body: AsyncDataView<Asset>(
+            status: state.status,
+            data: state.asset,
+            failure: state.failure,
+            onRetry: () => cubit.start(widget.assetId),
+            loadingView: const SkeletonForm(fields: 4),
+            builder: (_, __) => _ReturnForm(
               state: state,
               notes: _notes,
               onAddPhoto: () => _addPhoto(cubit),
             ),
-          },
+          ),
         );
       },
     );

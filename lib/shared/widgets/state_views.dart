@@ -64,30 +64,6 @@ class SkeletonBox extends StatelessWidget {
   }
 }
 
-/// A list of skeleton rows shaped like the real asset and employee rows.
-class SkeletonList extends StatelessWidget {
-  const SkeletonList({
-    this.itemCount = 6,
-    this.itemHeight = AppDimens.skeletonRowHeight,
-    super.key,
-  });
-
-  final int itemCount;
-  final double itemHeight;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: EdgeInsetsDirectional.all(context.screen.gutter),
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: itemCount,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
-      itemBuilder: (_, __) =>
-          SkeletonBox(height: itemHeight, radius: AppRadii.lg),
-    );
-  }
-}
-
 /// Shared frame for the empty and failure treatments: centred, scrollable so
 /// it survives a short viewport or a large text scale, and width-capped so
 /// the copy stays readable on a tablet.
@@ -230,6 +206,7 @@ class EmptyStateView extends StatelessWidget {
     required this.title,
     required this.message,
     this.icon = Icons.inbox_rounded,
+    this.fix,
     this.actionLabel,
     this.onAction,
     super.key,
@@ -238,6 +215,17 @@ class EmptyStateView extends StatelessWidget {
   final String title;
   final String message;
   final IconData icon;
+
+  /// The concrete next step, in the same "what to do" card [FailureView] uses.
+  ///
+  /// Optional because most empty states have no fix — a list with nothing in
+  /// it yet is not a problem to solve. It exists for the ones that *are* a
+  /// problem wearing an empty state's clothes: the scanner with the camera
+  /// permission switched off is the screen this was added for, and it was
+  /// showing the user what had happened and why while silently dropping the
+  /// sentence that said how to undo it.
+  final String? fix;
+
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -248,6 +236,7 @@ class EmptyStateView extends StatelessWidget {
       iconColor: Theme.of(context).colorScheme.secondary,
       title: title,
       body: message,
+      fix: fix,
       action: (actionLabel != null && onAction != null)
           ? AppButton(
               label: actionLabel!,
@@ -326,7 +315,7 @@ class FailureView extends StatelessWidget {
         FailureAction.retry => onRetry,
         FailureAction.editConnection =>
           onEditConnection ??
-              _authAction(context, (auth) => auth.forgetConnection()),
+              _authAction(context, (auth) => auth.editConnection()),
         FailureAction.signIn =>
           onSignIn ?? _authAction(context, (auth) => auth.signOut()),
         FailureAction.none => null,

@@ -13,7 +13,8 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/async_data_view.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../domain/entities/asset.dart';
 import '../cubit/asset_detail_cubit.dart';
@@ -139,15 +140,15 @@ class _AssetDetailView extends StatelessWidget {
               ),
             ],
           ],
-          body: switch (state) {
-            _ when state.isLoading && asset == null => const SkeletonList(),
-            _ when state.hasFailed && asset == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.load(assetId),
-            ),
-            _ when asset == null => const SizedBox.shrink(),
-            _ => _DetailBody(asset: asset, state: state, assetId: assetId),
-          },
+          body: AsyncDataView<Asset>(
+            status: state.status,
+            data: asset,
+            failure: state.failure,
+            onRetry: () => cubit.load(assetId),
+            loadingView: const SkeletonDetail(),
+            builder: (_, asset) =>
+                _DetailBody(asset: asset, state: state, assetId: assetId),
+          ),
         );
       },
     );
@@ -291,7 +292,7 @@ class _PrimaryActions extends StatelessWidget {
     return Row(
       children: <Widget>[
         for (var i = 0; i < actions.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(width: AppSpacing.sm + 1),
+          if (i > 0) const SizedBox(width: AppSpacing.gridGap),
           Expanded(child: actions[i]),
         ],
       ],

@@ -28,6 +28,20 @@ class ConnectionException extends AppException {
   const ConnectionException(super.message, {super.technicalDetails});
 }
 
+/// The URL asked for plain HTTP, which the app does not speak.
+///
+/// Both platforms refuse it before a packet leaves the device — Android
+/// through `usesCleartextTraffic="false"`, iOS through App Transport
+/// Security — and each phrases the refusal differently and only after the
+/// request has been attempted. Raised as its own type so the user is told the
+/// one thing that actually fixes it rather than being sent to check whether
+/// their server is switched on.
+class InsecureConnectionException extends AppException {
+  const InsecureConnectionException([
+    super.message = 'Sijil IT only connects over HTTPS.',
+  ]);
+}
+
 /// The request exceeded the configured timeout.
 class TimeoutException extends AppException {
   const TimeoutException([super.message = 'The request timed out']);
@@ -98,8 +112,17 @@ class CacheException extends AppException {
 }
 
 /// Client-side input validation failed before any request was sent.
+///
+/// [validationKey] names *which* rule was broken, using the same stable keys
+/// the Cubits publish. Without it every rejection collapsed into one message:
+/// `http://demo.odoo.com` is a perfectly well-formed URL, and telling the user
+/// it "doesn't look like a valid server address" sends them to re-read the
+/// host name when the only thing wrong is the scheme. The translated string
+/// naming the scheme already existed and nothing could reach it.
 class InputValidationException extends AppException {
-  const InputValidationException(super.message);
+  const InputValidationException(super.message, {this.validationKey});
+
+  final String? validationKey;
 }
 
 /// The record was read by id and Odoo returned nothing.

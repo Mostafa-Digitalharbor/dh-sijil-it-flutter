@@ -12,10 +12,17 @@ enum AuthStatus {
   /// Bootstrap has not finished; the splash screen is showing.
   unknown,
 
-  /// No connection has ever been configured — go to the connection screen.
-  unconfigured,
+  /// The server screen owns the user: either nothing has ever been
+  /// configured, or they stepped back to change the URL or database.
+  ///
+  /// Named for where the user *is* rather than for what is missing, because
+  /// both routes lead to the same screen and only one of them means "no
+  /// connection". [AuthState.connection] tells them apart, and is what the
+  /// screen prefills from.
+  configuring,
 
-  /// Configured but signed out — go to the login screen.
+  /// The server is known and the app is waiting for a sign-in — go to the
+  /// login screen.
   signedOut,
 
   busy,
@@ -78,12 +85,12 @@ class AuthCubit extends Cubit<AuthState> {
   /// Called once from the splash screen.
   ///
   /// Resolves to exactly one of three destinations, so the router never has to
-  /// guess: unconfigured, signed out, or signed in.
+  /// guess: configuring, signed out, or signed in.
   Future<void> restore() async {
     final saved = _repository.savedConnection();
 
     if (saved == null) {
-      emit(const AuthState(status: AuthStatus.unconfigured));
+      emit(const AuthState(status: AuthStatus.configuring));
       return;
     }
 
@@ -154,11 +161,31 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  /// Forgets the server entirely and returns to first-run.
-  Future<void> forgetConnection() async {
-    emit(state.copyWith(status: AuthStatus.busy, clearFailure: true));
+  /// The server screen is done: carry these details to the login screen.
+  ///
+  /// No round trip and nothing written to storage. The connection is only
+  /// worth persisting once a sign-in has proved it works, and until then it
+  /// holds an empty username — a half-filled record that a later restore
+  /// would have to special-case.
+  void useConnection(OdooConnection connection) =>
+      emit(AuthState(status: AuthStatus.signedOut, connection: connection));
+
+  /// Back to the server screen, with what is on file kept for the fields.
+  ///
+  /// Non-destructive on purpose. The old "forget the connection" behaviour
+  /// emptied the form, so a user who came back to fix one character in the URL
+  /// had to retype the whole thing — and a `FailureView` that sent them here
+  /// because the *saved* address was wrong showed them a blank screen with no
+  /// clue what it had been.
+  ///
+  /// The session itself does end. Every path to this screen means the server
+  /// details are in question, and a stale session against the old server would
+  /// otherwise be restored on the next launch.
+  Future<void> editConnection() async {
     await _repository.signOut();
-    emit(const AuthState(status: AuthStatus.unconfigured));
+    emit(
+      AuthState(status: AuthStatus.configuring, connection: state.connection),
+    );
   }
 
   /// Settings → "Refresh Odoo metadata" (spec §23).

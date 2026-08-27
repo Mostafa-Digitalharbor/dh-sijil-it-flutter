@@ -26,6 +26,9 @@ enum FailureKind {
   /// login page, a parked domain).
   notAnOdooServer,
 
+  /// The saved URL is plain HTTP, which neither platform will send.
+  insecureConnection,
+
   /// The request exceeded the timeout.
   timeout,
 
@@ -146,6 +149,7 @@ class Failure extends Equatable {
     FailureKind.cache => FailureAction.retry,
     FailureKind.serverUnreachable ||
     FailureKind.notAnOdooServer ||
+    FailureKind.insecureConnection ||
     FailureKind.databaseUnavailable => FailureAction.editConnection,
     FailureKind.invalidCredentials ||
     FailureKind.sessionExpired => FailureAction.signIn,

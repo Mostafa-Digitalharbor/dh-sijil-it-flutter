@@ -42,7 +42,7 @@ class AssetHeroCard extends StatelessWidget {
                 height: AppDimens.tileLg,
                 decoration: BoxDecoration(
                   color: primary.withValues(alpha: AppOpacities.overlay),
-                  borderRadius: BorderRadius.circular(AppRadii.md + 2),
+                  borderRadius: BorderRadius.circular(AppRadii.card),
                 ),
                 child: Icon(
                   AssetIcons.forCategory(asset.category?.name),

@@ -50,6 +50,7 @@ class OdooChatterService {
     required String model,
     required int id,
     int limit = AppConstants.historyLimit,
+    int offset = 0,
   }) async {
     final records = await _odoo.searchRead(
       model: OdooModels.mailMessage,
@@ -71,6 +72,7 @@ class OdooChatterService {
       fields: MailMessageFields.readSet,
       order: '${MailMessageFields.date} desc',
       limit: limit,
+      offset: offset,
     );
 
     final entries = <ChatterEntry>[];

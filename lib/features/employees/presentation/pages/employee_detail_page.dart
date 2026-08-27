@@ -18,7 +18,9 @@ import '../../../../shared/widgets/app_chip.dart';
 import '../../../../shared/widgets/app_data_views.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
-import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/async_data_view.dart';
+import '../../../../shared/widgets/skeleton_screens.dart';
+import '../../../../shared/widgets/skeletons.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../assets/presentation/widgets/asset_row.dart';
 import '../../domain/entities/employee.dart';
@@ -58,19 +60,18 @@ class _EmployeeDetailView extends StatelessWidget {
           compactTitle: true,
           showBack: true,
           onBack: () => context.go(AppRoutes.employees),
-          body: switch (state) {
-            _ when state.isLoading && employee == null => const SkeletonList(),
-            _ when state.hasFailed && employee == null => FailureView(
-              failure: state.failure!,
-              onRetry: () => cubit.load(employeeId),
-            ),
-            _ when employee == null => const SizedBox.shrink(),
-            _ => _ProfileBody(
+          body: AsyncDataView<Employee>(
+            status: state.status,
+            data: employee,
+            failure: state.failure,
+            onRetry: () => cubit.load(employeeId),
+            loadingView: const SkeletonDetail(hasActions: false),
+            builder: (_, employee) => _ProfileBody(
               employee: employee,
               state: state,
               employeeId: employeeId,
             ),
-          },
+          ),
         );
       },
     );
@@ -117,12 +118,28 @@ class _ProfileBody extends StatelessWidget {
                 l10n.employeeItemCount(state.assets.length),
                 style: theme.textTheme.bodySmall,
               ),
+              // The way through to the paginated list.
+              //
+              // `EmployeeAssetsPage` has been paginated since it was written
+              // and had nothing anywhere in the product that opened it: this
+              // screen read a single capped page of a hundred and stopped, so
+              // a pool account holding more than that simply had the rest of
+              // its assets missing, with no control anywhere that hinted at
+              // them. The route existed; only the link did not.
+              if (state.hasMoreAssets) ...<Widget>[
+                const SizedBox(width: AppSpacing.sm),
+                AppTextAction(
+                  label: l10n.actionSeeAll,
+                  onPressed: () =>
+                      context.go(AppRoutes.employeeAssetsPath(employeeId)),
+                ),
+              ],
             ],
           ),
         ),
 
         if (state.isLoadingAssets)
-          const SkeletonBox(height: AppDimens.skeletonRowHeight)
+          const SkeletonListRow()
         else if (state.assets.isEmpty)
           _NothingAssigned()
         else
@@ -155,20 +172,32 @@ class _ProfileCard extends StatelessWidget {
   /// Opens a `mailto:` / `tel:` URL.
   ///
   /// A device with no mail or dialler app is a real configuration — a tablet
-  /// kiosk, an emulator — so the failure is reported to the user rather than
-  /// swallowed into a button that appears to do nothing.
+  /// kiosk, a Wi-Fi-only tablet, an emulator — so the failure is reported to
+  /// the user rather than swallowed into a button that appears to do nothing.
+  ///
+  /// The message names *which* handler is missing. It used to be
+  /// `errorUnknownTitle` — "Something went wrong" — on a button the user had
+  /// deliberately pressed, which tells them neither what failed nor that the
+  /// answer is "this tablet has no mail app and never will". The scheme is
+  /// already in hand at the call site, so there is nothing to guess.
   static Future<void> _launch(BuildContext context, Uri uri) async {
     final l10n = AppL10n.of(context);
+    final message = uri.scheme == _telScheme
+        ? l10n.launchNoPhoneApp
+        : l10n.launchNoMailApp;
+
     try {
       final launched = await launchUrl(uri);
-      if (!launched && context.mounted) {
-        AppSnack.info(context, l10n.errorUnknownTitle);
-      }
+      if (!launched && context.mounted) AppSnack.info(context, message);
     } on Object catch (error) {
-      AppLogger.warn('Could not launch $uri — $error');
-      if (context.mounted) AppSnack.info(context, l10n.errorUnknownTitle);
+      // Sanitised: the URI carries the employee's own address or number.
+      AppLogger.warn('Could not launch a ${uri.scheme}: URL — $error');
+      if (context.mounted) AppSnack.info(context, message);
     }
   }
+
+  static const String _telScheme = 'tel';
+  static const String _mailScheme = 'mailto';
 
   @override
   Widget build(BuildContext context) {
@@ -235,12 +264,12 @@ class _ProfileCard extends StatelessWidget {
                       isCompact: true,
                       onPressed: () => _launch(
                         context,
-                        Uri(scheme: 'mailto', path: employee.workEmail),
+                        Uri(scheme: _mailScheme, path: employee.workEmail),
                       ),
                     ),
                   ),
                 if (employee.hasEmail && employee.hasPhone)
-                  const SizedBox(width: AppSpacing.sm + 1),
+                  const SizedBox(width: AppSpacing.gridGap),
                 if (employee.hasPhone)
                   Expanded(
                     child: AppButton.outlined(
@@ -250,7 +279,7 @@ class _ProfileCard extends StatelessWidget {
                       onPressed: () => _launch(
                         context,
                         Uri(
-                          scheme: 'tel',
+                          scheme: _telScheme,
                           path: employee.callableNumber!.replaceAll(' ', ''),
                         ),
                       ),

@@ -94,7 +94,6 @@ abstract class AppL10n {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
-    Locale('ar', 'EG'),
     Locale('en'),
   ];
 
@@ -145,6 +144,12 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Close'**
   String get actionClose;
+
+  /// No description provided for @actionContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get actionContinue;
 
   /// No description provided for @actionDelete.
   ///
@@ -206,6 +211,12 @@ abstract class AppL10n {
   /// **'Remove'**
   String get actionRemove;
 
+  /// Button on the camera-permission screen. Opens this app's page in the device settings, which is the only place the permission can be turned back on once it has been denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get actionOpenSettings;
+
   /// No description provided for @actionRetry.
   ///
   /// In en, this message translates to:
@@ -223,12 +234,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Save'**
   String get actionSave;
-
-  /// No description provided for @actionSaveAndSignIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Save & sign in'**
-  String get actionSaveAndSignIn;
 
   /// No description provided for @actionSeeAll.
   ///
@@ -575,7 +580,7 @@ abstract class AppL10n {
   /// No description provided for @detectFoundCount.
   ///
   /// In en, this message translates to:
-  /// **'Found {count} databases'**
+  /// **'{count,plural, =1{Found 1 database} other{Found {count} databases}}'**
   String detectFoundCount(int count);
 
   /// No description provided for @detectPickTitle.
@@ -665,7 +670,7 @@ abstract class AppL10n {
   /// No description provided for @employeeItemCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} items'**
+  /// **'{count,plural, =0{No items} =1{1 item} other{{count} items}}'**
   String employeeItemCount(int count);
 
   /// No description provided for @employeeSearchHint.
@@ -853,6 +858,24 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'What to do'**
   String get errorHowToFix;
+
+  /// Shown when the saved server URL uses http:// rather than https://.
+  ///
+  /// In en, this message translates to:
+  /// **'This address is not encrypted'**
+  String get errorInsecureConnectionTitle;
+
+  /// Cause line for a plain-HTTP server URL.
+  ///
+  /// In en, this message translates to:
+  /// **'Sijil IT only connects over HTTPS, so your Odoo password is never sent in the clear. The saved address starts with http://.'**
+  String get errorInsecureConnectionBody;
+
+  /// The concrete next step for a plain-HTTP server URL.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the address to https://. If your Odoo has no certificate yet, your administrator can add one — a self-hosted instance on the office network needs it too.'**
+  String get errorInsecureConnectionFix;
 
   /// No description provided for @errorInvalidCredentialsBody.
   ///
@@ -1160,6 +1183,12 @@ abstract class AppL10n {
   /// **'Warranty'**
   String get filterWarranty;
 
+  /// The Filters chip when filters are applied, showing how many. A placeholder rather than interpolation so the count follows the locale's numerals.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters ({count})'**
+  String filtersLabelActive(int count);
+
   /// No description provided for @filtersLabel.
   ///
   /// In en, this message translates to:
@@ -1202,10 +1231,22 @@ abstract class AppL10n {
   /// **'Category'**
   String get labelCategory;
 
+  /// Shown when the Email button cannot open a mail client — a tablet or kiosk with none installed.
+  ///
+  /// In en, this message translates to:
+  /// **'No email app is set up on this device.'**
+  String get launchNoMailApp;
+
+  /// Shown when the Call button cannot open a dialler — a Wi-Fi tablet, or an emulator.
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot place calls.'**
+  String get launchNoPhoneApp;
+
   /// No description provided for @labelHeldDays.
   ///
   /// In en, this message translates to:
-  /// **'{days} days'**
+  /// **'{days,plural, =1{1 day} other{{days} days}}'**
   String labelHeldDays(int days);
 
   /// No description provided for @labelManufacturer.
@@ -1322,11 +1363,11 @@ abstract class AppL10n {
   /// **'Sijil IT works inside your Odoo permissions. You will only see and change what your Odoo user is allowed to.'**
   String get loginAclNotice;
 
-  /// No description provided for @loginDifferentServer.
+  /// No description provided for @loginBackToServer.
   ///
   /// In en, this message translates to:
-  /// **'Connecting to a different server?'**
-  String get loginDifferentServer;
+  /// **'Back to server settings'**
+  String get loginBackToServer;
 
   /// No description provided for @loginKeepSignedIn.
   ///
@@ -1345,12 +1386,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Sign in with your Odoo credentials.'**
   String get loginSubtitle;
-
-  /// No description provided for @loginSwitchServer.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch'**
-  String get loginSwitchServer;
 
   /// No description provided for @loginWelcomeBack.
   ///
@@ -1583,7 +1618,7 @@ abstract class AppL10n {
   /// No description provided for @returnHeldFor.
   ///
   /// In en, this message translates to:
-  /// **'held {days} days'**
+  /// **'{days,plural, =1{held 1 day} other{held {days} days}}'**
   String returnHeldFor(int days);
 
   /// No description provided for @returnNotesHint.
@@ -1681,6 +1716,24 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Turn on camera access for Sijil IT in your device settings.'**
   String get scanPermissionFix;
+
+  /// Shown when the camera fails for a reason other than a denied permission — another app holding it, or hardware the OS would not hand over.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera could not start'**
+  String get scanCameraErrorTitle;
+
+  /// Cause line for a camera that failed to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Another app may be using the camera, or this device did not hand it over.'**
+  String get scanCameraErrorBody;
+
+  /// The concrete next step for a camera that failed to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Close any other app using the camera, then reopen this screen. Restarting the device clears it if that does not.'**
+  String get scanCameraErrorFix;
 
   /// No description provided for @scanPermissionTitle.
   ///
@@ -2057,13 +2110,13 @@ abstract class AppL10n {
   /// No description provided for @warrantyExpiredAgo.
   ///
   /// In en, this message translates to:
-  /// **'Expired {days} days ago'**
+  /// **'{days,plural, =1{Expired 1 day ago} other{Expired {days} days ago}}'**
   String warrantyExpiredAgo(int days);
 
   /// No description provided for @warrantyExpiresIn.
   ///
   /// In en, this message translates to:
-  /// **'Expires in {days} days'**
+  /// **'{days,plural, =1{Expires in 1 day} other{Expires in {days} days}}'**
   String warrantyExpiresIn(int days);
 
   /// No description provided for @warrantyFilterCritical.
@@ -2257,6 +2310,12 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Assignments, returns and repairs appear here as they happen.'**
   String get historyEmptyBody;
+
+  /// Button at the end of an asset's timeline when Odoo holds entries older than the ones read so far.
+  ///
+  /// In en, this message translates to:
+  /// **'Show older'**
+  String get historyLoadOlder;
 
   /// The final timeline entry: when the asset was created.
   ///
@@ -2738,18 +2797,6 @@ class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
 }
 
 AppL10n lookupAppL10n(Locale locale) {
-  // Lookup logic when language+country codes are specified.
-  switch (locale.languageCode) {
-    case 'ar':
-      {
-        switch (locale.countryCode) {
-          case 'EG':
-            return AppL10nArEg();
-        }
-        break;
-      }
-  }
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'ar':

@@ -8,6 +8,7 @@
   "actionChange": "تغيير",
   "actionClear": "مسح",
   "actionClose": "إغلاق",
+  "actionContinue": "متابعة",
   "actionDelete": "حذف",
   "actionDetectDatabases": "اكتشاف قواعد البيانات",
   "actionDone": "تم",
@@ -18,10 +19,10 @@
   "actionOpen": "فتح",
   "actionRefresh": "تحديث",
   "actionRemove": "إزالة",
+  "actionOpenSettings": "فتح الإعدادات",
   "actionRetry": "إعادة المحاولة",
   "actionReturn": "استرجاع",
   "actionSave": "حفظ",
-  "actionSaveAndSignIn": "حفظ وتسجيل الدخول",
   "actionSeeAll": "عرض الكل",
   "actionSignIn": "تسجيل الدخول",
   "actionSigningIn": "جارٍ تسجيل الدخول…",
@@ -115,8 +116,8 @@
   "dashboardOpenMaintenance": "صيانة مفتوحة",
   "dashboardRecentActivity": "النشاط الأخير",
   "dashboardTitle": "الرئيسية",
-  "dashboardWarrantyDue": "ضمان ينتهي خلال ٣٠ يومًا",
-  "detectFoundCount": "تم العثور على {count} قاعدة بيانات",
+  "dashboardWarrantyDue": "ضمان ينتهي خلال 30 يومًا",
+  "detectFoundCount": "{count,plural, =1{تم العثور على قاعدة بيانات واحدة} =2{تم العثور على قاعدتي بيانات} few{تم العثور على {count} قواعد بيانات} other{تم العثور على {count} قاعدة بيانات}}",
   "@detectFoundCount": {
     "placeholders": {
       "count": {
@@ -139,7 +140,7 @@
   "employeeAssetsHeld": "في العهدة",
   "employeeAssignedAssets": "الأصول المُسلَّمة",
   "employeeInService": "في الخدمة",
-  "employeeItemCount": "{count} عناصر",
+  "employeeItemCount": "{count,plural, =0{لا توجد عناصر} =1{عنصر واحد} =2{عنصران} few{{count} عناصر} other{{count} عنصرًا}}",
   "@employeeItemCount": {
     "placeholders": {
       "count": {
@@ -196,6 +197,9 @@
   "errorDatabaseUnavailableFix": "أسماء قواعد البيانات حساسة لحالة الأحرف. يمكن لمسؤول أودو تأكيد الاسم بدقة.",
   "errorDatabaseUnavailableTitle": "قاعدة البيانات غير موجودة",
   "errorHowToFix": "ما العمل",
+  "errorInsecureConnectionTitle": "هذا العنوان غير مُشفَّر",
+  "errorInsecureConnectionBody": "لا يتصل سِجل IT إلا عبر HTTPS، حتى لا تُرسَل كلمة مرور أودو بنص واضح. والعنوان المحفوظ يبدأ بـ‎http://‎.",
+  "errorInsecureConnectionFix": "غيّر العنوان ليبدأ بـ‎https://‎. وإن لم تكن نسخة أودو لديك تحمل شهادة بعد، فبإمكان المسؤول إضافتها — وهذا لازم أيضًا للنسخ المستضافة داخل شبكة المكتب.",
   "errorInvalidCredentialsBody": "لم يقبل أودو اسم المستخدم مع كلمة المرور أو مفتاح API هذا.",
   "errorInvalidCredentialsFix": "تحقق من اسم المستخدم، وانتبه أن مفتاح API يختلف عن كلمة المرور.",
   "errorInvalidCredentialsTitle": "رُفض تسجيل الدخول",
@@ -254,6 +258,16 @@
   "filterManufacturer": "الشركة المصنّعة",
   "filterStatus": "الحالة",
   "filterWarranty": "الضمان",
+  "filtersLabelActive": "الفلاتر ({count})",
+  "@filtersLabelActive": {
+    "description": "The Filters chip when filters are applied, showing how many. A placeholder rather than interpolation so the count follows the locale's numerals.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "filtersLabel": "الفلاتر",
   "filtersTitle": "تصفية الأصول",
   "labelAll": "الكل",
@@ -261,7 +275,9 @@
   "labelAssetTag": "رمز الأصل",
   "labelAssignedOn": "تاريخ التسليم",
   "labelCategory": "الفئة",
-  "labelHeldDays": "{days} يومًا",
+  "launchNoMailApp": "لا يوجد تطبيق بريد مُعَد على هذا الجهاز.",
+  "launchNoPhoneApp": "هذا الجهاز لا يمكنه إجراء المكالمات.",
+  "labelHeldDays": "{days,plural, =0{أقل من يوم} =1{يوم واحد} =2{يومان} few{{days} أيام} other{{days} يومًا}}",
   "@labelHeldDays": {
     "placeholders": {
       "days": {
@@ -289,11 +305,10 @@
   "languageSystem": "النظام",
   "loadingLabel": "جارٍ التحميل…",
   "loginAclNotice": "يعمل سِجل IT ضمن صلاحياتك في أودو. لن ترى أو تعدّل إلا ما يسمح به حسابك.",
-  "loginDifferentServer": "تريد الاتصال بخادم آخر؟",
+  "loginBackToServer": "الرجوع إلى إعدادات الخادم",
   "loginKeepSignedIn": "أبقني مسجَّلًا",
   "loginNeedApiKey": "تحتاج مفتاح API؟",
   "loginSubtitle": "سجّل الدخول ببيانات أودو الخاصة بك.",
-  "loginSwitchServer": "تغيير",
   "loginWelcomeBack": "أهلًا بعودتك",
   "maintenanceClosed": "أُغلق {date}",
   "@maintenanceClosed": {
@@ -351,7 +366,7 @@
   "returnCondition": "الحالة عند الاسترجاع",
   "returnConfirm": "تأكيد الاسترجاع",
   "returnDate": "تاريخ الاسترجاع",
-  "returnHeldFor": "بالعهدة {days} يومًا",
+  "returnHeldFor": "{days,plural, =0{بالعهدة أقل من يوم} =1{بالعهدة يوم واحد} =2{بالعهدة يومان} few{بالعهدة {days} أيام} other{بالعهدة {days} يومًا}}",
   "@returnHeldFor": {
     "placeholders": {
       "days": {
@@ -404,6 +419,9 @@
   "scanNoMatchTitle": "لا يوجد أصل بهذا الرمز",
   "scanPermissionBody": "يحتاج سِجل IT إلى الكاميرا لقراءة رموز الأصول.",
   "scanPermissionFix": "فعّل الوصول إلى الكاميرا لتطبيق سِجل IT من إعدادات جهازك.",
+  "scanCameraErrorTitle": "تعذّر تشغيل الكاميرا",
+  "scanCameraErrorBody": "قد يكون تطبيق آخر يستخدم الكاميرا، أو أن الجهاز لم يُتِح الوصول إليها.",
+  "scanCameraErrorFix": "أغلق أي تطبيق آخر يستخدم الكاميرا ثم افتح هذه الشاشة من جديد، وإن لم يُحلّ الأمر فأعد تشغيل الجهاز.",
   "scanPermissionTitle": "الوصول إلى الكاميرا مغلق",
   "scanTitle": "مسح أصل",
   "scanTorch": "الفلاش",
@@ -468,7 +486,7 @@
   "themeDark": "داكن",
   "themeLight": "فاتح",
   "themeSystem": "النظام",
-  "timeDaysAgo": "قبل {count} يوم",
+  "timeDaysAgo": "{count,plural, =1{قبل يوم} =2{قبل يومين} few{قبل {count} أيام} other{قبل {count} يومًا}}",
   "@timeDaysAgo": {
     "placeholders": {
       "count": {
@@ -477,7 +495,7 @@
       }
     }
   },
-  "timeHoursAgo": "قبل {count} ساعة",
+  "timeHoursAgo": "{count,plural, =1{قبل ساعة} =2{قبل ساعتين} few{قبل {count} ساعات} other{قبل {count} ساعة}}",
   "@timeHoursAgo": {
     "placeholders": {
       "count": {
@@ -487,7 +505,7 @@
     }
   },
   "timeJustNow": "الآن",
-  "timeMinutesAgo": "قبل {count} دقيقة",
+  "timeMinutesAgo": "{count,plural, =1{قبل دقيقة} =2{قبل دقيقتين} few{قبل {count} دقائق} other{قبل {count} دقيقة}}",
   "@timeMinutesAgo": {
     "placeholders": {
       "count": {
@@ -514,7 +532,7 @@
       }
     }
   },
-  "warrantyExpiredAgo": "انتهى منذ {days} يومًا",
+  "warrantyExpiredAgo": "{days,plural, =1{انتهى منذ يوم واحد} =2{انتهى منذ يومين} few{انتهى منذ {days} أيام} other{انتهى منذ {days} يومًا}}",
   "@warrantyExpiredAgo": {
     "placeholders": {
       "days": {
@@ -523,7 +541,7 @@
       }
     }
   },
-  "warrantyExpiresIn": "ينتهي خلال {days} يومًا",
+  "warrantyExpiresIn": "{days,plural, =1{ينتهي خلال يوم واحد} =2{ينتهي خلال يومين} few{ينتهي خلال {days} أيام} other{ينتهي خلال {days} يومًا}}",
   "@warrantyExpiresIn": {
     "placeholders": {
       "days": {
@@ -532,9 +550,9 @@
       }
     }
   },
-  "warrantyFilterCritical": "ينتهي خلال ٣٠ يومًا",
+  "warrantyFilterCritical": "ينتهي خلال 30 يومًا",
   "warrantyFilterExpired": "منتهٍ",
-  "warrantyFilterSoon": "ينتهي خلال ٩٠ يومًا",
+  "warrantyFilterSoon": "ينتهي خلال 90 يومًا",
   "warrantyFilterValid": "ساري",
   "warrantyStarted": "بدأ {date}",
   "@warrantyStarted": {
@@ -550,11 +568,11 @@
   "@errorFileUnavailableTitle": {
     "description": "Shown when a picked photo cannot be read back from disk."
   },
-  "errorFileUnavailableBody": "الهاتف تخلّص من الملف قبل ما يخلص رفع. ده بيحصل غالبًا لما النظام يقفل تطبيق الكاميرا وهو شغّال في الخلفية.",
+  "errorFileUnavailableBody": "تخلّى الهاتف عن الملف قبل اكتمال رفعه. يحدث هذا غالبًا عندما يُغلق النظام تطبيق الكاميرا وهو يعمل في الخلفية.",
   "@errorFileUnavailableBody": {
     "description": "Shown when a picked photo cannot be read back from disk."
   },
-  "errorFileUnavailableFix": "صوّر الصورة تاني وفضل في التطبيق لحد ما الرفع يخلص.",
+  "errorFileUnavailableFix": "التقط الصورة مرة أخرى وابقَ داخل التطبيق حتى يكتمل الرفع.",
   "@errorFileUnavailableFix": {
     "description": "Shown when a picked photo cannot be read back from disk."
   },
@@ -582,7 +600,7 @@
   "@photosEmpty": {
     "description": "Empty state of the photo section."
   },
-  "photosEmptyHint": "صوّر العطل قبل ما تبدأ، والإصلاح لما تخلص.",
+  "photosEmptyHint": "صوّر العطل قبل أن تبدأ، وصوّر الإصلاح عند الانتهاء.",
   "@photosEmptyHint": {
     "description": "Explains what the photos are for on a maintenance request."
   },
@@ -632,7 +650,7 @@
   "@greetingEvening": {
     "description": "Dashboard greeting after 18:00."
   },
-  "dashboardTrendTitle": "في الخدمة خلال ١٢ شهر",
+  "dashboardTrendTitle": "في الخدمة خلال 12 شهر",
   "@dashboardTrendTitle": {
     "description": "Header of the trend chart. Avoids a separator next to the digits: in Arabic a middot beside Arabic-Indic numerals reorders and reads as part of the number."
   },
@@ -656,6 +674,7 @@
   "@historyEmptyBody": {
     "description": "Explains what will fill the history screen."
   },
+  "historyLoadOlder": "عرض الأقدم",
   "historyRegistered": "تم التسجيل",
   "@historyRegistered": {
     "description": "The final timeline entry: when the asset was created."
@@ -685,7 +704,7 @@
   },
   "auditTitle": "الجرد",
   "auditStartTitle": "بتجرد إيه؟",
-  "auditStartBody": "الجرد المحدود بيخلص. جرد كل حاجة مرة واحدة محدش بيخلصه.",
+  "auditStartBody": "النطاق المحدود يكتمل. أما جرد كل شيء دفعة واحدة فلا يكتمل.",
   "auditScopeAll": "كل الأصول",
   "auditScopeCategory": "فئة واحدة",
   "auditScopeDepartment": "قسم واحد",
@@ -694,22 +713,22 @@
   "auditBegin": "ابدأ الجرد",
   "auditCounting": "جاري الجرد",
   "auditFound": "موجود",
-  "auditUnexpected": "مش في النطاق",
-  "auditMissing": "مش موجود",
-  "auditKeepScanning": "كمّل مسح — مش محتاج توقف",
+  "auditUnexpected": "خارج النطاق",
+  "auditMissing": "غير موجود",
+  "auditKeepScanning": "واصل المسح — لا داعي للتوقف",
   "auditJustScanned": "آخر ما تم مسحه",
   "auditWhereExpected": "في مكانه المتوقع",
   "auditOutOfScope": "موجود هنا، ومسجّل في مكان تاني",
-  "auditUnknownCode": "الكود ده مش تابع لأي أصل",
+  "auditUnknownCode": "هذا الرمز لا يطابق أي أصل",
   "auditFinish": "إنهاء الجرد",
-  "auditResume": "كمّل الجرد",
+  "auditResume": "واصل الجرد",
   "auditReportTitle": "انتهى الجرد",
   "auditNothingMissing": "كل الأصول في النطاق اتلقت.",
   "auditSaveToOdoo": "حفظ النتيجة في أودو",
   "auditSaved": "اتحفظت النتيجة في أودو",
   "auditSavedNone": "مفيش نتايج تتسجل.",
   "auditDiscardTitle": "تسيب الجرد؟",
-  "auditDiscardBody": "اللي اتمسح لحد دلوقتي على الموبايل بس. لو خرجت هيضيع.",
+  "auditDiscardBody": "ما جرى مسحه حتى الآن محفوظ على هذا الهاتف فقط، وسيضيع إن خرجت.",
   "auditDiscardConfirm": "اخرج",
   "auditOf": "{done} من {total}",
   "@auditOf": {
@@ -727,16 +746,16 @@
   "moreAuditSubtitle": "اعرف الموجود فعلًا",
   "moreToolsLabel": "الأدوات",
   "handoverTitle": "تسليم",
-  "handoverSubtitle": "أكتر من أصل، وتوقيع واحد",
+  "handoverSubtitle": "عدة أصول، وتوقيع واحد",
   "handoverConfirm": "تأكيد التسليم",
   "handoverStepRecipient": "مَن المُستلِم",
-  "handoverStepBundle": "اللي هيتسلّمه",
+  "handoverStepBundle": "ما سيتسلّمه",
   "handoverStepDate": "تاريخ التسليم",
   "handoverStepSignature": "توقيع المُستلِم",
   "handoverStepNotes": "ملاحظة",
   "handoverNotesHint": "تجهيزات موظف جديد، بديل لابتوب عطلان…",
   "handoverSearchPeople": "ابحث عن موظف",
-  "handoverBundleEmpty": "ما فيش حاجة مضافة لسّة.",
+  "handoverBundleEmpty": "لم تُضف أي أصول بعد.",
   "handoverAddAssets": "إضافة أصول",
   "handoverBundleFull": "أقصى عدد في التسليمة الواحدة {max}",
   "handoverRemoveFromBundle": "شيل {asset}",
@@ -746,10 +765,10 @@
   "handoverNeedsAssets": "ضيف أصل واحد على الأقل",
   "handoverNeedsSignature": "لازم المُستلِم يوقّع",
   "handoverPickAssets": "إضافة للتسليم",
-  "handoverPickAssetsBody": "بتظهر الأصول اللي ما حدش ماسكها بس.",
+  "handoverPickAssetsBody": "تظهر الأصول التي لا يحملها أحد فقط.",
   "handoverSearchAssets": "ابحث عن أصل",
   "handoverAddCount": "إضافة {count}",
-  "handoverNoAssignableAssets": "ما فيش أصول متاحة للتسليم دلوقتي.",
+  "handoverNoAssignableAssets": "لا توجد أصول متاحة للتسليم حاليًا.",
   "handoverDone": "اتسلّم لـ {employee}",
   "handoverPartial": "اتسجّل {done} من {total}",
   "handoverProofSaved": "التوقيع محفوظ على كل أصل في أودو.",
@@ -758,12 +777,12 @@
   "handoverRefused": "أودو رفض دول",
   "handoverRetryRefused": "جرّب دول تاني",
   "handoverNothingRecorded": "ما اتسجّلش حاجة",
-  "handoverNothingRecordedBody": "أودو ما قبلش أي حاجة من التسليمة، فما فيش أصل اتغيّر.",
-  "moreHandoverSubtitle": "سلّم كذا أصل لشخص واحد",
-  "errorFieldUnavailableTitle": "فيه حقل ناقص في أودو بتاعك",
-  "errorFieldUnavailableBody": "الشاشة طلبت من أودو حقل مش موجود عندك. ما اتغيّرش أي حاجة.",
-  "errorFieldUnavailableBodyDetailed": "الشاشة طلبت من أودو الحقل «{field}»، ومش موجود عندك. ما اتغيّرش أي حاجة.",
-  "errorFieldUnavailableFix": "إعادة المحاولة مش هتفيد — لازم الحقل يكون موجود الأول. لو اتضاف دلوقتي، اطلع وادخل تاني؛ وإلا كلّم مسؤول أودو.",
+  "handoverNothingRecordedBody": "لم يقبل أودو أي أصل من التسليمة، فلم تتغيّر عهدة أي أصل.",
+  "moreHandoverSubtitle": "سلّم عدة أصول لشخص واحد",
+  "errorFieldUnavailableTitle": "يوجد حقل ناقص في أودو لديك",
+  "errorFieldUnavailableBody": "طلبت هذه الشاشة من أودو حقلًا غير موجود في نسختك. لم يتغيّر شيء.",
+  "errorFieldUnavailableBodyDetailed": "طلبت هذه الشاشة من أودو الحقل «{field}» وهو غير موجود في نسختك. لم يتغيّر شيء.",
+  "errorFieldUnavailableFix": "إعادة المحاولة لن تُجدي — يجب أن يوجد الحقل أولًا. إن كان قد أُضيف للتو فسجّل الخروج ثم الدخول، وإلا فراجع مسؤول أودو لديك.",
   "operationRead": "عرض",
   "operationCreate": "إنشاء",
   "operationWrite": "تعديل",

@@ -119,7 +119,7 @@ class AppChip extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
           ],
           if (icon != null) ...[
-            Icon(icon, size: AppDimens.iconXs + 1, color: ink),
+            Icon(icon, size: AppDimens.iconChip, color: ink),
             const SizedBox(width: AppSpacing.xs),
           ],
           Flexible(
@@ -132,7 +132,7 @@ class AppChip extends StatelessWidget {
           ),
           if (trailingIcon != null) ...[
             const SizedBox(width: AppSpacing.xs),
-            Icon(trailingIcon, size: AppDimens.iconXs + 2, color: ink),
+            Icon(trailingIcon, size: AppDimens.iconControl, color: ink),
           ],
           if (onRemove != null) ...[
             const SizedBox(width: AppSpacing.xs),

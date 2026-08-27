@@ -45,6 +45,13 @@ class OdooConnection extends Equatable {
     return baseUrl.replace(path: '$base$path');
   }
 
+  /// The rules [parseBaseUrl] enforces, as the stable keys the widget layer
+  /// translates. Declared here beside the checks that raise them so the two
+  /// cannot drift.
+  static const String validationServerUrlRequired = 'validationEnterServerUrl';
+  static const String validationUrlInvalid = 'validationInvalidUrl';
+  static const String validationHttpsRequired = 'validationHttpsRequired';
+
   /// Normalises whatever the user typed into a usable base [Uri].
   ///
   /// Accepts `company.odoo.com`, `https://company.odoo.com/`, or a host with a
@@ -52,7 +59,10 @@ class OdooConnection extends Equatable {
   static Uri parseBaseUrl(String raw) {
     final trimmed = raw.trim();
     if (trimmed.isEmpty) {
-      throw const InputValidationException('Enter your Odoo server URL.');
+      throw const InputValidationException(
+        'Enter your Odoo server URL.',
+        validationKey: OdooConnection.validationServerUrlRequired,
+      );
     }
 
     final withScheme = trimmed.contains('://') ? trimmed : 'https://$trimmed';
@@ -61,11 +71,18 @@ class OdooConnection extends Equatable {
     if (uri == null || uri.host.isEmpty) {
       throw const InputValidationException(
         'That does not look like a valid server URL.',
+        validationKey: OdooConnection.validationUrlInvalid,
       );
     }
-    if (uri.scheme != 'http' && uri.scheme != 'https') {
+    // `http` is rejected here rather than accepted and left to fail later.
+    // Neither platform will send it — Android blocks cleartext, iOS blocks it
+    // through App Transport Security — so a connection saved with it can only
+    // ever produce a confusing "server unreachable" after a full timeout.
+    // Saying so at the keyboard costs the user seconds instead of minutes.
+    if (uri.scheme != 'https') {
       throw const InputValidationException(
         'The server URL must start with https://',
+        validationKey: OdooConnection.validationHttpsRequired,
       );
     }
 
@@ -73,7 +90,21 @@ class OdooConnection extends Equatable {
         ? uri.path.substring(0, uri.path.length - 1)
         : uri.path;
 
-    return uri.replace(path: path, query: '', fragment: '');
+    // Rebuilt rather than `replace`d.
+    //
+    // `uri.replace(query: '', fragment: '')` does not drop those components,
+    // it sets them to empty — and an empty-but-present query serialises. Every
+    // saved connection was therefore stored as `https://host?#`, and every
+    // XML-RPC endpoint built from it carried the same tail. Harmless in
+    // practice, which is why it survived: servers ignore it, so the only place
+    // it showed was the URL echoed back on the connection screen.
+    return Uri(
+      scheme: uri.scheme,
+      userInfo: uri.userInfo.isEmpty ? null : uri.userInfo,
+      host: uri.host,
+      port: uri.hasPort ? uri.port : null,
+      path: path,
+    );
   }
 
   OdooConnection copyWith({

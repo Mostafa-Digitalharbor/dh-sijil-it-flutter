@@ -193,7 +193,7 @@ class _SearchAndFilters extends StatelessWidget {
             AppChip(
               label: activeCount == 0
                   ? l10n.filtersLabel
-                  : '${l10n.filtersLabel} ($activeCount)',
+                  : l10n.filtersLabelActive(activeCount),
               icon: Icons.tune_rounded,
               selected: activeCount > 0,
               onTap: onOpenFilters,

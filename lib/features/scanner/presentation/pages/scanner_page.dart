@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../app/di/injector.dart';
 import '../../../../app/router/app_routes.dart';
@@ -50,31 +51,61 @@ class _ScannerViewState extends State<_ScannerView>
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.surfaceDark,
-          body: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              MobileScanner(
-                controller: controller,
-                onDetect: handleDetection,
-                errorBuilder: (context, error, _) => _CameraError(error: error),
-              ),
-              const ScannerScrim(),
-              SafeArea(
-                child: Column(
-                  children: <Widget>[
-                    _TopBar(controller: controller, state: state),
-                    const Expanded(child: Center(child: ScannerViewfinder())),
-                    _Instructions(state: state),
-                    const SizedBox(height: AppSpacing.lg),
-                    _ModeSwitch(state: state),
-                    const SizedBox(height: AppSpacing.lg),
-                    if (state.hasResult || state.isResolving)
-                      ScanResultSheet(state: state),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-                ),
-              ),
-            ],
+          // Listens to the controller rather than only handing `MobileScanner`
+          // an `errorBuilder`.
+          //
+          // `errorBuilder` renders *inside* the scanner widget, which is the
+          // bottom layer of this stack — so a failed camera drew its "camera
+          // access is off" message underneath the scrim, the viewfinder
+          // brackets and the sweep line, with "point the camera at the asset
+          // code" still printed below it. The message was there and unreadable,
+          // and the screen was instructing the user to do the one thing it had
+          // just told them they could not.
+          //
+          // Read here, the failure replaces the whole apparatus instead.
+          body: ValueListenableBuilder<MobileScannerState>(
+            valueListenable: controller,
+            builder: (context, scanner, _) {
+              final error = scanner.error;
+              if (error != null) {
+                return SafeArea(
+                  child: Column(
+                    children: <Widget>[
+                      _TopBar(controller: controller, state: state),
+                      Expanded(child: _CameraError(error: error)),
+                    ],
+                  ),
+                );
+              }
+
+              return Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  MobileScanner(
+                    controller: controller,
+                    onDetect: handleDetection,
+                  ),
+                  const ScannerScrim(),
+                  SafeArea(
+                    child: Column(
+                      children: <Widget>[
+                        _TopBar(controller: controller, state: state),
+                        const Expanded(
+                          child: Center(child: ScannerViewfinder()),
+                        ),
+                        _Instructions(state: state),
+                        const SizedBox(height: AppSpacing.lg),
+                        _ModeSwitch(state: state),
+                        const SizedBox(height: AppSpacing.lg),
+                        if (state.hasResult || state.isResolving)
+                          ScanResultSheet(state: state),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -162,7 +193,7 @@ class _Instructions extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
           ),
-          const SizedBox(height: AppSpacing.xs + 1),
+          const SizedBox(height: AppSpacing.fine),
           Text(
             l10n.scanInstructionDetail,
             textAlign: TextAlign.center,
@@ -215,6 +246,23 @@ class _ModeSwitch extends StatelessWidget {
 }
 
 /// Shown when the camera cannot start — most often a denied permission.
+///
+/// ## What this used to say
+///
+/// ```dart
+/// title:   isPermission ? l10n.scanPermissionTitle : l10n.errorUnknownTitle,
+/// message: isPermission ? l10n.scanPermissionBody  : l10n.scanPermissionFix,
+/// ```
+///
+/// Both arms were wrong, and in opposite directions. A user who had denied the
+/// permission — the case this screen exists for — was told *what* happened and
+/// *why*, and then never shown `scanPermissionFix`, the one sentence naming
+/// the switch that turns the camera back on. Meanwhile a camera that failed
+/// for some entirely different reason was headed "Something went wrong" and
+/// told to go and enable a permission it already had.
+///
+/// So the two cases are separated, and each gets the full three parts the rest
+/// of the app promises: what, why, and what to do about it.
 class _CameraError extends StatelessWidget {
   const _CameraError({required this.error});
 
@@ -232,10 +280,20 @@ class _CameraError extends StatelessWidget {
         icon: isPermission
             ? Icons.no_photography_outlined
             : Icons.videocam_off_outlined,
-        title: isPermission ? l10n.scanPermissionTitle : l10n.errorUnknownTitle,
+        title: isPermission
+            ? l10n.scanPermissionTitle
+            : l10n.scanCameraErrorTitle,
         message: isPermission
             ? l10n.scanPermissionBody
-            : l10n.scanPermissionFix,
+            : l10n.scanCameraErrorBody,
+        fix: isPermission ? l10n.scanPermissionFix : l10n.scanCameraErrorFix,
+        // Only for the permission case, and only because the instruction
+        // above it is otherwise a dead end: once "Don't allow" has been
+        // chosen on Android the system dialog never appears again, so the
+        // settings page is the single place the answer lives. A camera that
+        // failed for another reason has nothing to open.
+        actionLabel: isPermission ? l10n.actionOpenSettings : null,
+        onAction: isPermission ? () => unawaited(openAppSettings()) : null,
       ),
     );
   }

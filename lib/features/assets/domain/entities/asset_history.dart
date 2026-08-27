@@ -56,6 +56,7 @@ class AssetHistory extends Equatable {
   const AssetHistory({
     this.entries = const <AssetHistoryEntry>[],
     this.registeredOn,
+    this.hasMore = false,
   });
 
   /// Newest first.
@@ -66,7 +67,35 @@ class AssetHistory extends Equatable {
   /// happened to reach.
   final DateTime? registeredOn;
 
+  /// Whether Odoo holds older entries than the ones read so far.
+  ///
+  /// Inferred from a full page rather than from a count: answering exactly
+  /// would need a second `search_count` round trip, and this screen already
+  /// runs two reads in parallel so that it opens quickly. The cost of the
+  /// guess is one empty page at an exact multiple of the page size — a
+  /// spinner that resolves to nothing — against a timeline that used to stop
+  /// dead at sixty entries with no sign there was any more of it.
+  final bool hasMore;
+
   bool get isEmpty => entries.isEmpty && registeredOn == null;
+
+  /// This history with an older page appended.
+  ///
+  /// [registeredOn] is kept from the first page: it is the asset's creation
+  /// date, it is what closes the timeline, and later pages do not carry it.
+  AssetHistory merge(AssetHistory older) => AssetHistory(
+    entries: <AssetHistoryEntry>[...entries, ...older.entries],
+    registeredOn: registeredOn,
+    hasMore: older.hasMore,
+  );
+
+  /// The same entries, with the "there is more" flag cleared.
+  ///
+  /// For a page that failed to load. Without this the footer would ask for
+  /// the same page again the moment it rebuilt, and a server refusing that
+  /// offset would be retried forever a few hundred milliseconds apart.
+  AssetHistory copyWithNoMore() =>
+      AssetHistory(entries: entries, registeredOn: registeredOn);
 
   /// How many distinct people have held this asset.
   ///
@@ -80,5 +109,5 @@ class AssetHistory extends Equatable {
       .length;
 
   @override
-  List<Object?> get props => <Object?>[entries, registeredOn];
+  List<Object?> get props => <Object?>[entries, registeredOn, hasMore];
 }

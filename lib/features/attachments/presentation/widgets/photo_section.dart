@@ -237,7 +237,7 @@ class _CountBadge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm - 1,
+          horizontal: AppSpacing.tight,
           vertical: 1,
         ),
         child: Text(

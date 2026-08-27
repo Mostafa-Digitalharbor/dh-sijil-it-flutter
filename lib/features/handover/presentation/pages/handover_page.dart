@@ -21,6 +21,7 @@ import '../../../../shared/widgets/app_tiles.dart';
 import '../../../../shared/widgets/app_title_block.dart';
 import '../../../../shared/widgets/mono_text.dart';
 import '../../../../shared/widgets/signature_pad.dart';
+import '../../../../shared/widgets/skeletons.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../../../assets/domain/entities/asset.dart';
 import '../../../assets/presentation/widgets/asset_icons.dart';
@@ -132,12 +133,7 @@ class _HandoverViewState extends State<_HandoverView> {
           title: l10n.handoverTitle,
           subtitle: receipt == null ? l10n.handoverSubtitle : null,
           compactTitle: true,
-          leading: AppIconButton(
-            icon: Icons.close_rounded,
-            tooltip: l10n.actionClose,
-            bordered: false,
-            onPressed: _close,
-          ),
+          leading: AppCloseButton(onPressed: _close),
           bottomBar: receipt != null
               ? null
               : StickyActionBar(
@@ -305,7 +301,7 @@ class _RecipientSection extends StatelessWidget {
         if (state.isSearchingPeople && state.candidates.isEmpty)
           const Padding(
             padding: EdgeInsetsDirectional.only(top: AppSpacing.md),
-            child: SkeletonBox(height: AppDimens.skeletonRowHeight),
+            child: SkeletonListRow(showChips: false),
           )
         else if (state.candidates.isEmpty)
           Padding(

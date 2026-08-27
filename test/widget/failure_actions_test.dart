@@ -116,15 +116,22 @@ void main() {
       await tester.tap(find.byType(AppButton));
       await tester.pumpAndSettle();
 
-      // The distinction matters: signing out keeps the stored server, which is
-      // the one thing known to be wrong here. Only forgetting the connection
-      // gets the user back to the screen that can fix it.
+      // The distinction matters: signing out keeps the user on the sign-in
+      // screen for the very server that is known to be wrong. Only reopening
+      // the server screen gets them to the field that can fix it.
       expect(
         sl<AuthCubit>().state.status,
-        AuthStatus.unconfigured,
+        AuthStatus.configuring,
         reason:
             'Signing out alone would send the user back to a login screen for '
             'the very server that could not be reached.',
+      );
+      expect(
+        sl<AuthCubit>().state.connection,
+        isNotNull,
+        reason:
+            'And it arrives filled in: a blank form gives the user nothing to '
+            'compare against the address they meant to type.',
       );
     });
   });

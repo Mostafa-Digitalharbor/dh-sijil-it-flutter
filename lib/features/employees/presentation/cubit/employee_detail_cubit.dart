@@ -18,6 +18,7 @@ class EmployeeDetailState extends ViewState {
     this.employee,
     this.assets = const <Asset>[],
     this.isLoadingAssets = false,
+    this.hasMoreAssets = false,
   });
 
   final Employee? employee;
@@ -27,6 +28,15 @@ class EmployeeDetailState extends ViewState {
   final List<Asset> assets;
 
   final bool isLoadingAssets;
+
+  /// Whether Odoo holds more assets for this person than the one page read
+  /// here. Drives the "see all" link through to the paginated list.
+  ///
+  /// The page is capped rather than paged on purpose: the two summary tiles
+  /// beside it — in service, warranty due — are counted from the assets that
+  /// were actually loaded, so shrinking this read to a short preview would
+  /// quietly make both of them wrong.
+  final bool hasMoreAssets;
 
   int get heldCount => employee?.assetCount ?? assets.length;
 
@@ -44,6 +54,7 @@ class EmployeeDetailState extends ViewState {
     Employee? employee,
     List<Asset>? assets,
     bool? isLoadingAssets,
+    bool? hasMoreAssets,
     Failure? failure,
     bool clearFailure = false,
   }) => EmployeeDetailState(
@@ -52,11 +63,13 @@ class EmployeeDetailState extends ViewState {
     employee: employee ?? this.employee,
     assets: assets ?? this.assets,
     isLoadingAssets: isLoadingAssets ?? this.isLoadingAssets,
+    hasMoreAssets: hasMoreAssets ?? this.hasMoreAssets,
   );
 
   @override
   List<Object?> get props => [
     ...super.props,
+    hasMoreAssets,
     employee,
     assets,
     isLoadingAssets,
@@ -126,8 +139,13 @@ class EmployeeDetailCubit extends Cubit<EmployeeDetailState> {
     // reads the same as genuinely holding nothing.
     result.fold(
       (_) => emit(state.copyWith(isLoadingAssets: false)),
-      (page) =>
-          emit(state.copyWith(isLoadingAssets: false, assets: page.items)),
+      (page) => emit(
+        state.copyWith(
+          isLoadingAssets: false,
+          assets: page.items,
+          hasMoreAssets: page.hasMore,
+        ),
+      ),
     );
   }
 }

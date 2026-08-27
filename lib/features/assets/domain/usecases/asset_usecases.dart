@@ -174,4 +174,8 @@ class GetAssetHistory extends UseCase<AssetHistory, int> {
 
   @override
   ResultFuture<AssetHistory> call(int params) => _repository.history(params);
+
+  /// An older page of the same history.
+  ResultFuture<AssetHistory> page(int assetId, {required int offset}) =>
+      _repository.history(assetId, offset: offset);
 }

@@ -69,7 +69,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
                   color: Colors.white.withValues(
                     alpha: AppOpacities.viewfinderFill,
                   ),
-                  borderRadius: BorderRadius.circular(AppRadii.xl + 8),
+                  borderRadius: BorderRadius.circular(AppRadii.viewfinder),
                 ),
                 child: const SizedBox.expand(),
               ),
@@ -122,7 +122,7 @@ class _CornerBracket extends StatelessWidget {
       color: AppColors.mint,
       width: AppDimens.scannerCornerWidth,
     );
-    const radius = Radius.circular(AppRadii.xl + 8);
+    const radius = Radius.circular(AppRadii.viewfinder);
 
     return SizedBox(
       width: AppDimens.scannerCorner,
@@ -165,7 +165,7 @@ class _ScanLine extends StatelessWidget {
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: AppColors.mint.withValues(alpha: AppOpacities.glow),
-            blurRadius: AppDimens.sheetBlur + 4,
+            blurRadius: AppDimens.glowBlur,
           ),
         ],
       ),

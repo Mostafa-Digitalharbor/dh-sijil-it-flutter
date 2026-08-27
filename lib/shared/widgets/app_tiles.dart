@@ -68,7 +68,7 @@ class AppListTile extends StatelessWidget {
         if (chips.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.sm),
           Wrap(
-            spacing: AppSpacing.xs + 2,
+            spacing: AppSpacing.snug,
             runSpacing: AppSpacing.xs,
             children: chips,
           ),

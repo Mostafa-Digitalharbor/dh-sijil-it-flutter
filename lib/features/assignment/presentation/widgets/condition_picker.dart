@@ -43,7 +43,7 @@ class ConditionPicker extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (var c = 0; c < columns; c++) ...<Widget>[
-                if (c > 0) const SizedBox(width: AppSpacing.sm + 1),
+                if (c > 0) const SizedBox(width: AppSpacing.gridGap),
                 Expanded(
                   child: c < slice.length
                       ? _ConditionCard(
@@ -64,7 +64,7 @@ class ConditionPicker extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (var i = 0; i < rows.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: AppSpacing.sm + 1),
+          if (i > 0) const SizedBox(height: AppSpacing.gridGap),
           rows[i],
         ],
       ],
@@ -106,11 +106,11 @@ class _ConditionCard extends StatelessWidget {
           Row(
             children: <Widget>[
               Container(
-                width: AppDimens.tileSm + 1,
-                height: AppDimens.tileSm + 1,
+                width: AppDimens.conditionTile,
+                height: AppDimens.conditionTile,
                 decoration: BoxDecoration(
                   color: tone.withValues(alpha: AppOpacities.chipFillStrong),
-                  borderRadius: BorderRadius.circular(AppRadii.sm + 2),
+                  borderRadius: BorderRadius.circular(AppRadii.tile),
                 ),
                 child: Icon(
                   ConditionLabels.icon(condition),
@@ -121,8 +121,8 @@ class _ConditionCard extends StatelessWidget {
               const Spacer(),
               if (isSelected)
                 Container(
-                  width: AppDimens.checkboxSize + 1,
-                  height: AppDimens.checkboxSize + 1,
+                  width: AppDimens.conditionCheck,
+                  height: AppDimens.conditionCheck,
                   decoration: BoxDecoration(
                     color: tone,
                     shape: BoxShape.circle,
@@ -135,7 +135,7 @@ class _ConditionCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm + 1),
+          const SizedBox(height: AppSpacing.gridGap),
           Text(
             ConditionLabels.name(l10n, condition),
             style: theme.textTheme.titleSmall,

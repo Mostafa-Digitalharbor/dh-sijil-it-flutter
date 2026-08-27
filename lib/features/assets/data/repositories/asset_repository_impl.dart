@@ -245,29 +245,39 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
       });
 
   @override
-  ResultFuture<AssetHistory> history(int id) => guard(() async {
-    // Both reads are independent, so they go out together: the history screen
-    // is a back-navigation away from a detail the user is already looking at,
-    // and two sequential round trips is what makes that feel like a wait.
-    final (entries, asset) = await (
-      _chatter.history(model: _remote.model, id: id),
-      _remote.fetchOne(id),
-    ).wait;
+  ResultFuture<AssetHistory> history(int id, {int offset = 0}) =>
+      guard(() async {
+        const limit = AppConstants.historyLimit;
+        final isFirstPage = offset == 0;
 
-    return AssetHistory(
-      entries: <AssetHistoryEntry>[
-        for (final entry in entries)
-          AssetHistoryEntry(
-            id: entry.id,
-            kind: AssetNoteVocabulary.classify(entry.body),
-            summary: entry.body,
-            occurredAt: entry.postedAt,
-            author: entry.author,
-          ),
-      ],
-      registeredOn: asset?.readDate(EquipmentFields.createDate),
-    );
-  });
+        // On the first page both reads are independent, so they go out
+        // together: the history screen is a back-navigation away from a detail
+        // the user is already looking at, and two sequential round trips is
+        // what makes that feel like a wait. Later pages skip the asset read
+        // entirely — `create_date` cannot have changed since the page before.
+        final entries = await _chatter.history(
+          model: _remote.model,
+          id: id,
+          limit: limit,
+          offset: offset,
+        );
+        final asset = isFirstPage ? await _remote.fetchOne(id) : null;
+
+        return AssetHistory(
+          entries: <AssetHistoryEntry>[
+            for (final entry in entries)
+              AssetHistoryEntry(
+                id: entry.id,
+                kind: AssetNoteVocabulary.classify(entry.body),
+                summary: entry.body,
+                occurredAt: entry.postedAt,
+                author: entry.author,
+              ),
+          ],
+          registeredOn: asset?.readDate(EquipmentFields.createDate),
+          hasMore: entries.length >= limit,
+        );
+      });
 
   @override
   ResultFuture<AssetPermissions> permissions() => guard(() async {
