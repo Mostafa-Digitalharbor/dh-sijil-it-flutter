@@ -35,6 +35,7 @@ class Asset extends Equatable {
     this.createdAt,
     this.updatedAt,
     this.isStatusLocal = false,
+    this.hasPendingSync = false,
   });
 
   /// The Odoo database id of the backing record. Never rendered to users and
@@ -72,6 +73,14 @@ class Asset extends Equatable {
   /// from the user (spec §6).
   final bool isStatusLocal;
 
+  /// True when a change to this asset is still sitting in the outbox.
+  ///
+  /// Different from [isStatusLocal] in the way that matters: that one is a
+  /// state Odoo has no field for and never will, this one is a state Odoo has
+  /// simply not been told about yet. The first is permanent and the second is
+  /// a promise, so they are marked differently and counted separately.
+  final bool hasPendingSync;
+
   bool get isAssigned => assignedEmployee != null;
 
   bool get hasOpenMaintenance => openMaintenanceCount > 0;
@@ -104,6 +113,7 @@ class Asset extends Equatable {
     String? notes,
     int? openMaintenanceCount,
     bool? isStatusLocal,
+    bool? hasPendingSync,
     bool clearAssignment = false,
   }) {
     return Asset(
@@ -132,6 +142,7 @@ class Asset extends Equatable {
       createdAt: createdAt,
       updatedAt: updatedAt,
       isStatusLocal: isStatusLocal ?? this.isStatusLocal,
+      hasPendingSync: hasPendingSync ?? this.hasPendingSync,
     );
   }
 
@@ -155,5 +166,6 @@ class Asset extends Equatable {
     notes,
     openMaintenanceCount,
     isStatusLocal,
+    hasPendingSync,
   ];
 }

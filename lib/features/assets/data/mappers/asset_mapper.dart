@@ -23,6 +23,7 @@ abstract final class AssetMapper {
     OdooRecord record, {
     required ResolvedStatus status,
     DateTime? now,
+    bool hasPendingSync = false,
   }) {
     final warrantyEnd = record.readDate(EquipmentFields.warrantyDate);
 
@@ -31,6 +32,7 @@ abstract final class AssetMapper {
       name: record.readString(EquipmentFields.name) ?? '',
       status: status.status,
       isStatusLocal: status.isLocal,
+      hasPendingSync: hasPendingSync,
 
       // `partner_ref` is Odoo's vendor reference for the equipment. It is the
       // closest standard field to an inventory tag, and falling back to the
@@ -162,6 +164,12 @@ abstract final class AssetMapper {
   }
 
   /// `equipment_assign_to` selection values, as shipped by standard Odoo.
+  ///
+  /// The app only ever writes [assignToEmployee] and [assignToOther] —
+  /// assigning to a department is an Odoo-side choice this product does not
+  /// offer. [assignToDepartment] is named anyway so the set on the record is
+  /// complete: reading a value back and finding no constant for it is how a
+  /// third state gets mistaken for corrupt data.
   static const String assignToEmployee = 'employee';
   static const String assignToDepartment = 'department';
   static const String assignToOther = 'other';

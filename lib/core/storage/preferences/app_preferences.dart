@@ -53,6 +53,32 @@ class AppPreferences {
     await _prefs.remove(PrefKeys.odooServerVersion);
   }
 
+  // ── Warranty reminders ───────────────────────────────────────────────────
+
+  /// Off until the user turns it on.
+  ///
+  /// Default-off because turning it on is what asks the OS for the
+  /// notification permission, and a permission prompt nobody expected is a
+  /// permission denied for good.
+  bool get remindersEnabled =>
+      _prefs.getBool(PrefKeys.remindersEnabled) ?? false;
+
+  Future<void> setRemindersEnabled({required bool value}) =>
+      _prefs.setBool(PrefKeys.remindersEnabled, value);
+
+  /// How many days before a warranty ends the reminder fires.
+  int get reminderLeadDays =>
+      _prefs.getInt(PrefKeys.reminderLeadDays) ?? defaultReminderLeadDays;
+
+  Future<void> setReminderLeadDays(int days) =>
+      _prefs.setInt(PrefKeys.reminderLeadDays, days);
+
+  /// A month: long enough to raise a renewal, short enough to still be true.
+  static const int defaultReminderLeadDays = 30;
+
+  /// The windows the settings screen offers.
+  static const List<int> reminderLeadOptions = <int>[7, 30, 60];
+
   int? get userId => _prefs.getInt(PrefKeys.odooUserId);
 
   Future<void> setUserId(int? value) async {

@@ -21,8 +21,11 @@ abstract final class PrefKeys {
   static const String authMode = 'odoo_auth_mode'; // password | apiKey
   static const String themeMode = 'theme_mode';
   static const String locale = 'locale';
-  static const String hasCompletedOnboarding = 'has_completed_onboarding';
   static const String lastMetadataSync = 'last_metadata_sync';
+
+  /// Warranty reminders: whether they are on, and how far ahead they fire.
+  static const String remindersEnabled = 'reminders_enabled';
+  static const String reminderLeadDays = 'reminder_lead_days';
 
   const PrefKeys._();
 }
@@ -41,6 +44,19 @@ abstract final class CacheBoxes {
   /// (Reserved / Damaged / Lost). Documented in docs/ARCHITECTURE.md.
   static const String localAssetState = 'local_asset_state';
 
+  /// The last page and detail read for every list, kept so a technician with
+  /// no signal sees the fleet they were looking at upstairs rather than an
+  /// error screen.
+  static const String assetPages = 'cache_asset_pages';
+  static const String assetDetails = 'cache_asset_details';
+
+  /// Writes made while offline, waiting for a connection (docs/OFFLINE.md).
+  ///
+  /// Not a cache: everything else under here is disposable and rebuilt on the
+  /// next refresh, and this is the one box whose contents exist nowhere else.
+  /// It is deliberately excluded from Settings → Clear cache.
+  static const String outbox = 'outbox';
+
   static const List<String> all = <String>[
     metadata,
     categories,
@@ -49,6 +65,25 @@ abstract final class CacheBoxes {
     assets,
     userProfile,
     localAssetState,
+    assetPages,
+    assetDetails,
+    outbox,
+  ];
+
+  /// The boxes Settings → Clear cache is allowed to wipe.
+  ///
+  /// [outbox] is not among them, and neither is [localAssetState]: one holds
+  /// writes Odoo has never seen, the other holds three states Odoo cannot
+  /// express. Clearing either loses data rather than freeing space.
+  static const List<String> disposable = <String>[
+    metadata,
+    categories,
+    employees,
+    departments,
+    assets,
+    userProfile,
+    assetPages,
+    assetDetails,
   ];
 
   const CacheBoxes._();

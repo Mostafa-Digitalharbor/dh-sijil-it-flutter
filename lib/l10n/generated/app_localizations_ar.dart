@@ -1467,7 +1467,7 @@ class AppL10nAr extends AppL10n {
   String get auditResume => 'واصل الجرد';
 
   @override
-  String get auditReportTitle => 'انتهى الجرد';
+  String get auditReportTitle => 'جرد المخزون';
 
   @override
   String get auditNothingMissing => 'كل الأصول في النطاق اتلقت.';
@@ -1668,4 +1668,304 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get operationDelete => 'حذف';
+
+  @override
+  String get syncTitle => 'المزامنة';
+
+  @override
+  String get syncSubtitle => 'تغييرات في انتظار الاتصال';
+
+  @override
+  String get syncOfflineBanner => 'غير متصل';
+
+  @override
+  String syncStaleBanner(String time) {
+    return 'تُعرض النسخة المحفوظة من $time';
+  }
+
+  @override
+  String syncPendingBanner(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString تغيير في انتظار الإرسال',
+      many: '$countString تغييرًا في انتظار الإرسال',
+      few: '$countString تغييرات في انتظار الإرسال',
+      two: 'تغييران في انتظار الإرسال',
+      one: 'تغيير واحد في انتظار الإرسال',
+      zero: 'لا تغييرات في الانتظار',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncPendingChip => 'لم يُرسَل بعد';
+
+  @override
+  String get syncNow => 'أرسِل الآن';
+
+  @override
+  String get syncSending => 'جارٍ الإرسال…';
+
+  @override
+  String get syncQueueEmptyTitle => 'كل شيء وصل إلى أودو';
+
+  @override
+  String get syncQueueEmptyBody =>
+      'التغييرات التي تجريها بدون اتصال تنتظر هنا حتى يتوفر الاتصال.';
+
+  @override
+  String syncSentCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'أُرسل $countString تغيير',
+      many: 'أُرسل $countString تغييرًا',
+      few: 'أُرسلت $countString تغييرات',
+      two: 'أُرسل تغييران',
+      one: 'أُرسل تغيير واحد',
+      zero: 'لم يُرسَل شيء',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncBlocked => 'أودو رفض هذا التغيير، ولن تُعاد المحاولة.';
+
+  @override
+  String syncAttempts(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString محاولة',
+      many: '$countString محاولة',
+      few: '$countString محاولات',
+      two: 'محاولتان',
+      one: 'محاولة واحدة',
+      zero: 'بلا محاولات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncQueuedAssign(String employee) {
+    return 'تسليم إلى $employee';
+  }
+
+  @override
+  String get syncQueuedReturn => 'استرجاع';
+
+  @override
+  String syncQueuedStatus(String status) {
+    return 'تعيين الحالة إلى $status';
+  }
+
+  @override
+  String get syncDiscard => 'حذف قائمة الانتظار';
+
+  @override
+  String get syncDiscardConfirm => 'حذف التغييرات المنتظرة؟';
+
+  @override
+  String get syncDiscardBody =>
+      'هذه التغييرات لم تصل إلى أودو مطلقًا، وحذفها لا يمكن التراجع عنه.';
+
+  @override
+  String get syncQueuedNotice =>
+      'حُفظ على هذا الجهاز، وسيصل إلى أودو عند توفر الاتصال.';
+
+  @override
+  String get remindersTitle => 'تنبيهات الضمان';
+
+  @override
+  String get remindersSubtitle => 'نبّهني قبل انتهاء الضمان';
+
+  @override
+  String get remindersLeadLabel => 'نبّهني';
+
+  @override
+  String remindersLeadDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'قبل $daysString يوم',
+      many: 'قبل $daysString يومًا',
+      few: 'قبل $daysString أيام',
+      two: 'قبل يومين',
+      one: 'قبل يوم واحد',
+      zero: 'بلا مهلة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersScheduled(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString تنبيه مجدول',
+      many: '$countString تنبيهًا مجدولًا',
+      few: '$countString تنبيهات مجدولة',
+      two: 'تنبيهان مجدولان',
+      one: 'تنبيه واحد مجدول',
+      zero: 'لا تنبيهات مجدولة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get remindersDenied =>
+      'التنبيهات موقوفة لتطبيق سِجل IT في إعدادات جهازك.';
+
+  @override
+  String get reminderNotificationTitle => 'ضمان على وشك الانتهاء';
+
+  @override
+  String reminderNotificationBody(String asset, int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'بقي $daysString يوم',
+      many: 'بقي $daysString يومًا',
+      few: 'بقيت $daysString أيام',
+      two: 'بقي يومان',
+      one: 'بقي يوم واحد',
+      zero: 'انتهى',
+    );
+    return '$asset — $_temp0';
+  }
+
+  @override
+  String get exportShare => 'مشاركة';
+
+  @override
+  String get exportAssetsTitle => 'قائمة الأصول';
+
+  @override
+  String exportAssetsSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString أصل',
+      many: '$countString أصلًا',
+      few: '$countString أصول',
+      two: 'أصلان',
+      one: 'أصل واحد',
+      zero: 'لا أصول',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String exportGeneratedOn(String date) {
+    return 'أُنشئ في $date';
+  }
+
+  @override
+  String get exportFailed => 'تعذّر تجهيز الملف.';
+
+  @override
+  String get exportNothingToShare => 'لا يوجد ما يُصدَّر بعد.';
+
+  @override
+  String get exportColumnTag => 'الوسم';
+
+  @override
+  String get exportColumnName => 'الاسم';
+
+  @override
+  String get exportColumnCategory => 'الفئة';
+
+  @override
+  String get exportColumnManufacturer => 'الشركة المصنّعة';
+
+  @override
+  String get exportColumnModel => 'الموديل';
+
+  @override
+  String get exportColumnSerial => 'الرقم التسلسلي';
+
+  @override
+  String get exportColumnStatus => 'الحالة';
+
+  @override
+  String get exportColumnHolder => 'مُسلَّم إلى';
+
+  @override
+  String get exportColumnDepartment => 'القسم';
+
+  @override
+  String get exportColumnAssignedOn => 'تاريخ التسليم';
+
+  @override
+  String get exportColumnWarrantyEnd => 'نهاية الضمان';
+
+  @override
+  String get receiptTitle => 'إيصال تسليم';
+
+  @override
+  String get receiptShare => 'مشاركة الإيصال';
+
+  @override
+  String get receiptRecipient => 'استلمها';
+
+  @override
+  String get receiptDate => 'تاريخ التسليم';
+
+  @override
+  String get receiptAssets => 'الأصول';
+
+  @override
+  String get receiptNotes => 'ملاحظات';
+
+  @override
+  String get receiptSignature => 'التوقيع';
+
+  @override
+  String get auditReportShare => 'مشاركة التقرير';
+
+  @override
+  String get auditReportScope => 'النطاق';
+
+  @override
+  String get auditReportExpected => 'المتوقع';
+
+  @override
+  String get auditReportFound => 'تم عدّه';
+
+  @override
+  String get auditReportMissing => 'لم يُعثر عليه';
+
+  @override
+  String get auditReportUnexpected => 'عُثر عليه خارج النطاق';
 }

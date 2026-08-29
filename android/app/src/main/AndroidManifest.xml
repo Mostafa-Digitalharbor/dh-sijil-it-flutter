@@ -2,6 +2,13 @@
     <!-- XML-RPC calls to the customer's Odoo instance. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Warranty reminders. Android 13+ makes notifications opt-in, and the
+         app asks only when the user turns the switch on in Settings, so the
+         prompt is attached to the thing that needs it. No exact-alarm
+         permission is declared: reminders are scheduled inexactly on purpose,
+         because "some time that morning" is the right precision for a
+         warranty that expires in a month. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- QR / barcode scanning (spec sections 12 and 13). -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>

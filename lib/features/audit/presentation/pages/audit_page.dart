@@ -11,6 +11,8 @@ import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_palette.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/export/export_documents.dart';
+import '../../../../core/export/file_share.dart';
 import '../../../../core/network/odoo/odoo_name_ref.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/cubit/async_guards.dart';
@@ -20,6 +22,7 @@ import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_tiles.dart';
 import '../../../../shared/widgets/data_charts.dart';
+import '../../../../shared/widgets/export_action.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/mono_text.dart';
 import '../../../../shared/widgets/state_views.dart';
@@ -700,6 +703,16 @@ class _ReportView extends StatelessWidget {
                 const SizedBox(height: AppSpacing.lg),
                 FailureView(failure: state.failure!, onRetry: cubit.commit),
               ],
+
+              // Inside the scroll rather than beside the two actions below:
+              // saving to Odoo and resuming the walk are what the count *is*,
+              // and a third button of equal weight would make the choice
+              // harder rather than the report more shareable.
+              const SizedBox(height: AppSpacing.lg),
+              ExportButton(
+                label: l10n.auditReportShare,
+                onExport: () => _shareReport(context, session),
+              ),
             ],
           ),
         ),
@@ -738,6 +751,53 @@ class _ReportView extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The count as a PDF: what was not found, what turned up unexpectedly, and
+/// what was counted — in that order.
+///
+/// Missing first, because that is the reason somebody walked the floor. A
+/// report that opens with two hundred assets that were exactly where they
+/// should be gets filed unread.
+Future<void> _shareReport(BuildContext context, AuditSession session) async {
+  final l10n = AppL10n.of(context);
+
+  final copy = ExportAction.copyFor(
+    context,
+    title: l10n.auditReportTitle,
+    subtitle: session.scopeLabel ?? l10n.auditScopeAll,
+    columns: <String>[
+      l10n.exportColumnTag,
+      l10n.exportColumnName,
+      l10n.exportColumnHolder,
+    ],
+    sections: <String, String>{
+      'missing': l10n.auditReportMissing,
+      'unexpected': l10n.auditReportUnexpected,
+      'found': l10n.auditReportFound,
+    },
+    facts: <String, String>{
+      l10n.auditReportScope: session.scopeLabel ?? l10n.auditScopeAll,
+      l10n.auditReportExpected: AppNumber.count(context, session.expectedCount),
+      l10n.auditReportFound: AppNumber.count(context, session.foundCount),
+      l10n.auditReportMissing: AppNumber.count(context, session.missingCount),
+      l10n.auditReportUnexpected: AppNumber.count(
+        context,
+        session.unexpectedCount,
+      ),
+    },
+  );
+  final theme = await ExportAction.themeFor(context);
+  if (!context.mounted) return;
+
+  await ExportAction.share(
+    context: context,
+    filename: FileShare.safeName(l10n.auditReportTitle, 'pdf'),
+    subject: '${l10n.auditReportTitle} — ${copy.subtitle}',
+    mimeType: 'application/pdf',
+    build: () =>
+        AuditReportExport.build(session: session, copy: copy, theme: theme),
+  );
 }
 
 class _MissingRow extends StatelessWidget {

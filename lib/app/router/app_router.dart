@@ -25,6 +25,7 @@ import '../../features/maintenance/presentation/pages/maintenance_list_page.dart
 import '../../features/scanner/presentation/pages/scanner_page.dart';
 import '../../features/settings/presentation/pages/debug_log_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/sync/presentation/pages/sync_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/state_views.dart';
 import 'app_routes.dart';
@@ -276,6 +277,13 @@ abstract final class AppRouter {
                       pageBuilder: (_, state) => AppTransitions.modal(
                         key: state.pageKey,
                         child: const HandoverPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: AppRoutes.sync,
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: const SyncPage(),
                       ),
                     ),
                     GoRoute(

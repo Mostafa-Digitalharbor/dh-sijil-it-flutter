@@ -1,4 +1,5 @@
 import '../../../../core/constants/odoo_models.dart';
+import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/guard.dart';
 import '../../../../core/network/odoo/odoo_capability_service.dart';
@@ -7,6 +8,7 @@ import '../../../../core/network/odoo/odoo_object_service.dart';
 import '../../../../core/network/odoo/odoo_value.dart';
 import '../../../../core/pagination/page_request.dart';
 import '../../../../core/pagination/paginated_result.dart';
+import '../../../../core/sync/offline_reads.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/employee.dart';
@@ -27,9 +29,12 @@ class EmployeeRepositoryImpl
   const EmployeeRepositoryImpl({
     required OdooObjectService odoo,
     required OdooCapabilityService capabilities,
-  }) : _odoo = odoo,
+    required OfflineReads reads,
+  }) : _reads = reads,
+       _odoo = odoo,
        _capabilities = capabilities;
 
+  final OfflineReads _reads;
   final OdooObjectService _odoo;
   final OdooCapabilityService _capabilities;
 
@@ -89,32 +94,56 @@ class EmployeeRepositoryImpl
 
         final trimmed = query.trim();
 
-        // `name_search` returns only id and display name. The picker shows
-        // department and email too, so the matched ids are read back in one
-        // follow-up call rather than one per row.
-        final matches = await _odoo.nameSearch(
-          model: _model,
-          query: trimmed,
-          limit: limit,
-        );
-        if (matches.isEmpty) return const <Employee>[];
+        // Cached for the same reason the asset list is, and it was the half
+        // that was missing: a technician could browse the fleet in a server
+        // room and then find the recipient picker empty, which stops a
+        // handover one field short of being queueable.
+        //
+        // Raw records are stored rather than entities, exactly as the asset
+        // cache does: they are already JSON, and the mapper still runs on the
+        // way out, so a cached row is composed by the same code as a live one.
+        //
+        // Keyed on the term, so the empty search — the list the picker opens
+        // with — is the one most likely to be there when it matters.
+        final records = await _reads.read<OdooRecords>(
+          box: CacheBoxes.employees,
+          key: 'search|$trimmed|$limit',
+          encode: (rows) => rows,
+          decode: (stored) => <OdooRecord>[
+            for (final row in stored as List)
+              Map<String, dynamic>.from(row as Map),
+          ],
+          live: () async {
+            // `name_search` returns only id and display name. The picker shows
+            // department and email too, so the matched ids are read back in
+            // one follow-up call rather than one per row.
+            final matches = await _odoo.nameSearch(
+              model: _model,
+              query: trimmed,
+              limit: limit,
+            );
+            if (matches.isEmpty) return const <OdooRecord>[];
 
-        final records = await _odoo.read(
-          model: _model,
-          ids: matches.map((m) => m.id).toList(growable: false),
-          fields: await _readFields(),
+            final rows = await _odoo.read(
+              model: _model,
+              ids: matches.map((m) => m.id).toList(growable: false),
+              fields: await _readFields(),
+            );
+
+            // `read` does not preserve the order `name_search` ranked them in,
+            // and that ranking is the whole value of a typeahead. Applied
+            // before caching, so the stored copy is ranked too.
+            final byId = <int, OdooRecord>{
+              for (final record in rows) record.recordId: record,
+            };
+            return matches
+                .map((m) => byId[m.id])
+                .whereType<OdooRecord>()
+                .toList(growable: false);
+          },
         );
 
-        // `read` does not preserve the order `name_search` ranked them in, and
-        // that ranking is the whole value of a typeahead.
-        final byId = <int, OdooRecord>{
-          for (final record in records) record.recordId: record,
-        };
-        return matches
-            .map((m) => byId[m.id])
-            .whereType<OdooRecord>()
-            .map(_toEntity)
-            .toList(growable: false);
+        return records.map(_toEntity).toList(growable: false);
       });
 
   @override

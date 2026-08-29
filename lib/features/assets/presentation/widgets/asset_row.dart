@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/utils/app_text.dart';
 import '../../../../shared/widgets/app_avatar.dart';
+import '../../../../shared/widgets/app_chip.dart';
 import '../../../../shared/widgets/app_tiles.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../domain/entities/asset.dart';
@@ -69,6 +71,16 @@ class AssetRow extends StatelessWidget {
                 isLocal: asset.isStatusLocal,
                 dense: true,
               ),
+              // Ahead of the warranty chip on purpose: "not sent yet" is about
+              // whether this row is even true on the server, which outranks
+              // anything it says about the device.
+              if (asset.hasPendingSync)
+                AppChip(
+                  label: l10n.syncPendingChip,
+                  icon: Icons.cloud_upload_outlined,
+                  tone: AppColors.warning,
+                  dense: true,
+                ),
               if (showWarranty) WarrantyChip(warranty: asset.warranty),
             ],
     );

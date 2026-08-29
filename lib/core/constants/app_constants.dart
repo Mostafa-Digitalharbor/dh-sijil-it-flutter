@@ -16,11 +16,7 @@ abstract final class AppConstants {
   /// before a background refresh. Settings offers a manual refresh too.
   static const Duration metadataTtl = Duration(hours: 12);
 
-  /// TTL for cached reference data (categories, departments, employees).
-  static const Duration referenceDataTtl = Duration(hours: 6);
-
   static const int defaultPageSize = 50;
-  static const int searchDebounceMs = 350;
 
   /// Warranty buckets used by the dashboard and the warranty filter (spec §15).
   static const int warrantyWarningDays = 30;
@@ -29,8 +25,6 @@ abstract final class AppConstants {
   /// Scheme for QR payloads. Carries only an internal identifier, never
   /// credentials or session data (spec §12).
   static const String qrScheme = 'asset';
-
-  static const List<int> supportedOdooMajorVersions = <int>[17, 18, 19];
 
   /// How many chatter entries the dashboard's activity feed shows.
   /// Photos shown for one record. Past this the strip shows a "+N" badge
@@ -119,6 +113,21 @@ abstract final class AppAssets {
   static const String appIcon = 'assets/sijil-app-icon.png';
 
   static const String hero = 'assets/sijil-hero.png';
+
+  /// Faces loaded at runtime rather than through the manifest.
+  ///
+  /// The `pdf` package embeds a font by reading its bytes, so unlike the UI
+  /// type — which `pubspec.yaml` registers and Flutter resolves by family —
+  /// these are addressed by path and belong here with the images.
+  ///
+  /// The Arabic face is used for Latin too: a receipt written in English
+  /// still carries Arabic asset names, and a font without those glyphs prints
+  /// them as empty boxes.
+  static const String pdfFontRegular =
+      'assets/fonts/IBMPlexSansArabic-Regular.ttf';
+  static const String pdfFontBold =
+      'assets/fonts/IBMPlexSansArabic-SemiBold.ttf';
+  static const String pdfFontMono = 'assets/fonts/JetBrainsMono-Variable.ttf';
 
   const AppAssets._();
 }

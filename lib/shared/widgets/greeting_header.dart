@@ -117,39 +117,44 @@ class UserAvatar extends StatelessWidget {
     final palette = context.palette;
     final photo = this.photo;
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: palette.raised,
-        border: Border.all(color: palette.mint, width: AppDimens.avatarRing),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: photo == null
-          ? Center(
-              child: Text(
-                initialsOf(name),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(color: palette.mint),
-              ),
-            )
-          : Image.memory(
-              photo,
-              fit: BoxFit.cover,
-              // An instance that has been through a bad migration can hold a
-              // non-image in image_128. Initials beat an exception in the
-              // frame callback.
-              errorBuilder: (context, _, _) => Center(
+    // Decorative, like [AppAvatar]: the initials are a drawing of the name,
+    // and the name itself is the line beside this. Left in the tree the
+    // dashboard header opens with "M B" spelled out before the greeting.
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: palette.raised,
+          border: Border.all(color: palette.mint, width: AppDimens.avatarRing),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: photo == null
+            ? Center(
                 child: Text(
                   initialsOf(name),
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(color: palette.mint),
                 ),
+              )
+            : Image.memory(
+                photo,
+                fit: BoxFit.cover,
+                // An instance that has been through a bad migration can hold a
+                // non-image in image_128. Initials beat an exception in the
+                // frame callback.
+                errorBuilder: (context, _, _) => Center(
+                  child: Text(
+                    initialsOf(name),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleSmall?.copyWith(color: palette.mint),
+                  ),
+                ),
               ),
-            ),
+      ),
     );
   }
 }

@@ -2464,7 +2464,7 @@ abstract class AppL10n {
   /// No description provided for @auditReportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Count finished'**
+  /// **'Stock count'**
   String get auditReportTitle;
 
   /// No description provided for @auditNothingMissing.
@@ -2778,6 +2778,354 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'delete'**
   String get operationDelete;
+
+  /// No description provided for @syncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get syncTitle;
+
+  /// No description provided for @syncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Writes waiting for a connection'**
+  String get syncSubtitle;
+
+  /// No description provided for @syncOfflineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get syncOfflineBanner;
+
+  /// No description provided for @syncStaleBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the copy from {time}'**
+  String syncStaleBanner(String time);
+
+  /// No description provided for @syncPendingBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 change waiting to send} other{{count} changes waiting to send}}'**
+  String syncPendingBanner(int count);
+
+  /// No description provided for @syncPendingChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sent yet'**
+  String get syncPendingChip;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Send now'**
+  String get syncNow;
+
+  /// No description provided for @syncSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get syncSending;
+
+  /// No description provided for @syncQueueEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is on Odoo'**
+  String get syncQueueEmptyTitle;
+
+  /// No description provided for @syncQueueEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes you make without a connection wait here until there is one.'**
+  String get syncQueueEmptyBody;
+
+  /// No description provided for @syncSentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 change sent} other{{count} changes sent}}'**
+  String syncSentCount(int count);
+
+  /// No description provided for @syncBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Odoo refused this. It will not be retried.'**
+  String get syncBlocked;
+
+  /// No description provided for @syncAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 attempt} other{{count} attempts}}'**
+  String syncAttempts(int count);
+
+  /// No description provided for @syncQueuedAssign.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand over to {employee}'**
+  String syncQueuedAssign(String employee);
+
+  /// No description provided for @syncQueuedReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Take back'**
+  String get syncQueuedReturn;
+
+  /// No description provided for @syncQueuedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as {status}'**
+  String syncQueuedStatus(String status);
+
+  /// No description provided for @syncDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard queue'**
+  String get syncDiscard;
+
+  /// No description provided for @syncDiscardConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard the waiting changes?'**
+  String get syncDiscardConfirm;
+
+  /// No description provided for @syncDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'These were never sent to Odoo. Discarding them cannot be undone.'**
+  String get syncDiscardBody;
+
+  /// No description provided for @syncQueuedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this device. It will go to Odoo when there is a connection.'**
+  String get syncQueuedNotice;
+
+  /// No description provided for @remindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty reminders'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Be told before a warranty runs out'**
+  String get remindersSubtitle;
+
+  /// No description provided for @remindersLeadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Warn me'**
+  String get remindersLeadLabel;
+
+  /// No description provided for @remindersLeadDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day before} other{{days} days before}}'**
+  String remindersLeadDays(int days);
+
+  /// No description provided for @remindersScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing scheduled} =1{1 reminder scheduled} other{{count} reminders scheduled}}'**
+  String remindersScheduled(int count);
+
+  /// No description provided for @remindersDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are switched off for Sijil IT in your device settings.'**
+  String get remindersDenied;
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A warranty is running out'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{asset} — {days, plural, =1{1 day left} other{{days} days left}}'**
+  String reminderNotificationBody(String asset, int days);
+
+  /// No description provided for @exportShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get exportShare;
+
+  /// No description provided for @exportAssetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset list'**
+  String get exportAssetsTitle;
+
+  /// No description provided for @exportAssetsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 asset} other{{count} assets}}'**
+  String exportAssetsSubtitle(int count);
+
+  /// No description provided for @exportGeneratedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated {date}'**
+  String exportGeneratedOn(String date);
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The file could not be prepared.'**
+  String get exportFailed;
+
+  /// No description provided for @exportNothingToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'There is nothing to export yet.'**
+  String get exportNothingToShare;
+
+  /// No description provided for @exportColumnTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get exportColumnTag;
+
+  /// No description provided for @exportColumnName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get exportColumnName;
+
+  /// No description provided for @exportColumnCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get exportColumnCategory;
+
+  /// No description provided for @exportColumnManufacturer.
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer'**
+  String get exportColumnManufacturer;
+
+  /// No description provided for @exportColumnModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get exportColumnModel;
+
+  /// No description provided for @exportColumnSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial number'**
+  String get exportColumnSerial;
+
+  /// No description provided for @exportColumnStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get exportColumnStatus;
+
+  /// No description provided for @exportColumnHolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to'**
+  String get exportColumnHolder;
+
+  /// No description provided for @exportColumnDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get exportColumnDepartment;
+
+  /// No description provided for @exportColumnAssignedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned on'**
+  String get exportColumnAssignedOn;
+
+  /// No description provided for @exportColumnWarrantyEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty ends'**
+  String get exportColumnWarrantyEnd;
+
+  /// No description provided for @receiptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Handover receipt'**
+  String get receiptTitle;
+
+  /// No description provided for @receiptShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share receipt'**
+  String get receiptShare;
+
+  /// No description provided for @receiptRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Received by'**
+  String get receiptRecipient;
+
+  /// No description provided for @receiptDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Handed over on'**
+  String get receiptDate;
+
+  /// No description provided for @receiptAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets'**
+  String get receiptAssets;
+
+  /// No description provided for @receiptNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get receiptNotes;
+
+  /// No description provided for @receiptSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature'**
+  String get receiptSignature;
+
+  /// No description provided for @auditReportShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share report'**
+  String get auditReportShare;
+
+  /// No description provided for @auditReportScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Scope'**
+  String get auditReportScope;
+
+  /// No description provided for @auditReportExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected'**
+  String get auditReportExpected;
+
+  /// No description provided for @auditReportFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted'**
+  String get auditReportFound;
+
+  /// No description provided for @auditReportMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found'**
+  String get auditReportMissing;
+
+  /// No description provided for @auditReportUnexpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Found out of scope'**
+  String get auditReportUnexpected;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

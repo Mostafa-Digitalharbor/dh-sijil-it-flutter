@@ -150,6 +150,16 @@ class AssetQuery extends Equatable {
   AssetQuery first() =>
       AssetQuery(filters: filters, sort: sort, page: page.first());
 
+  /// A stable identity for this exact question, used to file the offline copy.
+  ///
+  /// Derived from [props] rather than written by hand, so a filter cannot be
+  /// added without changing the key. A hand-written key that forgets one is
+  /// how a filtered list gets answered from an unfiltered copy.
+  ///
+  /// Two logically-equal filter sets built in a different order produce
+  /// different keys. That costs a cache miss and nothing else.
+  String get cacheKey => props.map((p) => '$p').join('|');
+
   AssetQuery copyWith({
     AssetFilters? filters,
     AssetSort? sort,

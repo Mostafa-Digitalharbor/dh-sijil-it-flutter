@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sijil_it/core/error/exceptions.dart' as app;
 import 'package:sijil_it/core/network/connectivity/network_info.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
@@ -87,15 +89,31 @@ class InMemoryCache implements CacheStore {
 
 /// Connectivity that a test controls directly.
 class FakeNetworkInfo implements NetworkInfo {
-  FakeNetworkInfo({this.connected = true});
+  FakeNetworkInfo({bool connected = true}) : _connected = connected;
 
-  bool connected;
+  bool _connected;
+
+  final StreamController<bool> _changes = StreamController<bool>.broadcast();
+
+  bool get connected => _connected;
+
+  /// Setting this emits, so a test can walk the device out of a server room
+  /// and watch the queue drain by itself. A plain field could only ever be
+  /// read, which made the reconnect path — the whole point of the outbox —
+  /// untestable.
+  set connected(bool value) {
+    if (_connected == value) return;
+    _connected = value;
+    _changes.add(value);
+  }
 
   @override
-  Future<bool> get isConnected async => connected;
+  Future<bool> get isConnected async => _connected;
 
   @override
-  Stream<bool> get onConnectivityChanged => Stream<bool>.value(connected);
+  Stream<bool> get onConnectivityChanged => _changes.stream;
+
+  Future<void> dispose() => _changes.close();
 }
 
 /// An [XmlRpcClient] that answers from [FakeOdooData] without a socket.

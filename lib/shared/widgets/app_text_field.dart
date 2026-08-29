@@ -81,29 +81,51 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasError = errorText != null && errorText!.isNotEmpty;
-    final isMultiline = maxLines > 1;
+
+    // Obscuring wins over [maxLines], and everything downstream reads the
+    // resolved value.
+    //
+    // Only `maxLines` used to be coerced, so `obscure: true` with a multi-line
+    // field left `minLines` at the caller's number and `maxLines` at 1 — and
+    // `TextField` asserts on that combination, taking the screen down with a
+    // red box. Nothing in the app passes both today, which is exactly why it
+    // sat here waiting for the first person who did.
+    final lines = obscure ? 1 : maxLines;
+    final isMultiline = lines > 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (showLabel || action != null) ...[
-          Row(
+          // A Wrap, not a Row: [action] is a control rather than a glyph — on
+          // the sign-in screen it is the password/API-key switch — and at a
+          // raised text size it no longer fits beside its own label. A Row
+          // clipped it behind a yellow bar; this drops it to its own line.
+          //
+          // The empty leading box is deliberate: with two children,
+          // `spaceBetween` puts the label at the start and the action at the
+          // end, which is where an unlabelled field's action used to sit by
+          // way of the [Expanded] this replaced.
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.xs,
             children: [
-              Expanded(
-                child: showLabel
-                    ? Text(
-                        label.toUpperCase(),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: hasError
-                              ? AppColors.danger
-                              : theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : const SizedBox.shrink(),
-              ),
+              if (showLabel)
+                Text(
+                  label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: hasError
+                        ? AppColors.danger
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              else
+                const SizedBox.shrink(),
               if (action != null) action!,
             ],
           ),
@@ -117,8 +139,8 @@ class AppTextField extends StatelessWidget {
             focusNode: focusNode,
             enabled: enabled,
             obscureText: obscure,
-            maxLines: obscure ? 1 : maxLines,
-            minLines: isMultiline ? maxLines : null,
+            maxLines: lines,
+            minLines: isMultiline ? lines : null,
             keyboardType: isMultiline ? TextInputType.multiline : keyboardType,
             textInputAction: textInputAction,
             textAlignVertical: isMultiline ? TextAlignVertical.top : null,

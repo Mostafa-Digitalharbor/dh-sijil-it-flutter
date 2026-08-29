@@ -902,5 +902,133 @@
   "operationRead": "view",
   "operationCreate": "create",
   "operationWrite": "change",
-  "operationDelete": "delete"
+  "operationDelete": "delete",
+  "syncTitle": "Sync",
+  "syncSubtitle": "Writes waiting for a connection",
+  "syncOfflineBanner": "Offline",
+  "syncStaleBanner": "Showing the copy from {time}",
+  "@syncStaleBanner": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "syncPendingBanner": "{count, plural, =1{1 change waiting to send} other{{count} changes waiting to send}}",
+  "@syncPendingBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncPendingChip": "Not sent yet",
+  "syncNow": "Send now",
+  "syncSending": "Sending\u2026",
+  "syncQueueEmptyTitle": "Everything is on Odoo",
+  "syncQueueEmptyBody": "Changes you make without a connection wait here until there is one.",
+  "syncSentCount": "{count, plural, =1{1 change sent} other{{count} changes sent}}",
+  "@syncSentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncBlocked": "Odoo refused this. It will not be retried.",
+  "syncAttempts": "{count, plural, =1{1 attempt} other{{count} attempts}}",
+  "@syncAttempts": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncQueuedAssign": "Hand over to {employee}",
+  "@syncQueuedAssign": {
+    "placeholders": { "employee": { "type": "String" } }
+  },
+  "syncQueuedReturn": "Take back",
+  "syncQueuedStatus": "Mark as {status}",
+  "@syncQueuedStatus": {
+    "placeholders": { "status": { "type": "String" } }
+  },
+  "syncDiscard": "Discard queue",
+  "syncDiscardConfirm": "Discard the waiting changes?",
+  "syncDiscardBody": "These were never sent to Odoo. Discarding them cannot be undone.",
+  "syncQueuedNotice": "Saved on this device. It will go to Odoo when there is a connection.",
+  "remindersTitle": "Warranty reminders",
+  "remindersSubtitle": "Be told before a warranty runs out",
+  "remindersLeadLabel": "Warn me",
+  "remindersLeadDays": "{days, plural, =1{1 day before} other{{days} days before}}",
+  "@remindersLeadDays": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "remindersScheduled": "{count, plural, =0{Nothing scheduled} =1{1 reminder scheduled} other{{count} reminders scheduled}}",
+  "@remindersScheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "remindersDenied": "Notifications are switched off for Sijil IT in your device settings.",
+  "reminderNotificationTitle": "A warranty is running out",
+  "reminderNotificationBody": "{asset} — {days, plural, =1{1 day left} other{{days} days left}}",
+  "@reminderNotificationBody": {
+    "placeholders": {
+      "asset": { "type": "String" },
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "exportShare": "Share",
+  "exportAssetsTitle": "Asset list",
+  "exportAssetsSubtitle": "{count, plural, =1{1 asset} other{{count} assets}}",
+  "@exportAssetsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "exportGeneratedOn": "Generated {date}",
+  "@exportGeneratedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "exportFailed": "The file could not be prepared.",
+  "exportNothingToShare": "There is nothing to export yet.",
+  "exportColumnTag": "Tag",
+  "exportColumnName": "Name",
+  "exportColumnCategory": "Category",
+  "exportColumnManufacturer": "Manufacturer",
+  "exportColumnModel": "Model",
+  "exportColumnSerial": "Serial number",
+  "exportColumnStatus": "Status",
+  "exportColumnHolder": "Assigned to",
+  "exportColumnDepartment": "Department",
+  "exportColumnAssignedOn": "Assigned on",
+  "exportColumnWarrantyEnd": "Warranty ends",
+  "receiptTitle": "Handover receipt",
+  "receiptShare": "Share receipt",
+  "receiptRecipient": "Received by",
+  "receiptDate": "Handed over on",
+  "receiptAssets": "Assets",
+  "receiptNotes": "Notes",
+  "receiptSignature": "Signature",
+  "auditReportTitle": "Stock count",
+  "auditReportShare": "Share report",
+  "auditReportScope": "Scope",
+  "auditReportExpected": "Expected",
+  "auditReportFound": "Counted",
+  "auditReportMissing": "Not found",
+  "auditReportUnexpected": "Found out of scope"
 }

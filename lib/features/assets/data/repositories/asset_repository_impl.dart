@@ -10,6 +10,9 @@ import '../../../../core/network/odoo/odoo_chatter_service.dart';
 import '../../../../core/network/odoo/odoo_object_service.dart';
 import '../../../../core/network/odoo/odoo_value.dart';
 import '../../../../core/pagination/paginated_result.dart';
+import '../../../../core/sync/outbox_entry.dart';
+import '../../../../core/sync/outbox_store.dart';
+import '../../../../core/sync/write_queue.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../core/utils/typedefs.dart';
 import '../../../assignment/domain/entities/assignment.dart';
@@ -47,15 +50,21 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
     required AssetStatusResolver statusResolver,
     required AssetStateStore states,
     required OdooChatterService chatter,
+    required OutboxStore outbox,
+    required WriteQueue queue,
   }) : _remote = remote,
        _statusResolver = statusResolver,
        _states = states,
-       _chatter = chatter;
+       _chatter = chatter,
+       _outbox = outbox,
+       _queue = queue;
 
   final AssetRemoteDataSource _remote;
   final AssetStatusResolver _statusResolver;
   final AssetStateStore _states;
   final OdooChatterService _chatter;
+  final OutboxStore _outbox;
+  final WriteQueue _queue;
 
   /// Memoised for the process: whether this instance has a real status field.
   /// Probing it per row would be one `fields_get` per asset.
@@ -155,14 +164,23 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
   @override
   ResultFuture<Asset> assign(AssignmentRequest request) => guard(() async {
-    await _remote.update(
-      request.assetId,
-      AssetMapper.assignmentValues(
-        employeeId: request.employeeId,
-        assignedOn: request.assignedOn,
-        supported: await _remote.writableFields(),
-      ),
-    );
+    if (await _queue.shouldQueue()) return _queueAssign(request);
+
+    try {
+      await _remote.update(
+        request.assetId,
+        AssetMapper.assignmentValues(
+          employeeId: request.employeeId,
+          assignedOn: request.assignedOn,
+          supported: await _remote.writableFields(),
+        ),
+      );
+    } on Object catch (error) {
+      // The connection dropped between the check above and the write. Queue
+      // it rather than making the technician re-enter what they just typed.
+      if (!_queue.shouldQueueAfter(error)) rethrow;
+      return _queueAssign(request);
+    }
 
     // Handing an asset over supersedes any Reserved marker it carried.
     await _states.clear(_remote.model, request.assetId);
@@ -182,13 +200,20 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
   @override
   ResultFuture<Asset> unassign(ReturnRequest request) => guard(() async {
-    await _remote.update(
-      request.assetId,
-      AssetMapper.returnValues(
-        supported: await _remote.writableFields(),
-        required: await _remote.requiredFields(),
-      ),
-    );
+    if (await _queue.shouldQueue()) return _queueReturn(request);
+
+    try {
+      await _remote.update(
+        request.assetId,
+        AssetMapper.returnValues(
+          supported: await _remote.writableFields(),
+          required: await _remote.requiredFields(),
+        ),
+      );
+    } on Object catch (error) {
+      if (!_queue.shouldQueueAfter(error)) rethrow;
+      return _queueReturn(request);
+    }
 
     // A return can land the asset in a state Odoo cannot express (Damaged), so
     // the overlay is written *after* the assignment is cleared — otherwise the
@@ -228,13 +253,23 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   @override
   ResultFuture<Asset> setLocalStatus(int id, AssetStatus status) =>
       guard(() async {
+        if (await _queue.shouldQueue()) return _queueStatus(id, status);
+
         // The note *is* the write. These three states have no Odoo field, so
         // if this call fails the fact was recorded nowhere — which is why it
         // does not go through [_postNote]. Swallowing the error is right for a
         // note describing a write that already landed, and wrong for the only
         // write there is: it would report success and leave the state on this
         // handset alone, the failure this whole path was built to end.
-        await _remote.postNote(id, AssetNoteVocabulary.statusNote(status));
+        //
+        // Queueing is not swallowing: the fact is kept, and the badge on the
+        // asset says out loud that Odoo has not been told yet.
+        try {
+          await _remote.postNote(id, AssetNoteVocabulary.statusNote(status));
+        } on Object catch (error) {
+          if (!_queue.shouldQueueAfter(error)) rethrow;
+          return _queueStatus(id, status);
+        }
 
         // Mirrored after, so an offline read and the screen behind this one
         // both answer immediately instead of waiting on a round trip.
@@ -243,6 +278,26 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
         return _requireAsset(id);
       });
+
+  /// The offline arm of [setLocalStatus].
+  ///
+  /// Separate from the online one because the note *is* the write here: there
+  /// is no field to set, so all that can be queued is the note, and the mirror
+  /// has to carry the state until it goes out.
+  Future<Asset> _queueStatus(int id, AssetStatus status) async {
+    await _states.mirror(_remote.model, id, status);
+
+    final asset = await _requireAsset(id);
+    await _outbox.add(
+      kind: OutboxKind.setAssetStatus,
+      subjectId: id,
+      subjectName: asset.name,
+      payload: <String, dynamic>{'status': status.name},
+    );
+
+    _announce(id);
+    return _requireAsset(id);
+  }
 
   @override
   ResultFuture<AssetHistory> history(int id, {int offset = 0}) =>
@@ -308,6 +363,71 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   /// Closes the change stream. Called from `resetDependencies` in tests.
   Future<void> dispose() => _changes.close();
 
+  // ── The outbox ───────────────────────────────────────────────────────────
+
+  /// Parks an assignment and answers with what the asset will look like.
+  ///
+  /// The optimistic entity is not a guess: every field it sets is one this
+  /// device chose, and the row is marked [Asset.hasPendingSync] so nothing on
+  /// screen claims Odoo agrees yet.
+  Future<Asset> _queueAssign(AssignmentRequest request) async {
+    final asset = await _requireAsset(request.assetId);
+
+    // Handing an asset over supersedes any Reserved marker, offline as well.
+    await _states.clear(_remote.model, request.assetId);
+
+    await _outbox.add(
+      kind: OutboxKind.assignAsset,
+      subjectId: request.assetId,
+      subjectName: asset.name,
+      payload: <String, dynamic>{
+        'employeeId': request.employeeId,
+        'employeeName': request.employeeName,
+        'assignedOn': request.assignedOn.toIso8601String(),
+        'notes': request.notes,
+      },
+    );
+
+    _announce(request.assetId);
+    // Re-read rather than hand-building the optimistic copy: the queue is
+    // applied while composing, so this is the same entity every other screen
+    // will see, from one implementation.
+    return _requireAsset(request.assetId);
+  }
+
+  /// Parks a return.
+  ///
+  /// The photos travel as file paths rather than base64: a return may carry
+  /// five of them, and holding five images in an encrypted Hive box is how a
+  /// queue of six returns becomes a storage complaint. The trade is that a
+  /// photo the OS clears before the sync runs is lost — which the replay
+  /// tolerates the same way the online path does, per file.
+  Future<Asset> _queueReturn(ReturnRequest request) async {
+    final asset = await _requireAsset(request.assetId);
+
+    await _states.mirror(
+      _remote.model,
+      request.assetId,
+      request.resultingStatus,
+    );
+
+    await _outbox.add(
+      kind: OutboxKind.returnAsset,
+      subjectId: request.assetId,
+      subjectName: asset.name,
+      payload: <String, dynamic>{
+        'condition': request.condition.name,
+        'returnedOn': request.returnedOn.toIso8601String(),
+        'employeeName': request.employeeName,
+        'notes': request.notes,
+        'photoPaths': request.photoPaths,
+      },
+    );
+
+    _announce(request.assetId);
+    return _requireAsset(request.assetId);
+  }
+
   // ── Composition ──────────────────────────────────────────────────────────
 
   Future<Asset> _requireAsset(int id) async {
@@ -317,18 +437,79 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   }
 
   Future<Asset> _toEntity(OdooRecord record) async {
+    final id = record['id'] as int;
     final hasNative = await _nativeStatusField();
-    final overlay = await _states.read(_remote.model, record['id'] as int);
+    final overlay = await _states.read(_remote.model, id);
+    final pending = await _outbox.pending();
 
-    return AssetMapper.toEntity(
-      record,
-      status: _statusResolver.resolve(
-        record: record,
-        hasNativeField: hasNative,
-        overlay: overlay,
+    return _applyPending(
+      AssetMapper.toEntity(
+        record,
+        status: _statusResolver.resolve(
+          record: record,
+          hasNativeField: hasNative,
+          overlay: overlay,
+        ),
       ),
+      pending,
     );
   }
+
+  /// Shows the queue's version of an asset until Odoo has it.
+  ///
+  /// Without this the app tells two stories at once: the banner says a
+  /// handover is waiting to send, and the screen underneath still says the
+  /// laptop is on the shelf — because the cached record it re-read is the one
+  /// from before the technician gave it away.
+  ///
+  /// Applied here rather than by patching the cached record, so there is one
+  /// place that knows what a queued write means, it is applied on every read
+  /// consistently, and it disappears by itself the moment the entry leaves
+  /// the outbox.
+  Asset _applyPending(Asset asset, List<OutboxEntry> queue) {
+    var result = asset;
+    var touched = false;
+
+    // Oldest first, so assign-then-return lands the same way it will on Odoo.
+    for (final entry in queue.where((e) => e.subjectId == asset.id)) {
+      touched = true;
+      result = switch (entry.kind) {
+        OutboxKind.assignAsset => result.copyWith(
+          status: AssetStatus.assigned,
+          isStatusLocal: false,
+          assignedEmployee: OdooNameRef(
+            entry.payload['employeeId'] as int? ?? 0,
+            '${entry.payload['employeeName'] ?? ''}',
+          ),
+          assignmentDate:
+              DateTime.tryParse('${entry.payload['assignedOn']}') ??
+              entry.queuedAt,
+        ),
+        OutboxKind.returnAsset => result.copyWith(
+          status: _queuedReturnStatus(entry),
+          isStatusLocal: _queuedReturnStatus(entry).isLocalOnly,
+          clearAssignment: true,
+        ),
+        OutboxKind.setAssetStatus => result.copyWith(
+          status: _queuedStatus(entry) ?? result.status,
+          isStatusLocal: true,
+        ),
+      };
+    }
+
+    return touched ? result.copyWith(hasPendingSync: true) : result;
+  }
+
+  static AssetStatus _queuedReturnStatus(OutboxEntry entry) =>
+      ReturnCondition.values
+          .where((c) => c.name == entry.payload['condition'])
+          .firstOrNull
+          ?.resultingStatus ??
+      AssetStatus.available;
+
+  static AssetStatus? _queuedStatus(OutboxEntry entry) => AssetStatus.values
+      .where((s) => s.name == entry.payload['status'])
+      .firstOrNull;
 
   /// Maps a whole page, reading the overlay once for every id rather than
   /// once per row.
@@ -342,15 +523,21 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
         .toList(growable: false);
     final overlays = await _states.readAll(_remote.model, ids);
 
+    // Read once for the page, not once per row: the queue is a whole-box scan.
+    final pending = await _outbox.pending();
+
     return records
         .map(
-          (record) => AssetMapper.toEntity(
-            record,
-            status: _statusResolver.resolve(
-              record: record,
-              hasNativeField: hasNative,
-              overlay: overlays[record['id']],
+          (record) => _applyPending(
+            AssetMapper.toEntity(
+              record,
+              status: _statusResolver.resolve(
+                record: record,
+                hasNativeField: hasNative,
+                overlay: overlays[record['id']],
+              ),
             ),
+            pending,
           ),
         )
         .toList(growable: false);

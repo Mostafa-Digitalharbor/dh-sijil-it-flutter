@@ -33,10 +33,22 @@ class ScannerViewfinder extends StatefulWidget {
 
 class _ScannerViewfinderState extends State<ScannerViewfinder>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _sweep = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 2),
-  )..repeat(reverse: true);
+  late final AnimationController _sweep;
+
+  @override
+  void initState() {
+    super.initState();
+    // Built here rather than as a lazy field. On a screen with no room for a
+    // finder — a landscape phone, or the zero-height frame a rotation passes
+    // through — `build` returns before it ever touches the controller, and
+    // `dispose` was then the first thing to read it. That *constructed* an
+    // AnimationController against a deactivated element, which asserts, and
+    // left a ticker running that nothing would ever stop.
+    _sweep = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
 
   @override
   void dispose() {

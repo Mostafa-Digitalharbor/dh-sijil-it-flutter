@@ -377,20 +377,9 @@ class _LoginForm extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
 
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppCheckRow(
-                        label: l10n.loginKeepSignedIn,
-                        value: keepSignedIn,
-                        onChanged: onToggleKeep,
-                      ),
-                    ),
-                    AppTextAction(
-                      label: l10n.loginNeedApiKey,
-                      onPressed: () => _showApiKeyHelp(context),
-                    ),
-                  ],
+                _KeepSignedInRow(
+                  keepSignedIn: keepSignedIn,
+                  onToggleKeep: onToggleKeep,
                 ),
 
                 if (state.failure != null) ...[
@@ -454,18 +443,6 @@ class _LoginForm extends StatelessWidget {
       ],
     );
   }
-
-  void _showApiKeyHelp(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(l10n.errorInvalidCredentialsFix),
-          duration: AppDurations.snackBar,
-        ),
-      );
-  }
 }
 
 /// The chosen server, shown so the user knows what they are signing into.
@@ -489,29 +466,41 @@ class _ConnectionSummary extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            // A host and a database name are identifiers, not prose. Left to
-            // the ambient direction, an Arabic layout would render
-            // `dh-sijil.odoo.com` with its parts reordered.
-            child: Directionality(
-              textDirection: TextDirection.ltr,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+            // A host and a database name are identifiers, not prose, so their
+            // glyphs are ordered left-to-right in both languages — otherwise
+            // an Arabic layout renders `dh-sijil.odoo.com` with its parts
+            // rearranged.
+            //
+            // The direction is set per-[Text] rather than by wrapping this
+            // column in a `Directionality`, because that wrapper also decides
+            // what "start" means: the whole block aligned itself to the left
+            // of an Arabic card and sat marooned there, a finger's width from
+            // the icon it belongs to, with the gap on the wrong side.
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
                     connection.baseUrl.host,
+                    textDirection: TextDirection.ltr,
                     style: theme.textTheme.titleSmall,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
+                ),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
                     connection.database,
+                    textDirection: TextDirection.ltr,
                     style: theme.textTheme.bodySmall,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -594,4 +583,65 @@ abstract final class _ValidationKeys {
   static const String credential = 'validationEnterCredential';
 
   const _ValidationKeys._();
+}
+
+/// "Keep me signed in", with the API-key explainer beside it.
+///
+/// Side by side at ordinary text sizes, stacked once the user has turned text
+/// up: the checkbox label and the link are both sentences, and at 1.6x on a
+/// small phone they cannot share a line. Clipping either one costs the user
+/// the sentence that explains what the field above wants — which is the whole
+/// reason the link is on this screen and not in a help centre.
+class _KeepSignedInRow extends StatelessWidget {
+  const _KeepSignedInRow({
+    required this.keepSignedIn,
+    required this.onToggleKeep,
+  });
+
+  final bool keepSignedIn;
+  final ValueChanged<bool> onToggleKeep;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+
+    final keep = AppCheckRow(
+      label: l10n.loginKeepSignedIn,
+      value: keepSignedIn,
+      onChanged: onToggleKeep,
+    );
+    final help = AppTextAction(
+      label: l10n.loginNeedApiKey,
+      onPressed: () => _showApiKeyHelp(context),
+    );
+
+    if (context.screen.isLargeText) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[keep, help],
+      );
+    }
+
+    return Row(
+      children: <Widget>[
+        Expanded(child: keep),
+        help,
+      ],
+    );
+  }
+
+  /// What an API key is and where to get one, asked in the place the question
+  /// occurs to the user.
+  void _showApiKeyHelp(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorInvalidCredentialsFix),
+          duration: AppDurations.snackBar,
+        ),
+      );
+  }
 }

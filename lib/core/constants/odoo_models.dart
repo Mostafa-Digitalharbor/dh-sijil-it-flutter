@@ -11,20 +11,15 @@ abstract final class OdooModels {
   // -- Metadata / introspection (always present) ---------------------------
   static const String irModel = 'ir.model';
   static const String irModelFields = 'ir.model.fields';
-  static const String irModelData = 'ir.model.data';
-  static const String irModelAccess = 'ir.model.access';
   static const String irAttachment = 'ir.attachment';
-  static const String irConfigParameter = 'ir.config_parameter';
 
   // -- Users & partners (always present) -----------------------------------
   static const String resUsers = 'res.users';
   static const String resPartner = 'res.partner';
   static const String resCompany = 'res.company';
-  static const String resGroups = 'res.groups';
 
   // -- HR (optional, the `hr` app) -----------------------------------------
   static const String hrEmployee = 'hr.employee';
-  static const String hrEmployeePublic = 'hr.employee.public';
   static const String hrDepartment = 'hr.department';
   static const String hrJob = 'hr.job';
 
@@ -35,12 +30,9 @@ abstract final class OdooModels {
   static const String maintenanceEquipmentCategory =
       'maintenance.equipment.category';
   static const String maintenanceStage = 'maintenance.stage';
-  static const String maintenanceTeam = 'maintenance.team';
 
   // -- Inventory (optional, fallback asset source) -------------------------
-  static const String productTemplate = 'product.template';
   static const String productProduct = 'product.product';
-  static const String productCategory = 'product.category';
 
   /// Serial/lot model. Renamed from `stock.production.lot` in Odoo 16, so the
   /// capability service resolves whichever one exists.
@@ -49,7 +41,6 @@ abstract final class OdooModels {
 
   // -- Mail / activity (optional, drives the activity timeline) ------------
   static const String mailMessage = 'mail.message';
-  static const String mailActivity = 'mail.activity';
 
   /// Models the app can run without. Each is capability-checked at startup.
   static const List<String> optional = <String>[
@@ -85,9 +76,7 @@ abstract final class EquipmentFields {
   static const String scrapDate = 'scrap_date';
   static const String note = 'note';
   static const String ownerUserId = 'owner_user_id';
-  static const String maintenanceIds = 'maintenance_ids';
   static const String maintenanceOpenCount = 'maintenance_open_count';
-  static const String maintenanceCount = 'maintenance_count';
   static const String active = 'active';
   static const String companyId = 'company_id';
   static const String writeDate = 'write_date';
@@ -131,7 +120,6 @@ abstract final class EmployeeFields {
   static const String workEmail = 'work_email';
   static const String workPhone = 'work_phone';
   static const String mobilePhone = 'mobile_phone';
-  static const String avatar128 = 'avatar_128';
   static const String userId = 'user_id';
   static const String companyId = 'company_id';
   static const String active = 'active';
@@ -225,8 +213,6 @@ abstract final class UserFields {
 /// near-identical classes whose only field is `name`.
 abstract final class NamedRecordFields {
   static const String name = 'name';
-  static const String completeName = 'complete_name';
-  static const String parentId = 'parent_id';
   static const String active = 'active';
 
   static const List<String> readSet = <String>['id', name];
@@ -244,7 +230,6 @@ abstract final class MailMessageFields {
   static const String model = 'model';
   static const String resId = 'res_id';
   static const String messageType = 'message_type';
-  static const String subtypeId = 'subtype_id';
 
   /// The two `message_type` values that carry something a person wrote or that
   /// the system announced. The rest are field-tracking rows Odoo renders from

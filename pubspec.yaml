@@ -85,6 +85,12 @@ dependencies:
   # every module in the project at the same time — worth doing on purpose, not
   # as a side effect of `pub upgrade` on a package used for one function.
   permission_handler: ^12.0.1
+  flutter_local_notifications: ^20.1.0
+  timezone: ^0.10.1
+  flutter_timezone: ^5.1.0
+  pdf: ^3.12.0
+  share_plus: ^12.0.2
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

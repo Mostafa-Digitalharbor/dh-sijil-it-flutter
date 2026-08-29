@@ -32,12 +32,26 @@ void main() {
       'app_theme.dart',
     };
 
+    // A different measurement system, not an exemption from this one.
+    //
+    // `core/export` lays out A4 pages in PostScript points through the `pdf`
+    // package's own `SizedBox` and `EdgeInsets`. Those are not the widgets
+    // this rule is about, and `AppSpacing.md` — a density-independent pixel
+    // meant for a phone — is the wrong unit for a printed margin. Giving
+    // print its own token scale would mean two scales, which is the thing
+    // having one scale exists to prevent.
+    bool isPrintLayout(File file) => file.path.contains(
+      '${Platform.pathSeparator}export'
+      '${Platform.pathSeparator}',
+    );
+
     return Directory('lib')
         .listSync(recursive: true)
         .whereType<File>()
         .where((f) => f.path.endsWith('.dart'))
         .where((f) => !f.path.contains('generated'))
         .where((f) => !scaleFiles.contains(f.uri.pathSegments.last))
+        .where((f) => !isPrintLayout(f))
         .toList();
   }
 

@@ -19,6 +19,7 @@ import '../../../../shared/widgets/key_value.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../cubit/app_settings_cubit.dart';
 import '../cubit/settings_cubit.dart';
+import '../widgets/reminders_card.dart';
 
 /// Connection, account, appearance and cache (spec §23).
 class SettingsPage extends StatelessWidget {
@@ -105,6 +106,7 @@ class _SettingsView extends StatelessWidget {
               const _CapabilitiesCard(),
               const _AppearanceCard(),
               const _LanguageCard(),
+              const RemindersCard(),
               _DataCard(
                 state: state,
                 onClearCache: () => _confirmClearCache(context),

@@ -15,15 +15,9 @@ abstract final class AppRoutes {
   // ── Assets ───────────────────────────────────────────────────────────────
   static const String assetDetail = 'detail/:assetId';
   static const String assetCreate = 'create';
-  static const String assetEdit = 'detail/:assetId/edit';
-  static const String assetQr = 'detail/:assetId/qr';
-  static const String assetHistory = 'detail/:assetId/history';
-  static const String assetAssign = 'detail/:assetId/assign';
-  static const String assetReturn = 'detail/:assetId/return';
 
   // ── Employees ────────────────────────────────────────────────────────────
   static const String employeeDetail = 'detail/:employeeId';
-  static const String employeeAssets = 'detail/:employeeId/assets';
 
   // ── Maintenance & settings (reached from More) ───────────────────────────
   static const String maintenance = 'maintenance';
@@ -31,7 +25,7 @@ abstract final class AppRoutes {
   static const String audit = 'audit';
   static const String handover = 'handover';
   static const String settings = 'settings';
-  static const String debugLog = 'settings/diagnostics';
+  static const String sync = 'sync';
 
   // ── Absolute helpers for imperative navigation ───────────────────────────
   static String assetDetailPath(int id) => '$assets/detail/$id';
@@ -48,6 +42,7 @@ abstract final class AppRoutes {
   static const String auditPath = '$more/audit';
   static const String handoverPath = '$more/handover';
   static const String settingsPath = '$more/settings';
+  static const String syncPath = '$more/sync';
   static const String debugLogPath = '$more/settings/diagnostics';
 
   const AppRoutes._();

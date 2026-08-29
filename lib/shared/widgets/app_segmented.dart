@@ -59,12 +59,20 @@ class AppSegmented<T> extends StatelessWidget {
           mainAxisSize: compact ? MainAxisSize.min : MainAxisSize.max,
           children: [
             for (final option in options)
+              // Flexible, not bare: a compact control sizes to its labels,
+              // and two of those at a raised text size are wider than the
+              // phone. Loose fit keeps the pill snug at ordinary sizes and
+              // hands the segments a ceiling when there is not room — which
+              // is what lets the [FittedBox] inside each one do its job
+              // instead of the row painting a yellow bar.
               compact
-                  ? _Segment<T>(
-                      option: option,
-                      selected: option.value == value,
-                      compact: true,
-                      onTap: () => onChanged(option.value),
+                  ? Flexible(
+                      child: _Segment<T>(
+                        option: option,
+                        selected: option.value == value,
+                        compact: true,
+                        onTap: () => onChanged(option.value),
+                      ),
                     )
                   : Expanded(
                       child: _Segment<T>(

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +10,10 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_palette.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/export/export_documents.dart';
+import '../../../../core/export/file_share.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/utils/app_number.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -19,6 +24,7 @@ import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_tiles.dart';
 import '../../../../shared/widgets/app_title_block.dart';
+import '../../../../shared/widgets/export_action.dart';
 import '../../../../shared/widgets/mono_text.dart';
 import '../../../../shared/widgets/signature_pad.dart';
 import '../../../../shared/widgets/skeletons.dart';
@@ -89,10 +95,72 @@ class _HandoverViewState extends State<_HandoverView> {
 
   void _close() => context.go(AppRoutes.more);
 
+  /// Kept after submitting so the receipt can be shared.
+  ///
+  /// The pad still holds the strokes, but re-rendering them at share time
+  /// would produce a second image at whatever size the screen is *then* —
+  /// after a rotation, a different one from the signature Odoo received.
+  Uint8List? _signatureImage;
+
   Future<void> _submit() async {
     final bytes = await _signature.toPng(size: _padSize);
     if (!mounted) return;
+    _signatureImage = bytes;
     await context.read<HandoverCubit>().submit(bytes);
+  }
+
+  /// The receipt as a PDF, handed to the OS share sheet.
+  ///
+  /// The one document in the app that is evidence: who took what, when, and
+  /// their signature. It existed as a screen and a chatter note; what was
+  /// missing was the copy the recipient keeps.
+  Future<void> _shareReceipt(HandoverState state) async {
+    final receipt = state.receipt;
+    final recipient = state.recipient;
+    if (receipt == null || recipient == null) return;
+
+    final l10n = AppL10n.of(context);
+    final handedOverOn = state.handedOverOn ?? DateTime.now();
+
+    final copy = ExportAction.copyFor(
+      context,
+      title: l10n.receiptTitle,
+      subtitle: recipient.name,
+      columns: <String>[
+        l10n.exportColumnTag,
+        l10n.exportColumnName,
+        l10n.exportColumnCategory,
+      ],
+      sections: <String, String>{
+        'recipient': l10n.receiptRecipient,
+        'date': l10n.receiptDate,
+        'assets': l10n.receiptAssets,
+        'notes': l10n.receiptNotes,
+        'signature': l10n.receiptSignature,
+      },
+    );
+    final theme = await ExportAction.themeFor(context);
+    if (!mounted) return;
+
+    await ExportAction.share(
+      context: context,
+      filename: FileShare.safeName(
+        '${l10n.receiptTitle}-${recipient.name}',
+        'pdf',
+      ),
+      subject: '${l10n.receiptTitle} — ${recipient.name}',
+      mimeType: 'application/pdf',
+      build: () => HandoverReceiptExport.build(
+        receipt: receipt,
+        recipient: recipient,
+        handedOverOn: handedOverOn,
+        handedOverOnLabel: context.dates.dayLong(handedOverOn),
+        copy: copy,
+        theme: theme,
+        signature: _signatureImage,
+        notes: state.notes,
+      ),
+    );
   }
 
   Future<void> _addAssets() async {
@@ -151,6 +219,7 @@ class _HandoverViewState extends State<_HandoverView> {
                   recipient: state.recipient?.name ?? '',
                   onRetry: _startOver,
                   onDone: _close,
+                  onShare: () => _shareReceipt(state),
                 )
               : _HandoverForm(
                   state: state,
@@ -547,12 +616,14 @@ class _ReceiptView extends StatelessWidget {
     required this.recipient,
     required this.onRetry,
     required this.onDone,
+    required this.onShare,
   });
 
   final HandoverReceipt receipt;
   final String recipient;
   final VoidCallback onRetry;
   final VoidCallback onDone;
+  final Future<void> Function() onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -611,7 +682,11 @@ class _ReceiptView extends StatelessWidget {
             ),
         ],
 
+        // Above "Done", because sharing is the thing somebody does *before*
+        // leaving the screen — and after it the receipt is gone.
         const SizedBox(height: AppSpacing.md),
+        ExportButton(label: l10n.receiptShare, onExport: onShare),
+        const SizedBox(height: AppSpacing.sm),
         AppButton(label: l10n.actionDone, onPressed: onDone),
       ],
     );

@@ -18,10 +18,6 @@ abstract final class AppText {
   /// Between two facts on one line — "IT · Systems Engineer".
   static const String separator = ' · ';
 
-  /// The bare glyph, for layouts that own their own spacing because the two
-  /// halves need different text directions.
-  static const String separatorGlyph = '·';
-
   /// Joins what is actually there.
   ///
   /// Nulls and blanks are dropped rather than rendered, because the failure

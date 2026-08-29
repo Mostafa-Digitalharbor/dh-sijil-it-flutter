@@ -103,9 +103,14 @@ class AppButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (isBusy)
+          // Sized to match the icon it stands in for, so a button that hugs
+          // its label is exactly as wide busy as it is at rest. At `iconMd`
+          // against an `iconLg` icon it shrank by two pixels the moment it was
+          // pressed — small, but it is the button under the user's thumb, and
+          // "without changing width" is the whole point of swapping in place.
           SizedBox(
-            width: AppDimens.iconMd,
-            height: AppDimens.iconMd,
+            width: AppDimens.iconLg,
+            height: AppDimens.iconLg,
             child: CircularProgressIndicator(
               strokeWidth: AppDimens.progressStroke,
               valueColor: AlwaysStoppedAnimation<Color>(foreground),
@@ -144,7 +149,14 @@ class AppButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadii.md),
               border: border,
             ),
-            alignment: Alignment.center,
+            // Only when expanding. A `Container` given an alignment takes the
+            // largest size its constraints allow, so this one line quietly
+            // made `expand: false` mean nothing: every "hug the label" button
+            // — the retry on a failure screen, "Load older" under a timeline —
+            // stretched the full width of whatever centred it, which is the
+            // opposite of what the flag is for. The row inside already centres
+            // its own children, so an expanded button loses nothing.
+            alignment: expand ? Alignment.center : null,
             child: content,
           ),
         ),
@@ -293,11 +305,16 @@ class AppTextAction extends StatelessWidget {
               Icon(icon, size: AppDimens.iconSm, color: accent),
               const SizedBox(width: AppSpacing.xs),
             ],
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: accent,
-                letterSpacing: AppTypography.noTracking,
+            // Flexible so a link that is a sentence — "Need an API key?" —
+            // wraps onto a second line at a raised text size instead of
+            // running off the row it shares.
+            Flexible(
+              child: Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: accent,
+                  letterSpacing: AppTypography.noTracking,
+                ),
               ),
             ),
           ],

@@ -132,6 +132,12 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   /// Clears cached Odoo data.
   ///
+  /// Only [CacheBoxes.disposable] is touched, whichever branch runs. The
+  /// outbox is never cleared here: it holds writes Odoo has not seen, so
+  /// wiping it to reclaim a few hundred kilobytes would silently discard a
+  /// technician's afternoon. Emptying it deliberately is its own control on
+  /// the sync screen.
+  ///
   /// [keepLocalStates] defaults to true. It used to guard real user data: the
   /// Reserved / Damaged / Lost box was the only copy that existed. Odoo now
   /// holds those states (docs/ARCHITECTURE.md §6), so keeping the box only
@@ -141,15 +147,10 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(isClearingCache: true, clearFailure: true));
 
     try {
-      if (keepLocalStates) {
-        for (final box in CacheBoxes.all) {
-          if (box == CacheBoxes.localAssetState) continue;
-          await _cache.clearBox(box);
-        }
-      } else {
-        await _cache.clearAll();
-        await _states.clearAll();
+      for (final box in CacheBoxes.disposable) {
+        await _cache.clearBox(box);
       }
+      if (!keepLocalStates) await _states.clearAll();
 
       await _capabilities.invalidate();
       if (isClosed) return;

@@ -17,5 +17,3 @@ typedef OdooRecords = List<Map<String, dynamic>>;
 
 /// An Odoo search domain, e.g. `[['state', '=', 'assigned']]`.
 typedef OdooDomain = List<dynamic>;
-
-typedef VoidResult = Either<Failure, void>;

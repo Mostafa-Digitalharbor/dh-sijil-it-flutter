@@ -1437,7 +1437,7 @@ class AppL10nEn extends AppL10n {
   String get auditResume => 'Keep counting';
 
   @override
-  String get auditReportTitle => 'Count finished';
+  String get auditReportTitle => 'Stock count';
 
   @override
   String get auditNothingMissing => 'Everything in scope was found.';
@@ -1641,4 +1641,277 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get operationDelete => 'delete';
+
+  @override
+  String get syncTitle => 'Sync';
+
+  @override
+  String get syncSubtitle => 'Writes waiting for a connection';
+
+  @override
+  String get syncOfflineBanner => 'Offline';
+
+  @override
+  String syncStaleBanner(String time) {
+    return 'Showing the copy from $time';
+  }
+
+  @override
+  String syncPendingBanner(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes waiting to send',
+      one: '1 change waiting to send',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncPendingChip => 'Not sent yet';
+
+  @override
+  String get syncNow => 'Send now';
+
+  @override
+  String get syncSending => 'Sending…';
+
+  @override
+  String get syncQueueEmptyTitle => 'Everything is on Odoo';
+
+  @override
+  String get syncQueueEmptyBody =>
+      'Changes you make without a connection wait here until there is one.';
+
+  @override
+  String syncSentCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes sent',
+      one: '1 change sent',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncBlocked => 'Odoo refused this. It will not be retried.';
+
+  @override
+  String syncAttempts(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString attempts',
+      one: '1 attempt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncQueuedAssign(String employee) {
+    return 'Hand over to $employee';
+  }
+
+  @override
+  String get syncQueuedReturn => 'Take back';
+
+  @override
+  String syncQueuedStatus(String status) {
+    return 'Mark as $status';
+  }
+
+  @override
+  String get syncDiscard => 'Discard queue';
+
+  @override
+  String get syncDiscardConfirm => 'Discard the waiting changes?';
+
+  @override
+  String get syncDiscardBody =>
+      'These were never sent to Odoo. Discarding them cannot be undone.';
+
+  @override
+  String get syncQueuedNotice =>
+      'Saved on this device. It will go to Odoo when there is a connection.';
+
+  @override
+  String get remindersTitle => 'Warranty reminders';
+
+  @override
+  String get remindersSubtitle => 'Be told before a warranty runs out';
+
+  @override
+  String get remindersLeadLabel => 'Warn me';
+
+  @override
+  String remindersLeadDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days before',
+      one: '1 day before',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersScheduled(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString reminders scheduled',
+      one: '1 reminder scheduled',
+      zero: 'Nothing scheduled',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get remindersDenied =>
+      'Notifications are switched off for Sijil IT in your device settings.';
+
+  @override
+  String get reminderNotificationTitle => 'A warranty is running out';
+
+  @override
+  String reminderNotificationBody(String asset, int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days left',
+      one: '1 day left',
+    );
+    return '$asset — $_temp0';
+  }
+
+  @override
+  String get exportShare => 'Share';
+
+  @override
+  String get exportAssetsTitle => 'Asset list';
+
+  @override
+  String exportAssetsSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets',
+      one: '1 asset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String exportGeneratedOn(String date) {
+    return 'Generated $date';
+  }
+
+  @override
+  String get exportFailed => 'The file could not be prepared.';
+
+  @override
+  String get exportNothingToShare => 'There is nothing to export yet.';
+
+  @override
+  String get exportColumnTag => 'Tag';
+
+  @override
+  String get exportColumnName => 'Name';
+
+  @override
+  String get exportColumnCategory => 'Category';
+
+  @override
+  String get exportColumnManufacturer => 'Manufacturer';
+
+  @override
+  String get exportColumnModel => 'Model';
+
+  @override
+  String get exportColumnSerial => 'Serial number';
+
+  @override
+  String get exportColumnStatus => 'Status';
+
+  @override
+  String get exportColumnHolder => 'Assigned to';
+
+  @override
+  String get exportColumnDepartment => 'Department';
+
+  @override
+  String get exportColumnAssignedOn => 'Assigned on';
+
+  @override
+  String get exportColumnWarrantyEnd => 'Warranty ends';
+
+  @override
+  String get receiptTitle => 'Handover receipt';
+
+  @override
+  String get receiptShare => 'Share receipt';
+
+  @override
+  String get receiptRecipient => 'Received by';
+
+  @override
+  String get receiptDate => 'Handed over on';
+
+  @override
+  String get receiptAssets => 'Assets';
+
+  @override
+  String get receiptNotes => 'Notes';
+
+  @override
+  String get receiptSignature => 'Signature';
+
+  @override
+  String get auditReportShare => 'Share report';
+
+  @override
+  String get auditReportScope => 'Scope';
+
+  @override
+  String get auditReportExpected => 'Expected';
+
+  @override
+  String get auditReportFound => 'Counted';
+
+  @override
+  String get auditReportMissing => 'Not found';
+
+  @override
+  String get auditReportUnexpected => 'Found out of scope';
 }

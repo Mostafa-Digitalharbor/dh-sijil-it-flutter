@@ -43,18 +43,4 @@ void main() {
       expect(LogSanitizer.scrub(line), line);
     });
   });
-
-  group('LogSanitizer.maskSecret', () {
-    test('keeps only the last four characters', () {
-      expect(LogSanitizer.maskSecret('abcdefghij'), '******ghij');
-    });
-
-    test('fully masks a short secret', () {
-      expect(LogSanitizer.maskSecret('abc'), '****');
-    });
-
-    test('returns empty for a null secret', () {
-      expect(LogSanitizer.maskSecret(null), '');
-    });
-  });
 }

@@ -39,17 +39,24 @@ class AppAvatar extends StatelessWidget {
 
     return Semantics(
       label: name,
-      child: Container(
-        width: size,
-        height: size,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(color: background, shape: BoxShape.circle),
-        child: Text(
-          initialsOf(name),
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: foreground,
-            fontSize: size * 0.33,
-            letterSpacing: AppTypography.noTracking,
+      // The initials are a drawing of the name, not a second fact about it.
+      // Left in the tree they are announced after it — "Mostafa Bader, M B" —
+      // and TalkBack spells them, so every row of the employee list reads out
+      // two letters nobody asked for. `AppChip` already does this; the avatar
+      // was the one that did not.
+      child: ExcludeSemantics(
+        child: Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+          child: Text(
+            initialsOf(name),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: foreground,
+              fontSize: size * 0.33,
+              letterSpacing: AppTypography.noTracking,
+            ),
           ),
         ),
       ),

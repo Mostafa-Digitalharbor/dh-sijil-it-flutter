@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sijil_it/app/di/injector.dart';
 import 'package:sijil_it/app/router/app_router.dart';
 import 'package:sijil_it/app/theme/app_theme.dart';
 import 'package:sijil_it/core/network/odoo/odoo_connection.dart';
-import 'package:sijil_it/core/storage/preferences/app_preferences.dart';
 import 'package:sijil_it/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:sijil_it/features/auth/presentation/pages/login_page.dart';
 import 'package:sijil_it/features/connection/presentation/pages/connection_page.dart';
@@ -50,13 +48,8 @@ void main() {
     final auth = sl<AuthCubit>();
 
     await tester.pumpWidget(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthCubit>.value(value: auth),
-          BlocProvider<AppSettingsCubit>(
-            create: (_) => AppSettingsCubit(sl<AppPreferences>()),
-          ),
-        ],
+      withAppProviders(
+        auth: auth,
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           supportedLocales: AppSettingsCubit.supportedLocales,

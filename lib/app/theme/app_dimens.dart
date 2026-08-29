@@ -46,12 +46,9 @@ abstract final class AppDimens {
   static const double iconFact = 15;
 
   static const double iconHuge = 32;
-  static const double iconDisplay = 40;
 
   // ── Avatars & leading tiles ──────────────────────────────────────────────
-  static const double avatarSm = 26;
   static const double avatarMd = 38;
-  static const double avatarLg = 40;
   static const double avatarXl = 56;
   static const double tileSm = 29;
   static const double tileMd = 40;
@@ -62,7 +59,6 @@ abstract final class AppDimens {
   static const double buttonHeightCompact = 46;
   static const double buttonHeightSmall = 38;
   static const double fieldHeight = 50;
-  static const double fieldHeightCompact = 46;
   static const double appBarActionSize = 38;
   static const double segmentHeight = 32;
   static const double chipHeight = 32;
@@ -94,14 +90,10 @@ abstract final class AppDimens {
   /// take all of it — which is exactly how the bar once rendered vertically
   /// centred with the page squeezed to nothing behind it.
   static const double navBarHeight = 58;
-  static const double navIndicatorWidth = 58;
-  static const double navIndicatorHeight = 30;
-  static const double railWidth = 88;
   static const double progressBarHeight = 7;
   static const double statusStripHeight = 6;
   static const double statusStripGap = 2;
   static const double dotSize = 7;
-  static const double dotSizeSm = 6;
 
   /// The swatch in the dashboard's status legend. A point larger than
   /// [dotSize]: the legend's dot is read as a colour sample rather than as a
@@ -146,7 +138,6 @@ abstract final class AppDimens {
   static const double scannerFinder = 244;
   static const double scannerCorner = 54;
   static const double scannerCornerWidth = 3.5;
-  static const double logoLockupWidth = 158;
   static const double logoLockupWidthCompact = 128;
   static const double logoMonogramSize = 46;
   static const double logoMonogramSm = 34;
@@ -161,8 +152,6 @@ abstract final class AppDimens {
   // ── Layout ───────────────────────────────────────────────────────────────
   static const double contentMaxWidth = 720;
   static const double dialogMaxWidth = 480;
-  static const double masterPaneWidth = 380;
-  static const double skeletonRowHeight = 84;
 
   /// Placeholder sizes for the two dashboard cards whose real content is a
   /// drawing rather than text. Taken from what the ring and the sparkline
@@ -178,13 +167,9 @@ abstract final class AppDimens {
   static const double listPrefetchExtent = 320;
 
   // ── Elevation / blur ─────────────────────────────────────────────────────
-  static const double sheetBlur = 14;
 
   /// The glow behind the scanner's sweep line.
   static const double glowBlur = 18;
-
-  static const double fabShadowBlur = 20;
-  static const double fabShadowOffsetY = 8;
 
   // ── Obsidian (design/v3) ─────────────────────────────────────────────────
   /// Dot column on the history timeline. Doubles as the dot's own size, so the
@@ -192,7 +177,6 @@ abstract final class AppDimens {
   static const double timelineRail = 26;
 
   /// The coloured square that leads an asset row and carries its status.
-  static const double statusTile = 44;
   static const double statusTileSmall = 34;
 
   /// Height of the photo strip on a detail screen. The thumbnails beside the
@@ -210,7 +194,6 @@ abstract final class AppDimens {
   static const double signatureStroke = 2.6;
 
   /// Scanner and audit viewfinders, and the corner brackets drawn on them.
-  static const double viewfinderLarge = 196;
   static const double viewfinderCompact = 112;
   static const double viewfinderCorner = 30;
   static const double viewfinderCornerWeight = 3;
@@ -218,9 +201,6 @@ abstract final class AppDimens {
   /// The floating scan button in the middle of the navigation bar.
   static const double navFab = 46;
   static const double navFabLift = 14;
-
-  /// Tiles on the More screen.
-  static const double toolTileMin = 96;
 
   const AppDimens._();
 }
@@ -259,9 +239,6 @@ abstract final class AppOpacities {
   /// A hairline or divider softened against its surface.
   static const double divider = 0.5;
   static const double dividerSoft = 0.6;
-
-  /// A tinted badge on the navy hero card.
-  static const double heroBadgeFill = 0.16;
 
   /// The torch button's resting tint, before it is switched on.
   static const double toggleRestingFill = 0.18;

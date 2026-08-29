@@ -22,17 +22,12 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   // ── Brand ────────────────────────────────────────────────────────────────
   static const Color navy = Color(0xFF16255C);
-  static const Color navy700 = Color(0xFF1D3175);
-  static const Color navy500 = Color(0xFF2C4494);
   static const Color navy300 = Color(0xFF6E7799);
-  static const Color navy100 = Color(0xFFD7DCE9);
 
   static const Color mint = Color(0xFF2FE3A8);
-  static const Color mint600 = Color(0xFF14C289);
 
   /// Mint that clears 4.5:1 as text and as a filled button on a light ground.
   static const Color mintInk = Color(0xFF0F9E73);
-  static const Color mint100 = Color(0xFFD3F9EC);
 
   /// Ink for a filled mint button — near-black in dark mode, white in light.
   static const Color onMintDark = Color(0xFF04231A);
@@ -56,7 +51,6 @@ abstract final class AppColors {
   static const Color voidDark = Color(0xFF070C1E);
   static const Color surfaceDark = Color(0xFF0B1226);
   static const Color cardDark = Color(0xFF101A38);
-  static const Color raisedDark = Color(0xFF16224A);
   static const Color borderDark = Color(0xFF253361);
   static const Color borderSoftDark = Color(0xFF1B2749);
   static const Color textPrimaryDark = Color(0xFFF3F6FD);

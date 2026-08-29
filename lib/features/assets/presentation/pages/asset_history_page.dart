@@ -222,13 +222,25 @@ class _SummaryLine extends StatelessWidget {
               ).textTheme.bodySmall?.copyWith(color: palette.dim),
             ),
           ),
-          Text(
-            l10n.historyHolders(history.holderCount),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontSize: AppTextSize.label,
-              color: palette.mint,
+          // Zero is not shown, because zero is not a fact about the asset.
+          //
+          // The count comes from assignment notes in the chatter, and only
+          // this app writes those. An asset assigned in the Odoo web client,
+          // or imported with the rest of a customer's inventory, has a holder
+          // and no note — and "No holders yet" then sits one screen away from
+          // a detail page naming that holder, contradicting it. Real data
+          // makes this the *common* case on day one, not an edge case.
+          //
+          // The number earns its place once there is one: "fourth holder in
+          // two years" is the replacement signal this line exists for.
+          if (history.holderCount > 0)
+            Text(
+              l10n.historyHolders(history.holderCount),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontSize: AppTextSize.label,
+                color: palette.mint,
+              ),
             ),
-          ),
         ],
       ),
     );

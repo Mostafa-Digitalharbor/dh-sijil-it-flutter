@@ -14,6 +14,7 @@ import 'package:sijil_it/core/storage/preferences/app_preferences.dart';
 import 'package:sijil_it/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:sijil_it/features/settings/presentation/cubit/app_settings_cubit.dart';
 import 'package:sijil_it/l10n/generated/app_localizations.dart';
+import 'package:sijil_it/shared/cubit/sync_cubit.dart';
 
 import 'fake_odoo_data.dart';
 import 'test_doubles.dart';
@@ -83,19 +84,54 @@ class TestApp extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
       home: Builder(
-        builder: (context) {
-          final media = MediaQuery.of(context);
-          return MediaQuery(
-            data: media.copyWith(
-              size: size ?? media.size,
-              textScaler: TextScaler.linear(textScale),
-            ),
-            child: child,
-          );
-        },
+        builder: (context) =>
+            sized(context, size: size, textScale: textScale, child: child),
       ),
     );
   }
+}
+
+/// Puts a widget on a screen of exactly [size] — the *layout*, not only the
+/// [MediaQuery].
+///
+/// Overriding `MediaQuery.size` alone is what the breakpoints read, so the
+/// responsive *decisions* were exercised: a two-column grid collapsing to one,
+/// a rail becoming a bottom bar. The render tree, though, still measured
+/// against the 800x600 default test view. Every "does this fit on a 320 px
+/// phone" assertion was therefore laid out 800 px wide — the one width at
+/// which nothing overflows.
+///
+/// [OverflowBox] rather than a [SizedBox]: a constrained box is clamped by its
+/// parent, so a 390x844 phone would have come back as 390x600 and a tablet
+/// would not have fitted at all.
+Widget sized(
+  BuildContext context, {
+  required Widget child,
+  required double textScale,
+  Size? size,
+}) {
+  final media = MediaQuery.of(context);
+
+  // Flutter's historical test viewport, kept as the default so a test that
+  // does not care about the screen still gets the size it always had.
+  final screen = size ?? TestSizes.classic;
+
+  final scoped = MediaQuery(
+    data: media.copyWith(
+      size: screen,
+      textScaler: TextScaler.linear(textScale),
+    ),
+    child: child,
+  );
+
+  return OverflowBox(
+    alignment: Alignment.topLeft,
+    minWidth: screen.width,
+    maxWidth: screen.width,
+    minHeight: screen.height,
+    maxHeight: screen.height,
+    child: scoped,
+  );
 }
 
 /// [TestApp] with a router behind it.
@@ -137,16 +173,12 @@ class RoutedTestApp extends StatelessWidget {
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
       routerConfig: _router,
-      builder: (context, routed) {
-        final media = MediaQuery.of(context);
-        return MediaQuery(
-          data: media.copyWith(
-            size: size ?? media.size,
-            textScaler: TextScaler.linear(textScale),
-          ),
-          child: routed ?? const SizedBox.shrink(),
-        );
-      },
+      builder: (context, routed) => sized(
+        context,
+        size: size,
+        textScale: textScale,
+        child: routed ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
@@ -158,6 +190,9 @@ Future<AppL10n> loadL10n([String languageCode = 'en']) =>
 
 /// Common phone and tablet sizes to run a layout assertion across.
 abstract final class TestSizes {
+  /// Flutter's own default test viewport.
+  static const Size classic = Size(800, 600);
+
   static const Size phone = Size(390, 844);
   static const Size smallPhone = Size(320, 568);
   static const Size tablet = Size(834, 1194);
@@ -211,14 +246,24 @@ Future<void> signInForTest(FakeOdooData data) async {
   );
 }
 
+/// The Cubits the real app provides above the router.
+///
+/// Four test files had written this list out by hand. Adding one app-level
+/// Cubit — the offline banner's — broke all four at once, which is the point:
+/// the list belongs in one place, and that place should be the one the app
+/// itself would recognise.
+Widget withAppProviders({required Widget child, AuthCubit? auth}) =>
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>.value(value: auth ?? sl<AuthCubit>()),
+        BlocProvider<AppSettingsCubit>(
+          create: (_) => AppSettingsCubit(sl<AppPreferences>()),
+        ),
+        BlocProvider<SyncCubit>.value(value: sl<SyncCubit>()..start()),
+      ],
+      child: child,
+    );
+
 /// Wraps a screen with the providers the router normally supplies, plus a
 /// signed-in session.
-Widget signedInScreen(Widget child) => MultiBlocProvider(
-  providers: [
-    BlocProvider<AuthCubit>.value(value: sl<AuthCubit>()),
-    BlocProvider<AppSettingsCubit>(
-      create: (_) => AppSettingsCubit(sl<AppPreferences>()),
-    ),
-  ],
-  child: child,
-);
+Widget signedInScreen(Widget child) => withAppProviders(child: child);

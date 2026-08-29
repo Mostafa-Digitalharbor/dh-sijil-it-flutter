@@ -102,7 +102,16 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     // the layout does not jump when they arrive. `showChips` is the caller's,
     // because a row with a status and a warranty chip is a line taller than
     // one without and the difference is visible as a shove.
-    if (widget.status.isInitialLoad && widget.items.isEmpty) {
+    //
+    // `initial` counts as a load, matching `AsyncDataView`. It is the state
+    // before the first request has even been made, and with no items that read
+    // as "loaded, and there is nothing" — so a screen that built one frame
+    // ahead of its Cubit flashed "No assets yet" and then replaced it with a
+    // skeleton. Two widgets answering the same question differently is how
+    // that kind of thing survives a review.
+    final isFirstLoad =
+        widget.status == ViewStatus.initial || widget.status.isInitialLoad;
+    if (isFirstLoad && widget.items.isEmpty) {
       return SkeletonRowList(showChips: widget.skeletonHasChips);
     }
 

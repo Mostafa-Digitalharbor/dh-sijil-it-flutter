@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../../core/export/file_share.dart';
 import '../../core/network/connectivity/network_info.dart';
 import '../../core/network/odoo/odoo_attachment_service.dart';
 import '../../core/network/odoo/odoo_auth_service.dart';
@@ -8,12 +9,19 @@ import '../../core/network/odoo/odoo_chatter_service.dart';
 import '../../core/network/odoo/odoo_object_service.dart';
 import '../../core/network/odoo/odoo_session_manager.dart';
 import '../../core/network/xmlrpc/xml_rpc_client.dart';
+import '../../core/notifications/notification_service.dart';
+import '../../core/notifications/reminder_scheduler.dart';
 import '../../core/security/credential_vault.dart';
 import '../../core/services/photo_picker.dart';
 import '../../core/storage/cache/cache_store.dart';
 import '../../core/storage/cache/hive_cache_store.dart';
 import '../../core/storage/preferences/app_preferences.dart';
+import '../../core/sync/offline_reads.dart';
+import '../../core/sync/outbox_store.dart';
+import '../../core/sync/sync_service.dart';
+import '../../core/sync/write_queue.dart';
 import '../../features/assets/data/datasources/asset_remote_data_source.dart';
+import '../../features/assets/data/datasources/caching_asset_data_source.dart';
 import '../../features/assets/data/repositories/asset_repository_impl.dart';
 import '../../features/assets/data/services/asset_state_store.dart';
 import '../../features/assets/data/services/asset_status_resolver.dart';
@@ -54,6 +62,7 @@ import '../../features/maintenance/domain/repositories/maintenance_repository.da
 import '../../features/maintenance/presentation/cubit/maintenance_cubit.dart';
 import '../../features/scanner/presentation/cubit/scanner_cubit.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
+import '../../shared/cubit/sync_cubit.dart';
 
 /// Service Locator for the whole app.
 ///
@@ -87,6 +96,7 @@ Future<void> configureDependencies() async {
 /// and [XmlRpcClient] to be registered already.
 void registerAppGraph() {
   _registerOdooServices();
+  _registerSync();
   _registerRepositories();
   _registerUseCases();
   _registerCubits();
@@ -136,6 +146,43 @@ void _registerOdooServices() {
   sl.registerLazySingleton<PhotoPicker>(ImagePickerAdapter.new);
 }
 
+// ── Layer 2b: offline plumbing ─────────────────────────────────────────────
+//
+// Between the transport and the repositories on purpose: everything here is a
+// policy about *when* to talk to Odoo, and nothing here knows what an asset is.
+void _registerSync() {
+  sl.registerLazySingleton<FileShare>(FileShare.new);
+  sl.registerLazySingleton<NotificationService>(
+    NotificationService.createDefault,
+  );
+  sl.registerLazySingleton<ReminderScheduler>(
+    () => ReminderScheduler(
+      assets: sl<AssetRepository>(),
+      notifications: sl<NotificationService>(),
+      preferences: sl<AppPreferences>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SyncTrail>(SyncTrail.new);
+  sl.registerLazySingleton<OfflineReads>(
+    () => OfflineReads(cache: sl<CacheStore>(), trail: sl<SyncTrail>()),
+  );
+  sl.registerLazySingleton<OutboxStore>(() => OutboxStore(sl<CacheStore>()));
+  sl.registerLazySingleton<WriteQueue>(() => WriteQueue(sl<NetworkInfo>()));
+
+  sl.registerLazySingleton<SyncService>(
+    () => SyncService(
+      outbox: sl<OutboxStore>(),
+      queue: sl<WriteQueue>(),
+      network: sl<NetworkInfo>(),
+      // A closure, not the instance: the repository this drains is built with
+      // the queue this service owns, and resolving it here would be a cycle.
+      // ignore: implicit_call_tearoffs -- get_it's `call` *is* the resolver.
+      assets: sl<AssetRepository>,
+    ),
+  );
+}
+
 // ── Layer 3: repositories ──────────────────────────────────────────────────
 //
 // Singletons: they hold no per-screen state, and the asset repository memoises
@@ -169,10 +216,18 @@ void _registerRepositories() {
   // The strategy that decides which standard model backs an asset. Registered
   // against the interface so adding a `stock.lot` source later is one line
   // here rather than an edit to every caller.
+  //
+  // Wrapped in the read cache here rather than inside the strategy: which
+  // model backs an asset and whether the last answer is kept on disk are two
+  // unrelated questions, and a second strategy gets the offline behaviour
+  // without knowing it exists.
   sl.registerLazySingleton<AssetRemoteDataSource>(
-    () => MaintenanceEquipmentDataSource(
-      sl<OdooObjectService>(),
-      sl<OdooCapabilityService>(),
+    () => CachingAssetDataSource(
+      inner: MaintenanceEquipmentDataSource(
+        sl<OdooObjectService>(),
+        sl<OdooCapabilityService>(),
+      ),
+      reads: sl<OfflineReads>(),
     ),
   );
 
@@ -182,6 +237,8 @@ void _registerRepositories() {
       statusResolver: sl<AssetStatusResolver>(),
       states: sl<AssetStateStore>(),
       chatter: sl<OdooChatterService>(),
+      outbox: sl<OutboxStore>(),
+      queue: sl<WriteQueue>(),
     ),
   );
 
@@ -189,6 +246,7 @@ void _registerRepositories() {
     () => EmployeeRepositoryImpl(
       odoo: sl<OdooObjectService>(),
       capabilities: sl<OdooCapabilityService>(),
+      reads: sl<OfflineReads>(),
     ),
   );
 
@@ -280,6 +338,18 @@ void _registerUseCases() {
 // router.
 void _registerCubits() {
   sl.registerLazySingleton<AuthCubit>(() => AuthCubit(sl<AuthRepository>()));
+
+  // A singleton, unlike the screen Cubits: being offline is a fact about the
+  // app, and the banner has to outlive the navigation a technician does while
+  // walking back into signal.
+  sl.registerLazySingleton<SyncCubit>(
+    () => SyncCubit(
+      outbox: sl<OutboxStore>(),
+      service: sl<SyncService>(),
+      trail: sl<SyncTrail>(),
+      network: sl<NetworkInfo>(),
+    ),
+  );
 
   sl.registerFactory(() => AssetHistoryCubit(sl<GetAssetHistory>()));
 

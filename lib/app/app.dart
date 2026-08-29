@@ -8,6 +8,7 @@ import '../core/storage/preferences/app_preferences.dart';
 import '../features/auth/presentation/cubit/auth_cubit.dart';
 import '../features/settings/presentation/cubit/app_settings_cubit.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../shared/cubit/sync_cubit.dart';
 import 'di/injector.dart';
 import 'router/app_router.dart';
 import 'theme/app_dimens.dart';
@@ -29,6 +30,7 @@ class _SijilAppState extends State<SijilApp> {
   late final GoRouter _router;
   late final AppSettingsCubit _settings;
   late final AuthCubit _auth;
+  late final SyncCubit _sync;
 
   @override
   void initState() {
@@ -36,6 +38,11 @@ class _SijilAppState extends State<SijilApp> {
     _settings = AppSettingsCubit(sl<AppPreferences>());
     _auth = sl<AuthCubit>();
     _router = AppRouter.create(auth: _auth);
+
+    // Above the router, because being offline outlives any one screen: the
+    // banner has to survive the navigation a technician does on the way back
+    // into signal.
+    _sync = sl<SyncCubit>()..start();
   }
 
   @override
@@ -50,6 +57,7 @@ class _SijilAppState extends State<SijilApp> {
       providers: [
         BlocProvider<AppSettingsCubit>.value(value: _settings),
         BlocProvider<AuthCubit>.value(value: _auth),
+        BlocProvider<SyncCubit>.value(value: _sync),
       ],
       child: BlocBuilder<AppSettingsCubit, AppSettingsState>(
         builder: (context, settings) {

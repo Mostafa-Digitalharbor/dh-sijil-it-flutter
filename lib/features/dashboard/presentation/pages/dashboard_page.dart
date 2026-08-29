@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +10,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_palette.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/notifications/reminder_scheduler.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/cubit/view_state.dart';
 import '../../../../shared/utils/app_date_format.dart';
@@ -51,7 +54,25 @@ class _DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
 
-    return BlocBuilder<DashboardCubit, SimpleViewState<DashboardSummary>>(
+    return BlocConsumer<DashboardCubit, SimpleViewState<DashboardSummary>>(
+      // The reminder set is rebuilt from whatever Odoo just said, on the
+      // screen the user lands on. A warranty that was extended — or an asset
+      // that was scrapped — stops warning here rather than going on firing
+      // for a date that is no longer true.
+      listenWhen: (previous, current) =>
+          previous.status != current.status &&
+          current.status == ViewStatus.success,
+      listener: (context, _) {
+        final l10n = AppL10n.of(context);
+        unawaited(
+          sl<ReminderScheduler>().refresh(
+            ReminderCopy(
+              title: l10n.reminderNotificationTitle,
+              body: l10n.reminderNotificationBody,
+            ),
+          ),
+        );
+      },
       builder: (context, state) {
         final cubit = context.read<DashboardCubit>();
         final summary = state.data;

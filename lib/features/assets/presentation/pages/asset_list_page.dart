@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,12 +10,15 @@ import '../../../../app/router/app_routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/export/export_documents.dart';
+import '../../../../core/export/file_share.dart';
 import '../../../../core/responsive/responsive.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_chip.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/export_action.dart';
 import '../../../../shared/widgets/paginated_list_view.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../../domain/entities/asset.dart';
@@ -68,6 +74,46 @@ class _AssetListViewState extends State<_AssetListView> {
       ..setSort(applied.sort);
   }
 
+  /// Hands the list, exactly as filtered, to the OS share sheet.
+  ///
+  /// CSV rather than a PDF: this is the export somebody opens in a
+  /// spreadsheet to sort and pivot, and a PDF of two hundred rows is a worse
+  /// version of the screen they are already looking at.
+  ///
+  /// Only what is loaded is exported — the count in the subject line says so,
+  /// rather than a file quietly claiming to be the whole fleet.
+  Future<void> _shareList(BuildContext context, List<Asset> assets) {
+    final l10n = AppL10n.of(context);
+
+    final copy = ExportAction.copyFor(
+      context,
+      title: l10n.exportAssetsTitle,
+      subtitle: l10n.exportAssetsSubtitle(assets.length),
+      columns: <String>[
+        l10n.exportColumnTag,
+        l10n.exportColumnName,
+        l10n.exportColumnCategory,
+        l10n.exportColumnManufacturer,
+        l10n.exportColumnModel,
+        l10n.exportColumnSerial,
+        l10n.exportColumnStatus,
+        l10n.exportColumnHolder,
+        l10n.exportColumnDepartment,
+        l10n.exportColumnAssignedOn,
+        l10n.exportColumnWarrantyEnd,
+      ],
+    );
+
+    return ExportAction.share(
+      context: context,
+      filename: FileShare.safeName(l10n.exportAssetsTitle, 'csv'),
+      subject: '${l10n.exportAssetsTitle} — ${copy.subtitle}',
+      mimeType: 'text/csv',
+      build: () async =>
+          Uint8List.fromList(utf8.encode(AssetListExport.csv(assets, copy))),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
@@ -81,6 +127,16 @@ class _AssetListViewState extends State<_AssetListView> {
               ? l10n.assetsShowingOf(state.assets.length, state.page.totalCount)
               : null,
           actions: <Widget>[
+            // The list the user has already narrowed is the export they want.
+            // Anything else would be a second, unfiltered answer to a question
+            // they spent three taps refining.
+            AppIconButton(
+              icon: Icons.ios_share_rounded,
+              tooltip: l10n.exportShare,
+              onPressed: state.assets.isEmpty
+                  ? null
+                  : () => _shareList(context, state.assets),
+            ),
             AppIconButton(
               icon: Icons.swap_vert_rounded,
               tooltip: l10n.sortLabel,

@@ -52,6 +52,11 @@ class EventTimeline extends StatelessWidget {
     return Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Column(
+        // Sized to the events it has. The default `max` makes an empty
+        // timeline claim every pixel its parent offers — harmless inside the
+        // scroll view it normally lives in, and a full blank screen anywhere
+        // with a bounded height.
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           for (var i = 0; i < events.length; i++)

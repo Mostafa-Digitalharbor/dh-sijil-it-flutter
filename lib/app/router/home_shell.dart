@@ -8,6 +8,7 @@ import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/app_nav_bar.dart';
 import '../../shared/widgets/app_scaffold.dart';
+import '../../shared/widgets/sync_banner.dart';
 import '../../shared/widgets/tool_tile.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -69,6 +70,9 @@ class HomeShell extends StatelessWidget {
     final l10n = AppL10n.of(context);
     final tabs = _tabsFor(l10n);
 
+    // Above the tab bar and below every screen: what it reports is a fact
+    // about the app, and a technician walking out of a server room changes
+    // tabs on the way back into signal.
     if (context.screen.usesNavigationRail) {
       return Scaffold(
         body: Row(
@@ -88,7 +92,14 @@ class HomeShell extends StatelessWidget {
               ],
             ),
             const VerticalDivider(width: AppSpacing.xs / 4),
-            Expanded(child: navigationShell),
+            Expanded(
+              child: Column(
+                children: <Widget>[
+                  const SyncBanner(),
+                  Expanded(child: navigationShell),
+                ],
+              ),
+            ),
           ],
         ),
       );
@@ -96,10 +107,16 @@ class HomeShell extends StatelessWidget {
 
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: AppNavBar(
-        items: tabs,
-        currentIndex: navigationShell.currentIndex,
-        onSelected: _onTap,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const SyncBanner(),
+          AppNavBar(
+            items: tabs,
+            currentIndex: navigationShell.currentIndex,
+            onSelected: _onTap,
+          ),
+        ],
       ),
     );
   }
@@ -155,6 +172,16 @@ class MorePage extends StatelessWidget {
                 title: l10n.auditTitle,
                 subtitle: l10n.moreAuditSubtitle,
                 onTap: () => context.go(AppRoutes.auditPath),
+              ),
+              // Always listed, empty queue or not: somebody handing a phone in
+              // at the end of a shift needs a place to check that nothing is
+              // still sitting on it.
+              AppToolTile(
+                icon: Icons.cloud_sync_rounded,
+                tone: AppColors.warning,
+                title: l10n.syncTitle,
+                subtitle: l10n.syncSubtitle,
+                onTap: () => context.go(AppRoutes.syncPath),
               ),
               AppToolTile(
                 icon: Icons.settings_rounded,

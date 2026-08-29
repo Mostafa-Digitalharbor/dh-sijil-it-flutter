@@ -161,25 +161,46 @@ class InlineFact extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final glyph = Icon(
+      icon,
+      size: AppDimens.iconFact,
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final name = Text(label, style: theme.textTheme.bodySmall);
+    final fact = Text(
+      value,
+      style: theme.textTheme.titleSmall,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+    final note = trailing == null
+        ? null
+        : Text(trailing!, style: theme.textTheme.bodySmall);
+
+    // Three pieces of prose on one line, and only the middle one was
+    // flexible. "مُسلَّم · ٢٣ أغسطس ٢٠٢٦ · ١٢ يومًا" at a raised text size is
+    // wider than the phone, and the row painted a yellow bar across the
+    // ownership block of the detail screen.
+    //
+    // Wrapping is the honest answer: every part of the sentence is worth
+    // reading, so none of them should be the one that gets clipped.
+    if (context.screen.isLargeText) {
+      return Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.xs,
+        children: <Widget>[glyph, name, fact, if (note != null) note],
+      );
+    }
+
     return Row(
-      children: [
-        Icon(
-          icon,
-          size: AppDimens.iconFact,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+      children: <Widget>[
+        glyph,
         const SizedBox(width: AppSpacing.sm),
-        Text(label, style: theme.textTheme.bodySmall),
+        name,
         const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            value,
-            style: theme.textTheme.titleSmall,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (trailing != null) Text(trailing!, style: theme.textTheme.bodySmall),
+        Expanded(child: fact),
+        if (note != null) note,
       ],
     );
   }

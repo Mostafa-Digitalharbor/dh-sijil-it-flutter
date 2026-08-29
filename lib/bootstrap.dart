@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'app/di/injector.dart';
 import 'app/observers/app_bloc_observer.dart';
 import 'core/observability/crash_reporter.dart';
+import 'core/sync/sync_service.dart';
 import 'core/utils/logger.dart';
 
 /// Single startup path shared by every flavour (dev / staging / prod).
@@ -57,6 +58,11 @@ Future<void> Function() _start(Widget Function() builder) => () async {
       Bloc.observer = const AppBlocObserver();
 
       await configureDependencies();
+
+      // Starts watching connectivity, so writes queued in a basement go out
+      // by themselves the moment the technician reaches a corridor with
+      // signal — without anybody opening the sync screen.
+      sl<SyncService>().start();
 
       runApp(builder());
     },

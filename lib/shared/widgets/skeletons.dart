@@ -69,18 +69,25 @@ class SkeletonPage extends StatelessWidget {
 /// length: a title placeholder that is always 180 pt looks pasted on a tablet
 /// and overflows a 320-pt phone.
 class SkeletonLine extends StatelessWidget {
-  const SkeletonLine({this.widthFactor = 1, this.height, super.key});
+  const SkeletonLine({this.widthFactor = 1, this.height, super.key})
+    : _role = _LineRole.plain;
 
-  /// A title line, at the weight `titleSmall` renders.
+  /// A title line, as tall as the `titleSmall` line it stands in for.
   const SkeletonLine.title({this.widthFactor = 0.55, super.key})
-    : height = AppSpacing.md;
+    : height = null,
+      _role = _LineRole.title;
 
-  /// A subtitle or caption line.
+  /// A subtitle or caption line, as tall as `bodySmall`.
   const SkeletonLine.caption({this.widthFactor = 0.8, super.key})
-    : height = AppSpacing.sm;
+    : height = null,
+      _role = _LineRole.caption;
 
   final double widthFactor;
+
+  /// An explicit height. Null lets the role decide.
   final double? height;
+
+  final _LineRole _role;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +96,7 @@ class SkeletonLine extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: widthFactor,
         child: Container(
-          height: height ?? AppSpacing.md,
+          height: height ?? _lineHeight(context),
           decoration: BoxDecoration(
             color: _SkeletonPalette.base(context),
             borderRadius: BorderRadius.circular(AppRadii.xs),
@@ -98,7 +105,36 @@ class SkeletonLine extends StatelessWidget {
       ),
     );
   }
+
+  /// One line of the text this bar is standing in for.
+  ///
+  /// The title bar used to be a flat 12 px and the caption 8 — roughly half
+  /// of what the text actually occupies. Six of those stacked made the asset
+  /// list's placeholder 43 px shorter *per row* than the list that replaced
+  /// it, so the moment the data landed the page jumped under the reader's
+  /// thumb. Deriving the height from the style also means the placeholder
+  /// grows when the user turns text up, which the fixed bars never did.
+  double _lineHeight(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final style = switch (_role) {
+      _LineRole.title => text.titleSmall,
+      _LineRole.caption => text.bodySmall,
+      _LineRole.plain => null,
+    };
+
+    final size = style?.fontSize;
+    if (size == null) return AppSpacing.md;
+
+    // `height` is unset on the styles that inherit the font's own leading;
+    // 1.4 is what the rest of the type scale uses.
+    return MediaQuery.textScalerOf(
+      context,
+    ).scale(size * (style?.height ?? 1.4));
+  }
 }
+
+/// Which piece of type a [SkeletonLine] is standing in for.
+enum _LineRole { plain, title, caption }
 
 /// A stand-in for a square leading tile or an avatar.
 class SkeletonTile extends StatelessWidget {
@@ -153,8 +189,13 @@ class SkeletonChip extends StatelessWidget {
 class SkeletonListRow extends StatelessWidget {
   const SkeletonListRow({this.showChips = true, super.key});
 
-  /// The assets list shows a status and a warranty chip; the employee list
-  /// shows none, and a two-line row is shorter than a three-line one.
+  /// Whether to stand in for an asset row rather than an employee one.
+  ///
+  /// The two differ in more than the chips: an asset's subtitle is a tag, a
+  /// manufacturer and a holder, which wraps to a second line on a phone,
+  /// while an employee's is a department and a title on one. Both are drawn
+  /// here, because getting only the chips right still left the placeholder a
+  /// line short of what replaced it.
   final bool showChips;
 
   @override
@@ -173,6 +214,9 @@ class SkeletonListRow extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 const SkeletonLine.caption(),
                 if (showChips) ...<Widget>[
+                  // No gap: this is the second line of one wrapped subtitle,
+                  // not a second field.
+                  const SkeletonLine.caption(widthFactor: 0.5),
                   const SizedBox(height: AppSpacing.sm),
                   const Row(
                     children: <Widget>[

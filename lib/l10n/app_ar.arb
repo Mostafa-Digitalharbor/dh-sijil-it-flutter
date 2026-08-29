@@ -786,5 +786,133 @@
   "operationRead": "عرض",
   "operationCreate": "إنشاء",
   "operationWrite": "تعديل",
-  "operationDelete": "حذف"
+  "operationDelete": "حذف",
+  "syncTitle": "المزامنة",
+  "syncSubtitle": "تغييرات في انتظار الاتصال",
+  "syncOfflineBanner": "غير متصل",
+  "syncStaleBanner": "تُعرض النسخة المحفوظة من {time}",
+  "@syncStaleBanner": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "syncPendingBanner": "{count, plural, zero{لا تغييرات في الانتظار} one{تغيير واحد في انتظار الإرسال} two{تغييران في انتظار الإرسال} few{{count} تغييرات في انتظار الإرسال} many{{count} تغييرًا في انتظار الإرسال} other{{count} تغيير في انتظار الإرسال}}",
+  "@syncPendingBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncPendingChip": "لم يُرسَل بعد",
+  "syncNow": "أرسِل الآن",
+  "syncSending": "جارٍ الإرسال\u2026",
+  "syncQueueEmptyTitle": "كل شيء وصل إلى أودو",
+  "syncQueueEmptyBody": "التغييرات التي تجريها بدون اتصال تنتظر هنا حتى يتوفر الاتصال.",
+  "syncSentCount": "{count, plural, zero{لم يُرسَل شيء} one{أُرسل تغيير واحد} two{أُرسل تغييران} few{أُرسلت {count} تغييرات} many{أُرسل {count} تغييرًا} other{أُرسل {count} تغيير}}",
+  "@syncSentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncBlocked": "أودو رفض هذا التغيير، ولن تُعاد المحاولة.",
+  "syncAttempts": "{count, plural, zero{بلا محاولات} one{محاولة واحدة} two{محاولتان} few{{count} محاولات} many{{count} محاولة} other{{count} محاولة}}",
+  "@syncAttempts": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "syncQueuedAssign": "تسليم إلى {employee}",
+  "@syncQueuedAssign": {
+    "placeholders": { "employee": { "type": "String" } }
+  },
+  "syncQueuedReturn": "استرجاع",
+  "syncQueuedStatus": "تعيين الحالة إلى {status}",
+  "@syncQueuedStatus": {
+    "placeholders": { "status": { "type": "String" } }
+  },
+  "syncDiscard": "حذف قائمة الانتظار",
+  "syncDiscardConfirm": "حذف التغييرات المنتظرة؟",
+  "syncDiscardBody": "هذه التغييرات لم تصل إلى أودو مطلقًا، وحذفها لا يمكن التراجع عنه.",
+  "syncQueuedNotice": "حُفظ على هذا الجهاز، وسيصل إلى أودو عند توفر الاتصال.",
+  "remindersTitle": "تنبيهات الضمان",
+  "remindersSubtitle": "نبّهني قبل انتهاء الضمان",
+  "remindersLeadLabel": "نبّهني",
+  "remindersLeadDays": "{days, plural, zero{بلا مهلة} one{قبل يوم واحد} two{قبل يومين} few{قبل {days} أيام} many{قبل {days} يومًا} other{قبل {days} يوم}}",
+  "@remindersLeadDays": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "remindersScheduled": "{count, plural, zero{لا تنبيهات مجدولة} one{تنبيه واحد مجدول} two{تنبيهان مجدولان} few{{count} تنبيهات مجدولة} many{{count} تنبيهًا مجدولًا} other{{count} تنبيه مجدول}}",
+  "@remindersScheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "remindersDenied": "التنبيهات موقوفة لتطبيق سِجل IT في إعدادات جهازك.",
+  "reminderNotificationTitle": "ضمان على وشك الانتهاء",
+  "reminderNotificationBody": "{asset} — {days, plural, zero{انتهى} one{بقي يوم واحد} two{بقي يومان} few{بقيت {days} أيام} many{بقي {days} يومًا} other{بقي {days} يوم}}",
+  "@reminderNotificationBody": {
+    "placeholders": {
+      "asset": { "type": "String" },
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "exportShare": "مشاركة",
+  "exportAssetsTitle": "قائمة الأصول",
+  "exportAssetsSubtitle": "{count, plural, zero{لا أصول} one{أصل واحد} two{أصلان} few{{count} أصول} many{{count} أصلًا} other{{count} أصل}}",
+  "@exportAssetsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "exportGeneratedOn": "أُنشئ في {date}",
+  "@exportGeneratedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "exportFailed": "تعذّر تجهيز الملف.",
+  "exportNothingToShare": "لا يوجد ما يُصدَّر بعد.",
+  "exportColumnTag": "الوسم",
+  "exportColumnName": "الاسم",
+  "exportColumnCategory": "الفئة",
+  "exportColumnManufacturer": "الشركة المصنّعة",
+  "exportColumnModel": "الموديل",
+  "exportColumnSerial": "الرقم التسلسلي",
+  "exportColumnStatus": "الحالة",
+  "exportColumnHolder": "مُسلَّم إلى",
+  "exportColumnDepartment": "القسم",
+  "exportColumnAssignedOn": "تاريخ التسليم",
+  "exportColumnWarrantyEnd": "نهاية الضمان",
+  "receiptTitle": "إيصال تسليم",
+  "receiptShare": "مشاركة الإيصال",
+  "receiptRecipient": "استلمها",
+  "receiptDate": "تاريخ التسليم",
+  "receiptAssets": "الأصول",
+  "receiptNotes": "ملاحظات",
+  "receiptSignature": "التوقيع",
+  "auditReportTitle": "جرد المخزون",
+  "auditReportShare": "مشاركة التقرير",
+  "auditReportScope": "النطاق",
+  "auditReportExpected": "المتوقع",
+  "auditReportFound": "تم عدّه",
+  "auditReportMissing": "لم يُعثر عليه",
+  "auditReportUnexpected": "عُثر عليه خارج النطاق"
 }

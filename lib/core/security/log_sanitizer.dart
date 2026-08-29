@@ -44,11 +44,4 @@ abstract final class LogSanitizer {
 
     return output;
   }
-
-  /// Masks a value for display, e.g. an API key shown in Settings.
-  static String maskSecret(String? value) {
-    if (value == null || value.isEmpty) return '';
-    if (value.length <= 4) return '****';
-    return '${'*' * (value.length - 4)}${value.substring(value.length - 4)}';
-  }
 }

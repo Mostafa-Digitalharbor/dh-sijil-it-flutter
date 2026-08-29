@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/cubit/view_state.dart';
 import '../../domain/entities/asset_history.dart';
 import '../../domain/usecases/asset_usecases.dart';
@@ -60,7 +59,4 @@ class AssetHistoryCubit extends Cubit<SimpleViewState<AssetHistory>> {
       (older) => emit(state.success(current.merge(older))),
     );
   }
-
-  /// Entries are appended, so a full page is [AppConstants.historyLimit] long.
-  static const int pageSize = AppConstants.historyLimit;
 }
