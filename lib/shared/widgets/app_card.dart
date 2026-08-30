@@ -19,6 +19,7 @@ class AppCard extends StatelessWidget {
     ),
     this.radius = AppRadii.lg,
     this.onTap,
+    this.onLongPress,
     this.borderColor,
     this.backgroundColor,
     this.selected = false,
@@ -31,6 +32,7 @@ class AppCard extends StatelessWidget {
     required this.child,
     this.radius = AppRadii.lg,
     this.onTap,
+    this.onLongPress,
     this.borderColor,
     this.backgroundColor,
     this.selected = false,
@@ -42,6 +44,7 @@ class AppCard extends StatelessWidget {
   const AppCard.row({
     required this.child,
     this.onTap,
+    this.onLongPress,
     this.borderColor,
     this.backgroundColor,
     this.selected = false,
@@ -57,6 +60,15 @@ class AppCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final double radius;
   final VoidCallback? onTap;
+
+  /// The long-press gesture, for a row that can start a multi-selection.
+  ///
+  /// Given its own `InkWell` arm rather than being folded into [onTap],
+  /// because a card with only a long-press must still show ink and still be
+  /// reachable — and because `InkWell` treats a null `onTap` as "not
+  /// interactive" and swallows the press.
+  final VoidCallback? onLongPress;
+
   final Color? borderColor;
   final Color? backgroundColor;
 
@@ -86,10 +98,11 @@ class AppCard extends StatelessWidget {
       color: backgroundColor ?? scheme.surface,
       shape: shape,
       clipBehavior: Clip.antiAlias,
-      child: onTap == null
+      child: (onTap == null && onLongPress == null)
           ? Padding(padding: padding, child: child)
           : InkWell(
               onTap: onTap,
+              onLongPress: onLongPress,
               child: Padding(padding: padding, child: child),
             ),
     );
@@ -98,6 +111,7 @@ class AppCard extends StatelessWidget {
     return Semantics(
       label: semanticLabel,
       button: onTap != null,
+      selected: selected ? true : null,
       child: surface,
     );
   }

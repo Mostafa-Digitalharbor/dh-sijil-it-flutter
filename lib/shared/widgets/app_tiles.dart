@@ -21,6 +21,8 @@ class AppListTile extends StatelessWidget {
     this.chips = const [],
     this.trailing,
     this.onTap,
+    this.onLongPress,
+    this.selected = false,
     this.showChevron = true,
     this.subtitleIsLatin = false,
     super.key,
@@ -37,6 +39,13 @@ class AppListTile extends StatelessWidget {
   final Widget? trailing;
 
   final VoidCallback? onTap;
+
+  /// The gesture that starts multi-select on a list.
+  final VoidCallback? onLongPress;
+
+  /// Draws the selected border. Used while the list is in multi-select.
+  final bool selected;
+
   final bool showChevron;
 
   /// Forces LTR on the subtitle, for rows whose subtitle is a tag and serial.
@@ -82,6 +91,8 @@ class AppListTile extends StatelessWidget {
 
     return AppCard.row(
       onTap: onTap,
+      onLongPress: onLongPress,
+      selected: selected,
       semanticLabel: AppText.announced(title, subtitle ?? ''),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

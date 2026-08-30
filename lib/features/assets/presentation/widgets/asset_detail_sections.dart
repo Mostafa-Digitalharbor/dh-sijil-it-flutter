@@ -14,6 +14,7 @@ import '../../../../shared/widgets/state_views.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../maintenance/domain/entities/maintenance_request.dart';
 import '../../domain/entities/asset.dart';
+import '../../domain/entities/return_due.dart';
 import '../../domain/entities/warranty.dart';
 import 'asset_icons.dart';
 
@@ -229,7 +230,52 @@ class AssetOwnershipSection extends StatelessWidget {
               trailing: context.dates.daysSince(asset.assignmentDate),
             ),
           ],
+          // Only when somebody promised it back. A handover with no date is
+          // the common case and is not late for anything, so the row would be
+          // an empty fact on most of the fleet.
+          if (asset.dueBack.isSet) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            _DueFact(due: asset.dueBack),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+/// The expected-return line, tinted once the date matters.
+///
+/// Full sentence here rather than the list row's one-word chip: this is the
+/// screen somebody is on when they decide whether to chase it, and "4 days
+/// overdue" is the part of that decision the app can supply.
+class _DueFact extends StatelessWidget {
+  const _DueFact({required this.due});
+
+  final ReturnDue due;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final theme = Theme.of(context);
+    final tone = DueChip.colorFor(due.state);
+
+    return Container(
+      padding: const EdgeInsetsDirectional.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: due.state.needsAttention
+            ? tone.withValues(alpha: AppOpacities.overlay)
+            : theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: AppOpacities.overlay,
+              ),
+        borderRadius: BorderRadius.circular(AppRadii.md),
+      ),
+      child: InlineFact(
+        icon: due.isOverdue
+            ? Icons.event_busy_rounded
+            : Icons.event_available_rounded,
+        label: l10n.labelDueBack,
+        value: context.dates.day(due.date),
+        trailing: DueChip.detailFor(l10n, due),
       ),
     );
   }

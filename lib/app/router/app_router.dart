@@ -8,6 +8,7 @@ import '../../features/assets/presentation/pages/asset_form_page.dart';
 import '../../features/assets/presentation/pages/asset_history_page.dart';
 import '../../features/assets/presentation/pages/asset_list_page.dart';
 import '../../features/assets/presentation/pages/asset_qr_page.dart';
+import '../../features/assets/presentation/pages/overdue_assets_page.dart';
 import '../../features/assignment/presentation/pages/assign_asset_page.dart';
 import '../../features/assignment/presentation/pages/return_asset_page.dart';
 import '../../features/audit/presentation/pages/audit_page.dart';
@@ -277,6 +278,13 @@ abstract final class AppRouter {
                       pageBuilder: (_, state) => AppTransitions.modal(
                         key: state.pageKey,
                         child: const HandoverPage(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: AppRoutes.overdue,
+                      pageBuilder: (_, state) => AppTransitions.forward(
+                        key: state.pageKey,
+                        child: const OverdueAssetsPage(),
                       ),
                     ),
                     GoRoute(

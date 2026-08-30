@@ -76,6 +76,14 @@ class OfflineReads {
 
   /// Drops a cached entry, so the next read has to go to Odoo.
   Future<void> forget(String box, String key) => _cache.delete(box, key);
+
+  /// Drops every cached entry in a box.
+  ///
+  /// For a write whose blast radius is not a list of keys: a bulk department
+  /// move changes which rows the department filter matches, and there is no
+  /// way to name the affected pages without re-deriving every cache key that
+  /// was ever written.
+  Future<void> forgetBox(String box) => _cache.clearBox(box);
 }
 
 /// Where the app records how fresh what the user is looking at actually is.

@@ -20,6 +20,7 @@ class AssignAssetState extends ViewState {
     this.candidates = const <Employee>[],
     this.selected,
     this.assignedOn,
+    this.dueOn,
     this.notes,
     this.isSearching = false,
     this.isSubmitting = false,
@@ -37,6 +38,13 @@ class AssignAssetState extends ViewState {
   /// are; the field stays editable for a handover being recorded late.
   final DateTime? assignedOn;
 
+  /// When the asset is expected back, if this handover is a loan.
+  ///
+  /// Deliberately has no default. A date invented on the user's behalf would
+  /// put the entire fleet on the overdue screen the moment it passed, which is
+  /// the fastest way to make a list of late returns worth ignoring.
+  final DateTime? dueOn;
+
   final String? notes;
 
   final bool isSearching;
@@ -53,12 +61,14 @@ class AssignAssetState extends ViewState {
     List<Employee>? candidates,
     Employee? selected,
     DateTime? assignedOn,
+    DateTime? dueOn,
     String? notes,
     bool? isSearching,
     bool? isSubmitting,
     Asset? assigned,
     Failure? failure,
     bool clearFailure = false,
+    bool clearDue = false,
   }) => AssignAssetState(
     status: status ?? this.status,
     failure: clearFailure ? null : (failure ?? this.failure),
@@ -66,6 +76,7 @@ class AssignAssetState extends ViewState {
     candidates: candidates ?? this.candidates,
     selected: selected ?? this.selected,
     assignedOn: assignedOn ?? this.assignedOn,
+    dueOn: clearDue ? null : (dueOn ?? this.dueOn),
     notes: notes ?? this.notes,
     isSearching: isSearching ?? this.isSearching,
     isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -79,6 +90,7 @@ class AssignAssetState extends ViewState {
     candidates,
     selected,
     assignedOn,
+    dueOn,
     notes,
     isSearching,
     isSubmitting,
@@ -151,6 +163,15 @@ class AssignAssetCubit extends Cubit<AssignAssetState> {
 
   void setDate(DateTime date) => emit(state.copyWith(assignedOn: date));
 
+  /// Sets the expected return date, or clears it when passed null.
+  ///
+  /// Clearing has to be reachable: a user who opened the picker to see what
+  /// was there, or who set a date and then decided the handover is permanent,
+  /// otherwise has no way back to "no date" short of abandoning the screen.
+  void setDue(DateTime? date) => emit(
+    date == null ? state.copyWith(clearDue: true) : state.copyWith(dueOn: date),
+  );
+
   void setNotes(String notes) => emit(state.copyWith(notes: notes));
 
   Future<void> submit() async {
@@ -169,6 +190,7 @@ class AssignAssetCubit extends Cubit<AssignAssetState> {
         employeeId: employee.id,
         employeeName: employee.name,
         assignedOn: date,
+        dueOn: state.dueOn,
         notes: state.notes,
       ),
     );

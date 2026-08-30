@@ -46,6 +46,15 @@ abstract interface class AssetRepository {
   /// the app never stores what Odoo can already prove.
   ResultFuture<Asset> setLocalStatus(int id, AssetStatus status);
 
+  /// Moves many assets to one department in a single write, and answers with
+  /// how many were moved.
+  ///
+  /// The bulk half of multi-select. Deliberately narrow: a department is the
+  /// one field where "these forty, all at once" is a real request an IT
+  /// manager makes — after a re-org, or when a floor moves — and where getting
+  /// it wrong is a one-tap undo rather than a lost record.
+  ResultFuture<int> moveToDepartment(List<int> ids, int departmentId);
+
   /// Everything that has happened to an asset, newest first.
   ///
   /// Reads the chatter this app has been writing to since the first release,

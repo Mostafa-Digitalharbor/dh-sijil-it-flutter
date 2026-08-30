@@ -19,6 +19,7 @@ import '../../../../shared/widgets/key_value.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../cubit/app_settings_cubit.dart';
 import '../cubit/settings_cubit.dart';
+import '../widgets/app_lock_card.dart';
 import '../widgets/reminders_card.dart';
 
 /// Connection, account, appearance and cache (spec §23).
@@ -107,6 +108,10 @@ class _SettingsView extends StatelessWidget {
               const _AppearanceCard(),
               const _LanguageCard(),
               const RemindersCard(),
+              // Between the reminders and the data controls on purpose: it is
+              // the last setting that changes how the app behaves, and the
+              // ones below it are about what the app is holding.
+              const AppLockCard(),
               _DataCard(
                 state: state,
                 onClearCache: () => _confirmClearCache(context),

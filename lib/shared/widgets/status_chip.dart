@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../features/assets/domain/entities/asset_status.dart';
+import '../../features/assets/domain/entities/return_due.dart';
 import '../../features/assets/domain/entities/warranty.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'app_chip.dart';
@@ -118,6 +119,59 @@ class WarrantyChip extends StatelessWidget {
       WarrantyState.expired => l10n.warrantyExpiredAgo(days.abs()),
     };
   }
+}
+
+/// Expected-return counterpart of [WarrantyChip].
+///
+/// Renders nothing unless the asset is actually near or past its date. Most
+/// assignments are permanent and carry no date at all, and a chip on every row
+/// saying "on time" would cost the list a column to tell the reader nothing —
+/// this one only appears when there is something to do about it.
+class DueChip extends StatelessWidget {
+  const DueChip({required this.due, this.dense = true, super.key});
+
+  final ReturnDue due;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!due.state.needsAttention) return const SizedBox.shrink();
+
+    final l10n = AppL10n.of(context);
+
+    return AppChip(
+      label: labelFor(l10n, due),
+      tone: colorFor(due.state),
+      icon: due.isOverdue
+          ? Icons.event_busy_rounded
+          : Icons.event_available_rounded,
+      dense: dense,
+    );
+  }
+
+  static Color colorFor(ReturnDueState state) => switch (state) {
+    ReturnDueState.none => AppColors.navy300,
+    ReturnDueState.scheduled => AppColors.info,
+    ReturnDueState.dueSoon => AppColors.warning,
+    ReturnDueState.overdue => AppColors.danger,
+  };
+
+  /// The chip's short form: what state it is in, not how many days.
+  ///
+  /// The number belongs on the detail screen, where there is room for it and
+  /// where somebody is deciding what to do. On a list row it would be a second
+  /// number competing with the warranty chip's, and "Overdue" is the part that
+  /// changes the reader's behaviour.
+  static String labelFor(AppL10n l10n, ReturnDue due) => switch (due.state) {
+    ReturnDueState.overdue => l10n.dueChipOverdue,
+    ReturnDueState.dueSoon => l10n.dueChipSoon,
+    ReturnDueState.scheduled || ReturnDueState.none => l10n.labelDueBack,
+  };
+
+  /// The long form, for a detail row: "4 days overdue" / "Due back in 9 days".
+  static String detailFor(AppL10n l10n, ReturnDue due) => due.isOverdue
+      ? l10n.dueOverdueBy(due.daysLate)
+      : l10n.dueInDays(due.daysRemaining ?? 0);
 }
 
 /// Condition picker label helper, shared by the return workflow and any

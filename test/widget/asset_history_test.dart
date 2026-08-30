@@ -51,6 +51,11 @@ void main() {
       'model': OdooModels.maintenanceEquipment,
       'res_id': assignedAssetId,
       'message_type': 'comment',
+      // Odoo sends an empty x2m as `[]`. Present because the fake projects
+      // exactly the fields it was asked for and faults on a missing one —
+      // which is what real Odoo does, and what stops a fixture from quietly
+      // describing a schema the app would never meet.
+      'tracking_value_ids': <Object?>[],
     });
   }
 

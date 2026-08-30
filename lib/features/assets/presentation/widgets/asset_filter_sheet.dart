@@ -253,6 +253,23 @@ class _AssetFilterSheetState extends State<AssetFilterSheet> {
                     ),
                   ),
                 _Group(
+                  title: l10n.labelDueBack,
+                  child: AppChipWrap(
+                    children: <Widget>[
+                      AppChip(
+                        label: l10n.filterOverdue,
+                        icon: Icons.event_busy_rounded,
+                        selected: _filters.overdueOnly,
+                        onTap: () => setState(() {
+                          _filters = _filters.copyWith(
+                            overdueOnly: !_filters.overdueOnly,
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+                _Group(
                   title: l10n.statusRetired,
                   child: AppChipWrap(
                     children: <Widget>[

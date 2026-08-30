@@ -85,6 +85,20 @@ dependencies:
   # every module in the project at the same time — worth doing on purpose, not
   # as a side effect of `pub upgrade` on a package used for one function.
   permission_handler: ^12.0.1
+  # ── Device unlock ────────────────────────────────────────────────────────
+  #
+  # One call: `authenticate()`, when Settings → Require unlock is on.
+  #
+  # `isDeviceSupported()` is true for *any* secure lock — fingerprint, face,
+  # PIN, pattern or password — and the prompt falls back through them in that
+  # order, which is what makes this a lock a user can always get past on their
+  # own device rather than a biometric-only gate that strands somebody with a
+  # cut finger.
+  #
+  # Requires MainActivity to be a FlutterFragmentActivity on Android: the
+  # AndroidX BiometricPrompt is a fragment, and a plain FlutterActivity throws
+  # at the point the prompt is shown rather than at build time.
+  local_auth: ^2.3.0
   flutter_local_notifications: ^20.1.0
   timezone: ^0.10.1
   flutter_timezone: ^5.1.0

@@ -151,9 +151,42 @@ class _AssignForm extends StatelessWidget {
           onChanged: cubit.setDate,
         ),
 
+        // Step three, and optional — which is the whole design. Most
+        // handovers are permanent and should stay dateless; the ones that are
+        // not are the loans that quietly never come back, and this is the
+        // field that puts them on the overdue screen.
         const SizedBox(height: AppSpacing.sm),
         AppStepHeader(
           step: 3,
+          title: l10n.assignStepDue,
+          trailing: l10n.labelOptional,
+          isActive: state.dueOn != null,
+        ),
+        WorkflowDateField(
+          label: l10n.assignStepDue,
+          showLabel: false,
+          value: state.dueOn,
+          emptyLabel: l10n.assignDueNotSet,
+          clearLabel: l10n.assignDueClear,
+          onCleared: () => cubit.setDue(null),
+          // A return cannot precede the handover it ends, and opening the
+          // picker on the handover date is one tap from every plausible
+          // answer.
+          firstDate: state.assignedOn,
+          initialWhenEmpty: state.assignedOn,
+          onChanged: cubit.setDue,
+        ),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
+          child: Text(
+            l10n.assignDueHint,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.sm),
+        AppStepHeader(
+          step: 4,
           title: l10n.assignStepNotes,
           trailing: l10n.labelOptional,
           isActive: false,

@@ -277,6 +277,27 @@ class _CountingViewState extends State<_CountingView>
     });
   }
 
+  /// Counts an asset whose label the camera cannot read.
+  ///
+  /// Goes through `onDetected` rather than a path of its own, so a typed code
+  /// is tallied, deduplicated and fed back into the "just scanned" list
+  /// exactly as a scanned one is.
+  Future<void> _enterCodeByHand(BuildContext context, AppL10n l10n) async {
+    final cubit = context.read<AuditCubit>();
+
+    final code = await AppPromptDialog.show(
+      context,
+      title: l10n.scanEnterCodeTitle,
+      message: l10n.scanEnterCodeBody,
+      hint: l10n.scanEnterCodeHint,
+      confirmLabel: l10n.actionAdd,
+    );
+    if (code == null) return;
+
+    await cubit.onDetected(code);
+    cubit.clearLastCode();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
@@ -297,6 +318,18 @@ class _CountingViewState extends State<_CountingView>
               _Tally(session: session),
               const SizedBox(height: AppSpacing.md),
               _Viewfinder(controller: controller, onDetect: handleDetection),
+              const SizedBox(height: AppSpacing.sm),
+              // The same way in the scanner screen has, for the same reason
+              // and with more at stake: a stock count is a fixed target, and
+              // one unreadable sticker halfway round the floor otherwise
+              // leaves an asset counted as missing when it is in the room.
+              Center(
+                child: AppTextAction(
+                  label: l10n.scanEnterCode,
+                  icon: Icons.keyboard_alt_outlined,
+                  onPressed: () => _enterCodeByHand(context, l10n),
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               if (session.feed.isNotEmpty) ...<Widget>[
                 Text(

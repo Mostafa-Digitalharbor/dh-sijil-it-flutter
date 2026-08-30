@@ -35,6 +35,15 @@ abstract interface class AssetRemoteDataSource {
 
   Future<void> update(int id, Map<String, dynamic> values);
 
+  /// Applies the same values to many records in one call.
+  ///
+  /// One `write` rather than a loop: Odoo's ORM takes a list of ids natively,
+  /// so moving forty assets to a new department is one round trip and one
+  /// transaction. A loop would be forty of each, and a failure halfway through
+  /// would leave the fleet split across two departments with nothing saying
+  /// where the boundary fell.
+  Future<void> updateMany(List<int> ids, Map<String, dynamic> values);
+
   Future<void> delete(int id);
 
   /// Writes an internal note to the record's chatter.
@@ -146,6 +155,10 @@ class MaintenanceEquipmentDataSource implements AssetRemoteDataSource {
   @override
   Future<void> update(int id, Map<String, dynamic> values) =>
       _odoo.write(model: model, ids: <int>[id], values: values);
+
+  @override
+  Future<void> updateMany(List<int> ids, Map<String, dynamic> values) =>
+      _odoo.write(model: model, ids: ids, values: values);
 
   @override
   Future<void> delete(int id) => _odoo.unlink(model: model, ids: <int>[id]);

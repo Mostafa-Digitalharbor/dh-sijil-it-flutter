@@ -27,6 +27,14 @@ abstract final class PrefKeys {
   static const String remindersEnabled = 'reminders_enabled';
   static const String reminderLeadDays = 'reminder_lead_days';
 
+  /// Whether the app asks for the device's own unlock before it opens.
+  ///
+  /// A preference and not a secret: it records a *choice*, and the thing it
+  /// protects — the Odoo credential — is in the keychain either way. Storing
+  /// the flag here keeps [SecureKeys] to the three values that are actually
+  /// secret.
+  static const String appLockEnabled = 'app_lock_enabled';
+
   const PrefKeys._();
 }
 
@@ -43,6 +51,13 @@ abstract final class CacheBoxes {
   /// Locally-maintained asset states that standard Odoo cannot express
   /// (Reserved / Damaged / Lost). Documented in docs/ARCHITECTURE.md.
   static const String localAssetState = 'local_asset_state';
+
+  /// Expected return dates, mirrored from the chatter notes that record them.
+  ///
+  /// Separate from [localAssetState] rather than sharing the box: they are
+  /// keyed the same way but hold different types, and one box holding two
+  /// unrelated value shapes is how a read comes back as the wrong thing.
+  static const String localAssetDue = 'local_asset_due';
 
   /// The last page and detail read for every list, kept so a technician with
   /// no signal sees the fleet they were looking at upstairs rather than an
@@ -65,6 +80,7 @@ abstract final class CacheBoxes {
     assets,
     userProfile,
     localAssetState,
+    localAssetDue,
     assetPages,
     assetDetails,
     outbox,

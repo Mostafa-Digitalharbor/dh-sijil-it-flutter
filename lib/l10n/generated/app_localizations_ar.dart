@@ -1968,4 +1968,226 @@ class AppL10nAr extends AppL10n {
 
   @override
   String get auditReportUnexpected => 'عُثر عليه خارج النطاق';
+
+  @override
+  String get assignStepDue => 'تاريخ الإرجاع المتوقع';
+
+  @override
+  String get assignDueHint => 'سيبه فاضي إلا لو الأصل إعارة لازم ترجع.';
+
+  @override
+  String get assignDueNotSet => 'بدون تاريخ إرجاع';
+
+  @override
+  String get assignDueClear => 'شيل التاريخ';
+
+  @override
+  String get labelDueBack => 'موعد الإرجاع';
+
+  @override
+  String get dueChipOverdue => 'متأخر';
+
+  @override
+  String get dueChipSoon => 'قرب موعده';
+
+  @override
+  String dueOverdueBy(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'متأخر $daysString يومًا',
+      few: 'متأخر $daysString أيام',
+      two: 'متأخر يومين',
+      one: 'متأخر يوم واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dueInDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'الإرجاع بعد $daysString يومًا',
+      few: 'الإرجاع بعد $daysString أيام',
+      two: 'الإرجاع بعد يومين',
+      one: 'الإرجاع بكرة',
+      zero: 'الإرجاع النهاردة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overdueTitle => 'متأخر عن الإرجاع';
+
+  @override
+  String get overdueSubtitle => 'أصول فات موعد إرجاعها';
+
+  @override
+  String get overdueEmptyTitle => 'مفيش حاجة متأخرة';
+
+  @override
+  String get overdueEmptyBody =>
+      'كل أصل ليه تاريخ إرجاع لسه في وقته. حدّد تاريخ وإنت بتسلّم وهيتراقب هنا.';
+
+  @override
+  String overdueCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString أصلًا متأخرًا',
+      few: '$countString أصول متأخرة',
+      two: 'أصلان متأخران',
+      one: 'أصل واحد متأخر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterOverdue => 'المتأخر فقط';
+
+  @override
+  String get exportColumnDueBack => 'موعد الإرجاع';
+
+  @override
+  String get selectionStart => 'تحديد أصول';
+
+  @override
+  String get selectionCancel => 'إنهاء التحديد';
+
+  @override
+  String selectionCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديد $countString',
+      few: 'تم تحديد $countString',
+      two: 'تم تحديد اثنين',
+      one: 'تم تحديد واحد',
+      zero: 'لم يتم تحديد شيء',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectionAll => 'تحديد كل المحمّل';
+
+  @override
+  String get selectionNone => 'إلغاء التحديد';
+
+  @override
+  String selectionLimitReached(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'تقدر تشتغل على $countString أصل في المرة.';
+  }
+
+  @override
+  String get bulkMoveDepartment => 'نقل إلى قسم';
+
+  @override
+  String get bulkMoveTitle => 'أي قسم؟';
+
+  @override
+  String bulkMoveDone(int count, String department) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم نقل $countString أصلًا إلى $department',
+      few: 'تم نقل $countString أصول إلى $department',
+      two: 'تم نقل أصلين إلى $department',
+      one: 'تم نقل أصل واحد إلى $department',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkMoveNoDepartments => 'أودو ده مفيهوش أقسام تنقل ليها الأصول.';
+
+  @override
+  String get bulkPrintLabels => 'ورقة ملصقات';
+
+  @override
+  String get labelSheetTitle => 'ملصقات الأصول';
+
+  @override
+  String labelSheetSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString ملصقًا',
+      few: '$countString ملصقات',
+      two: 'ملصقان',
+      one: 'ملصق واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanEnterCode => 'اكتب الكود';
+
+  @override
+  String get scanEnterCodeTitle => 'اكتب كود الأصل';
+
+  @override
+  String get scanEnterCodeBody =>
+      'للملصق اللي الكاميرا مش شايفاه — مخربش، أو في ضلمة، أو ورا مكتب.';
+
+  @override
+  String get scanEnterCodeHint => 'الرقم التسلسلي أو كود الأصل';
+
+  @override
+  String get lockSettingsTitle => 'اطلب فتح القفل';
+
+  @override
+  String get lockSettingsSubtitle =>
+      'اسأل عن بصمة الجهاز أو الوجه أو رمز المرور قبل ما سجل IT يفتح.';
+
+  @override
+  String get lockUnavailable =>
+      'الجهاز ده مفيهوش قفل شاشة، فمفيش حاجة نسأل عنها.';
+
+  @override
+  String get lockTitle => 'سجل IT مقفول';
+
+  @override
+  String get lockBody =>
+      'أي حد ماسك موبايل مفتوح يقدر يعيد توزيع أجهزة الشركة. افتح القفل عشان تكمل.';
+
+  @override
+  String get lockUnlock => 'افتح القفل';
+
+  @override
+  String get lockReason => 'افتح سجل IT';
+
+  @override
+  String get lockFailed => 'ماتفتحش. جرّب تاني.';
 }

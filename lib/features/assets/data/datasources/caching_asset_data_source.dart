@@ -101,6 +101,17 @@ class CachingAssetDataSource implements AssetRemoteDataSource {
   }
 
   @override
+  Future<void> updateMany(List<int> ids, Map<String, dynamic> values) async {
+    await _inner.updateMany(ids, values);
+    // Every cached copy in the set is now a lie, and so is the page they were
+    // read from: a bulk move changes what the department filter matches.
+    for (final id in ids) {
+      await _reads.forget(CacheBoxes.assetDetails, '$model|$id');
+    }
+    await _reads.forgetBox(CacheBoxes.assetPages);
+  }
+
+  @override
   Future<void> delete(int id) async {
     await _inner.delete(id);
     await _reads.forget(CacheBoxes.assetDetails, '$model|$id');

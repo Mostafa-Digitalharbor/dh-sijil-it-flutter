@@ -263,9 +263,63 @@ If the customer later adds a real status field, the resolver picks it up on
 the next metadata refresh and the log stops being consulted — no migration, no
 code change.
 
+### 6a. The expected return date, recorded the same way
+
+`maintenance.equipment` has no "due back" column either, and spec §2 forbids
+adding one. So it takes the path above, with one difference that matters:
+
+- **The clause is part of the handover note, not a note of its own.**
+  `AssetNoteVocabulary.dueClause` writes `Due back on 2026-09-30.` into the
+  sentence `AssetRepositoryImpl` already posts, so one event stays one row on
+  the history screen. `dueDateIn` therefore matches the marker *anywhere* in a
+  body rather than at the start.
+- **Every handover writes the clause, including the ones with no date.** It
+  reads back as "the newest note mentioning the marker", so a silent note would
+  let the previous holder's loan date attach itself to a freshly-issued laptop.
+- **`AssetDueDateStore` mirrors it into `local_asset_due`**, exactly as the
+  status store mirrors into `local_asset_state`, for offline reads.
+- **Whether an asset is *late* is not the store's decision.** That needs the
+  assignment as well as the date, so `ReturnDue.evaluate` takes both: an asset
+  back on the shelf is not overdue no matter what its chatter still says. The
+  note that set the date stays where it is, because it is history.
+
+The overdue screen is the asset list with `AssetFilters.overdueOnly` on it.
+Odoo narrows "assigned" server-side; the date comparison happens on the device,
+alongside the warranty buckets and for the same reason — there is no field to
+compare against today.
+
+### 6b. What colleagues did in the web client
+
+An asset's history is `mail.message`, and for years that was only half of it. A
+message Odoo posts for a *tracked field change* carries no body at all — the
+sentence is rendered in the browser from `mail.tracking.value` rows. The app
+read those messages, found them blank, and dropped them. So an asset handed
+over in Odoo had a history in which the handover had not happened.
+
+`OdooChatterService` now reads the tracking rows too:
+
+- **One extra read per page of history**, and none at all when nothing on the
+  page has tracking.
+- **Field names, not labels.** `field_id` resolves through `ir.model.fields` to
+  a technical name, memoised for the process, because "Used By" and
+  "مستخدم بواسطة" are the same field and only `employee_id` says so. That is
+  what lets `AssetNoteVocabulary.classifyChange` draw a web-client handover the
+  same way it draws one of ours.
+- **Version-tolerant.** Odoo ≤16 had `field` + `field_desc`; 17 renamed it to
+  `field_id` and dropped the label. Both names go through `supportedFields`, so
+  one build reads either.
+- **A refused read costs the refinement, not the screen.** Notes are the bulk
+  of the timeline and are already in hand.
+- **Holders are counted by name.** `AssetHistoryEntry.holder` comes from either
+  source, so the same handover recorded twice — once by this app, once by
+  Odoo's tracking — is one person, not two.
+
+It works retroactively: every tracked change already in the customer's database
+appears the moment this ships.
+
 ---
 
-## 6b. Handover: one event, several records
+## 6c. Handover: one event, several records
 
 Standard Odoo has no object meaning "these four things went to this person at
 this moment". A handover is therefore N assignments, and the design problem is
@@ -356,6 +410,20 @@ Cubit state.failure  →  ErrorStateView renders userMessage only
 | Secret not held in memory | `OdooSessionManager.requireSecret()` fetches per call; it lives only in that stack frame, never in a state object |
 | Cache at rest | Hive boxes are AES-encrypted with a per-install key from the keystore |
 | QR safety | Payload is `asset://<id>` only — no URL, database, or token (spec §12) |
+| Device unlock (optional) | `AppLock` → `local_auth`, off by default; `AppLockGate` covers the app opaquely, never dims it |
+
+**What the device unlock does and does not protect.** The credential has always
+been in the keychain. What it was not protected from is the ordinary case: an
+already-unlocked phone on a desk, from which anybody can reassign company
+equipment under the signed-in user's name. This is the same check a banking app
+makes and worth the same — it stops the person holding the phone.
+
+It asks for *any* secure lock rather than biometrics only, so a technician with
+a cut finger has the PIN; it never locks a device that has no screen lock at
+all, because there would be nothing left to unlock it with; and it re-locks on
+resume only after `AppConstants.appLockGrace`, because the camera permission
+dialog, the photo picker, the share sheet and its own prompt all background the
+app.
 
 ---
 
@@ -449,10 +517,23 @@ launch with no connectivity.
 | Unit — repository | Data layer against a fake `XmlRpcClient` fed recorded Odoo XML | `mocktail` |
 | Cubit | State sequences per screen | `bloc_test` |
 | Widget | Shared widgets, status/warranty chips, states | `flutter_test` |
-| Integration | Login → list → detail → assign → return, against a demo Odoo | `integration_test` |
+| Widget — end to end | Whole screens against `FakeOdooServer`, a real socket speaking Odoo's XML-RPC | `flutter_test` |
+| On device | What a host VM cannot prove: plugin channels, the asset bundle, real gestures | `integration_test` |
 
-Currently green: 29 tests across the codec, domain builder, warranty
-calculator and log sanitizer.
+**What the on-device suite is for.** `integration_test/device_features_test.dart`
+covers only the things that are invisible on a desktop VM and are where the app
+can actually be broken on a phone: `local_auth` needs `MainActivity` to be a
+`FlutterFragmentActivity` — not a compile error, and a plain one launches fine
+and then throws the first time somebody turns the unlock on — the label sheet
+embeds fonts read from the installed asset bundle, and a long press that starts
+multi-select goes through the platform's own touch pipeline. Everything else is
+faster and more precise as a widget test.
+
+```
+flutter test                                             # host
+flutter test integration_test/... -d <device>            # on a phone
+dart run test/fake_odoo/serve.dart                       # drive it by hand
+```
 
 ---
 

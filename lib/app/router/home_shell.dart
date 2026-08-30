@@ -173,6 +173,16 @@ class MorePage extends StatelessWidget {
                 subtitle: l10n.moreAuditSubtitle,
                 onTap: () => context.go(AppRoutes.auditPath),
               ),
+              // Not capability-gated, unlike Maintenance: an expected return
+              // date is recorded in the chatter every stock Odoo has, so this
+              // screen works on every instance the app can sign in to.
+              AppToolTile(
+                icon: Icons.event_busy_rounded,
+                tone: AppColors.danger,
+                title: l10n.overdueTitle,
+                subtitle: l10n.overdueSubtitle,
+                onTap: () => context.go(AppRoutes.overduePath),
+              ),
               // Always listed, empty queue or not: somebody handing a phone in
               // at the end of a shift needs a place to check that nothing is
               // still sitting on it.

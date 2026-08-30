@@ -1030,5 +1030,112 @@
   "auditReportExpected": "Expected",
   "auditReportFound": "Counted",
   "auditReportMissing": "Not found",
-  "auditReportUnexpected": "Found out of scope"
+  "auditReportUnexpected": "Found out of scope",
+  "assignStepDue": "Expected return date",
+  "assignDueHint": "Leave this empty unless the asset is a loan somebody has to bring back.",
+  "assignDueNotSet": "No return date",
+  "assignDueClear": "Remove the date",
+  "labelDueBack": "Due back",
+  "dueChipOverdue": "Overdue",
+  "dueChipSoon": "Due soon",
+  "dueOverdueBy": "{days,plural, =1{1 day overdue} other{{days} days overdue}}",
+  "@dueOverdueBy": {
+    "description": "How far past its expected return date an asset is.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "dueInDays": "{days,plural, =0{Due back today} =1{Due back tomorrow} other{Due back in {days} days}}",
+  "@dueInDays": {
+    "description": "How long is left before an asset is expected back.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "overdueTitle": "Overdue returns",
+  "overdueSubtitle": "Assets past the date they were promised back",
+  "overdueEmptyTitle": "Nothing is late",
+  "overdueEmptyBody": "Every asset with a return date is still within it. Set a date when you hand something over and it will be watched here.",
+  "overdueCount": "{count,plural, =1{1 asset is late} other{{count} assets are late}}",
+  "@overdueCount": {
+    "description": "Subtitle of the overdue-returns screen.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "filterOverdue": "Overdue only",
+  "exportColumnDueBack": "Due back",
+  "selectionStart": "Select assets",
+  "selectionCancel": "Leave selection",
+  "selectionCount": "{count,plural, =0{Nothing selected} =1{1 selected} other{{count} selected}}",
+  "@selectionCount": {
+    "description": "Title of the assets screen while selecting.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "selectionAll": "Select all loaded",
+  "selectionNone": "Clear selection",
+  "selectionLimitReached": "You can act on {count} assets at a time.",
+  "@selectionLimitReached": {
+    "description": "Shown when a selection hits its ceiling.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "bulkMoveDepartment": "Move to department",
+  "bulkMoveTitle": "Which department?",
+  "bulkMoveDone": "{count,plural, =1{1 asset moved to {department}} other{{count} assets moved to {department}}}",
+  "@bulkMoveDone": {
+    "description": "Confirmation after a bulk department move.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "department": {
+        "type": "String"
+      }
+    }
+  },
+  "bulkMoveNoDepartments": "This Odoo has no departments to move assets to.",
+  "bulkPrintLabels": "Label sheet",
+  "labelSheetTitle": "Asset labels",
+  "labelSheetSubtitle": "{count,plural, =1{1 label} other{{count} labels}}",
+  "@labelSheetSubtitle": {
+    "description": "Subtitle printed on the label sheet.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanEnterCode": "Type a code",
+  "scanEnterCodeTitle": "Type the asset code",
+  "scanEnterCodeBody": "For a label the camera cannot read — scratched, in the dark, or behind a desk.",
+  "scanEnterCodeHint": "Serial number or asset tag",
+  "lockSettingsTitle": "Require unlock",
+  "lockSettingsSubtitle": "Ask for this device’s fingerprint, face or passcode before Sijil IT opens.",
+  "lockUnavailable": "This device has no screen lock set up, so there is nothing to ask for.",
+  "lockTitle": "Sijil IT is locked",
+  "lockBody": "Anyone holding an unlocked phone could reassign company equipment. Unlock to carry on.",
+  "lockUnlock": "Unlock",
+  "lockReason": "Unlock Sijil IT",
+  "lockFailed": "That did not unlock. Try again."
 }

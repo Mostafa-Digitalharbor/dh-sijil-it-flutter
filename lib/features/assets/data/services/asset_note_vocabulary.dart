@@ -1,3 +1,5 @@
+import '../../../../core/constants/odoo_models.dart';
+import '../../../../core/network/odoo/odoo_chatter_service.dart';
 import '../../domain/entities/asset_history.dart';
 import '../../domain/entities/asset_status.dart';
 
@@ -27,6 +29,27 @@ abstract final class AssetNoteVocabulary {
   static const String statusPrefix = 'Status set to';
   static const String auditPrefix = 'Audit';
   static const String handoverPrefix = 'Handover';
+
+  /// The marker that carries an expected return date.
+  ///
+  /// Unlike every other prefix here it is matched *anywhere* in a body rather
+  /// than at the start, because it is a clause inside the assignment note
+  /// rather than a note of its own. That is deliberate: one event should be
+  /// one line in the history, and a second note saying "and it is due back on
+  /// the 30th" would have shown every handover twice.
+  static const String duePrefix = 'Due back';
+
+  /// The words after [duePrefix] when a date was actually given.
+  static const String dueOnJoiner = ' on ';
+
+  /// What the clause says when nobody set a date.
+  ///
+  /// Written out rather than omitted, so that *every* assignment note carries
+  /// the marker. The date is read back as "the newest note mentioning Due
+  /// back", and a note that stayed silent would let the previous holder's
+  /// date survive the next handover — quietly making a freshly-issued laptop
+  /// overdue for a loan that ended months ago.
+  static const String dueNotSet = ': not set';
 
   /// Joins a headline and the user's own note.
   ///
@@ -62,6 +85,42 @@ abstract final class AssetNoteVocabulary {
     'Signed by the recipient ($fingerprint).',
     notes,
   );
+
+  /// The sentence that records — or clears — an expected return date.
+  ///
+  /// English and ISO, like every other note this class writes: it is read in
+  /// Odoo's web client by whoever opens the record, and `2026-09-30` is the
+  /// one date format that cannot be read as the ninth of a different month.
+  static String dueClause(DateTime? due) => due == null
+      ? '$duePrefix$dueNotSet.'
+      : '$duePrefix$dueOnJoiner${isoDay(due)}.';
+
+  /// The date a body promises the asset back, or null when it names none.
+  ///
+  /// Searched anywhere in the text, because the clause rides along with the
+  /// assignment sentence. Reads notes written by every version of the app that
+  /// has one: only the marker and the ISO date are matched.
+  static DateTime? dueDateIn(String body) {
+    final marker = body.indexOf(duePrefix);
+    if (marker < 0) return null;
+
+    final rest = body.substring(marker + duePrefix.length);
+    if (!rest.startsWith(dueOnJoiner)) return null;
+
+    // Exactly ten characters: `DateTime.tryParse` would otherwise happily
+    // swallow the rest of the sentence as a time component.
+    final date = rest.substring(dueOnJoiner.length);
+    if (date.length < _isoDayLength) return null;
+    return DateTime.tryParse(date.substring(0, _isoDayLength));
+  }
+
+  /// `2026-09-30`. The one date format the chatter ever carries.
+  static String isoDay(DateTime value) =>
+      '${value.year.toString().padLeft(4, '0')}-'
+      '${value.month.toString().padLeft(2, '0')}-'
+      '${value.day.toString().padLeft(2, '0')}';
+
+  static const int _isoDayLength = 10;
 
   /// The note that *records* a Reserved / Damaged / Lost state.
   ///
@@ -132,4 +191,51 @@ abstract final class AssetNoteVocabulary {
     if (text.startsWith(auditPrefix)) return AssetEventKind.audited;
     return AssetEventKind.note;
   }
+
+  /// What kind of event a set of *tracked field changes* describes.
+  ///
+  /// This is the half of an asset's history the app did not write. Odoo logs a
+  /// row like this whenever somebody edits a tracked field in the web client,
+  /// and matching on the technical field name is what turns "Used By changed"
+  /// into a handover the timeline can draw the same way it draws its own.
+  ///
+  /// Matched on the name, never on the label: the label arrives in whatever
+  /// language the person making the change had Odoo set to, so a rule written
+  /// against it would work in one office and silently stop at the border.
+  static AssetEventKind classifyChange(List<TrackedChange> changes) {
+    for (final change in changes) {
+      if (change.field != EquipmentFields.employeeId) continue;
+      return change.isSet ? AssetEventKind.assigned : AssetEventKind.returned;
+    }
+    return AssetEventKind.note;
+  }
+
+  /// The person an assignment note names, or null when it names nobody.
+  ///
+  /// Feeds the holder count, which is a count of *people* — so it has to see
+  /// that "Assigned to Ahmed Mohamed on 2026-01-04." and a tracked change
+  /// setting Used By to "Ahmed Mohamed" are the same person receiving the same
+  /// device once, not twice.
+  static String? holderIn(String body) {
+    final text = body.trimLeft();
+    if (!text.startsWith(assignedPrefix)) return null;
+
+    final rest = text.substring(assignedPrefix.length).trim();
+    final end = rest.indexOf(_assignedOnJoiner);
+    final name = (end < 0 ? rest : rest.substring(0, end)).trim();
+    return name.isEmpty ? null : name;
+  }
+
+  /// The holder a tracked change hands the asset to, or null for anything
+  /// else — including a change that *clears* the holder.
+  static String? holderInChange(List<TrackedChange> changes) {
+    for (final change in changes) {
+      if (change.field != EquipmentFields.employeeId) continue;
+      return change.isSet ? change.to : null;
+    }
+    return null;
+  }
+
+  /// What separates the holder's name from the date in an assignment note.
+  static const String _assignedOnJoiner = ' on ';
 }

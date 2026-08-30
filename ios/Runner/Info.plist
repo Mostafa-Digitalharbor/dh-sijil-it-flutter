@@ -4,6 +4,8 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Sijil IT uses the camera to scan asset QR codes and barcodes.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Sijil IT asks for Face ID before it opens, so company assets cannot be reassigned from an unlocked phone.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sijil IT attaches photos to asset return records.</string>
 	<key>CFBundleDevelopmentRegion</key>

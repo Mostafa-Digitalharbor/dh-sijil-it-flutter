@@ -42,6 +42,14 @@ abstract final class OdooModels {
   // -- Mail / activity (optional, drives the activity timeline) ------------
   static const String mailMessage = 'mail.message';
 
+  /// The rows Odoo writes when a *tracked field* changes.
+  ///
+  /// A `mail.message` posted by the web client for a field edit carries no
+  /// body at all — Odoo renders the sentence in the browser from these rows.
+  /// Reading only `mail.message` therefore showed an asset's whole life as
+  /// seen from this app and nothing anybody did in Odoo itself.
+  static const String mailTrackingValue = 'mail.tracking.value';
+
   /// Models the app can run without. Each is capability-checked at startup.
   static const List<String> optional = <String>[
     hrEmployee,
@@ -231,6 +239,14 @@ abstract final class MailMessageFields {
   static const String resId = 'res_id';
   static const String messageType = 'message_type';
 
+  /// The tracked-field changes attached to this message, if any.
+  ///
+  /// Read through `supportedFields` like every other set, because it is the
+  /// one field here an instance can genuinely lack: `mail.message` has carried
+  /// it for many versions, but a trimmed model or a restricted read would
+  /// otherwise turn the whole history screen into an "invalid field" fault.
+  static const String trackingValueIds = 'tracking_value_ids';
+
   /// The two `message_type` values that carry something a person wrote or that
   /// the system announced. The rest are field-tracking rows Odoo renders from
   /// tracking values the app does not read, so they arrive with an empty body.
@@ -246,6 +262,7 @@ abstract final class MailMessageFields {
     model,
     resId,
     messageType,
+    trackingValueIds,
   ];
 
   /// The `message_post` keyword arguments the app uses when writing a note.
@@ -257,6 +274,104 @@ abstract final class MailMessageFields {
   static const String subtypeNote = 'mail.mt_note';
 
   const MailMessageFields._();
+}
+
+/// Field names on `mail.tracking.value` — what a tracked field changed from
+/// and to.
+///
+/// ## Why every name here is optional
+///
+/// This model is the one the app touches whose schema Odoo actually reshuffled
+/// between supported versions. Up to 16 the link to the field was `field`
+/// plus a `field_desc` label; 17 renamed it to `field_id` and dropped the
+/// separate label, because `ir.model.fields` already renders as its
+/// translated description. Naming both and letting `supportedFields` decide is
+/// what keeps one build working across 17, 18 and 19 (spec §28) — and would
+/// have kept it working on 16.
+///
+/// The value columns are typed rather than generic: Odoo stores an integer
+/// change in `old_value_integer` and a text one in `old_value_char`, and the
+/// only way to know which is populated is to read them all and take the one
+/// that is.
+abstract final class MailTrackingValueFields {
+  static const String id = 'id';
+  static const String messageId = 'mail_message_id';
+
+  /// Odoo 17+.
+  static const String fieldId = 'field_id';
+
+  /// Odoo ≤16.
+  static const String fieldLegacy = 'field';
+
+  /// Odoo ≤16 — the translated label, which 17+ reads off [fieldId] instead.
+  static const String fieldDescription = 'field_desc';
+
+  static const String oldChar = 'old_value_char';
+  static const String newChar = 'new_value_char';
+  static const String oldText = 'old_value_text';
+  static const String newText = 'new_value_text';
+  static const String oldInteger = 'old_value_integer';
+  static const String newInteger = 'new_value_integer';
+  static const String oldFloat = 'old_value_float';
+  static const String newFloat = 'new_value_float';
+  static const String oldMonetary = 'old_value_monetary';
+  static const String newMonetary = 'new_value_monetary';
+  static const String oldDatetime = 'old_value_datetime';
+  static const String newDatetime = 'new_value_datetime';
+
+  /// Narrowed by `supportedFields` before it is sent.
+  static const List<String> readSet = <String>[
+    id,
+    messageId,
+    fieldId,
+    fieldLegacy,
+    fieldDescription,
+    oldChar,
+    newChar,
+    oldText,
+    newText,
+    oldInteger,
+    newInteger,
+    oldFloat,
+    newFloat,
+    oldMonetary,
+    newMonetary,
+    oldDatetime,
+    newDatetime,
+  ];
+
+  /// The value columns, oldest-typed first, paired old→new.
+  ///
+  /// Order matters only in that the first populated pair wins; a tracking row
+  /// populates exactly one of them, so any order is correct and this one reads
+  /// in the order a person would guess.
+  static const List<(String, String)> valuePairs = <(String, String)>[
+    (oldChar, newChar),
+    (oldText, newText),
+    (oldDatetime, newDatetime),
+    (oldMonetary, newMonetary),
+    (oldFloat, newFloat),
+    (oldInteger, newInteger),
+  ];
+
+  const MailTrackingValueFields._();
+}
+
+/// Field names on `ir.model.fields`, read to recover a tracked field's
+/// *technical* name.
+///
+/// The label is what a person reads; the technical name is what the app can
+/// reason about. "Used By" and "مستخدم بواسطة" are the same field, and only
+/// `employee_id` says so — which is what lets a change made in the web client
+/// be classified as a handover rather than as an anonymous edit.
+abstract final class ModelFieldFields {
+  static const String id = 'id';
+  static const String name = 'name';
+  static const String description = 'field_description';
+
+  static const List<String> readSet = <String>[id, name, description];
+
+  const ModelFieldFields._();
 }
 
 /// Field names on `ir.attachment`, used for return photos (spec §8).

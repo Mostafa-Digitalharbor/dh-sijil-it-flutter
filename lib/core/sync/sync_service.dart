@@ -148,6 +148,10 @@ class SyncService {
           employeeName: '${payload['employeeName'] ?? ''}',
           assignedOn:
               DateTime.tryParse('${payload['assignedOn']}') ?? entry.queuedAt,
+          // Absent on entries queued by a build that predates due dates, and
+          // `tryParse` answers null for that as well as for "no date set" —
+          // which are the same thing to a replay.
+          dueOn: DateTime.tryParse('${payload['dueOn']}'),
           notes: payload['notes'] as String?,
         ),
       ),

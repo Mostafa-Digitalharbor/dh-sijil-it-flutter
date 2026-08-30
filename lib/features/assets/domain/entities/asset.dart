@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/odoo/odoo_object_service.dart';
 import 'asset_status.dart';
+import 'return_due.dart';
 import 'warranty.dart';
 
 /// An IT asset, as the app understands it.
@@ -30,6 +31,7 @@ class Asset extends Equatable {
     this.assignedEmployee,
     this.department,
     this.assignmentDate,
+    this.dueBack = ReturnDue.none,
     this.notes,
     this.openMaintenanceCount = 0,
     this.createdAt,
@@ -62,6 +64,14 @@ class Asset extends Equatable {
   final OdooNameRef? department;
   final DateTime? assignmentDate;
 
+  /// When this asset is expected back, and whether that date has passed.
+  ///
+  /// Standard Odoo has no field for it, so — like the three overlay statuses —
+  /// it is recorded as a note in the asset's chatter and read back from there
+  /// (`AssetDueDateStore`). Which means it is visible to a colleague in the
+  /// web client, rather than being a promise one handset made to itself.
+  final ReturnDue dueBack;
+
   final String? notes;
   final int openMaintenanceCount;
 
@@ -84,6 +94,9 @@ class Asset extends Equatable {
   bool get isAssigned => assignedEmployee != null;
 
   bool get hasOpenMaintenance => openMaintenanceCount > 0;
+
+  /// Past its expected return date and still with somebody.
+  bool get isOverdue => dueBack.isOverdue;
 
   /// Payload encoded into the asset's QR code (spec §12).
   ///
@@ -110,6 +123,7 @@ class Asset extends Equatable {
     OdooNameRef? assignedEmployee,
     OdooNameRef? department,
     DateTime? assignmentDate,
+    ReturnDue? dueBack,
     String? notes,
     int? openMaintenanceCount,
     bool? isStatusLocal,
@@ -137,6 +151,10 @@ class Asset extends Equatable {
       assignmentDate: clearAssignment
           ? null
           : (assignmentDate ?? this.assignmentDate),
+      // A return ends the obligation as well as the assignment: an asset back
+      // on the shelf is not late for anything, and leaving the date attached
+      // is how a returned laptop stays on the overdue list.
+      dueBack: clearAssignment ? ReturnDue.none : (dueBack ?? this.dueBack),
       notes: notes ?? this.notes,
       openMaintenanceCount: openMaintenanceCount ?? this.openMaintenanceCount,
       createdAt: createdAt,
@@ -163,6 +181,7 @@ class Asset extends Equatable {
     assignedEmployee,
     department,
     assignmentDate,
+    dueBack,
     notes,
     openMaintenanceCount,
     isStatusLocal,

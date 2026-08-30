@@ -21,9 +21,11 @@ import '../../domain/entities/asset_draft.dart';
 import '../../domain/entities/asset_history.dart';
 import '../../domain/entities/asset_query.dart';
 import '../../domain/entities/asset_status.dart';
+import '../../domain/entities/return_due.dart';
 import '../../domain/repositories/asset_repository.dart';
 import '../datasources/asset_remote_data_source.dart';
 import '../mappers/asset_mapper.dart';
+import '../services/asset_due_date_store.dart';
 import '../services/asset_note_vocabulary.dart';
 import '../services/asset_state_store.dart';
 import '../services/asset_status_resolver.dart';
@@ -49,12 +51,14 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
     required AssetRemoteDataSource remote,
     required AssetStatusResolver statusResolver,
     required AssetStateStore states,
+    required AssetDueDateStore dues,
     required OdooChatterService chatter,
     required OutboxStore outbox,
     required WriteQueue queue,
   }) : _remote = remote,
        _statusResolver = statusResolver,
        _states = states,
+       _dues = dues,
        _chatter = chatter,
        _outbox = outbox,
        _queue = queue;
@@ -62,6 +66,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   final AssetRemoteDataSource _remote;
   final AssetStatusResolver _statusResolver;
   final AssetStateStore _states;
+  final AssetDueDateStore _dues;
   final OdooChatterService _chatter;
   final OutboxStore _outbox;
   final WriteQueue _queue;
@@ -156,9 +161,10 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   @override
   ResultFuture<void> deleteAsset(int id) => guard(() async {
     await _remote.delete(id);
-    // Only the mirror needs clearing: the notes went down with the record,
+    // Only the mirrors need clearing: the notes went down with the record,
     // and an id Odoo reissues comes back with a chatter of its own.
     await _states.clear(_remote.model, id);
+    await _dues.clear(_remote.model, id);
     _announce(id);
   });
 
@@ -185,11 +191,17 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
     // Handing an asset over supersedes any Reserved marker it carried.
     await _states.clear(_remote.model, request.assetId);
 
+    // Mirrored before the note goes out, and unconditionally — including for a
+    // handover with no date, which *clears* whatever the previous holder's
+    // loan promised.
+    await _dues.mirror(_remote.model, request.assetId, request.dueOn);
+
     await _postNote(
       request.assetId,
       _AssetNote.assigned(
         employee: request.employeeName,
         on: request.assignedOn,
+        dueOn: request.dueOn,
         notes: request.notes,
       ),
     );
@@ -233,6 +245,11 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
         AssetNoteVocabulary.statusNote(request.resultingStatus),
       );
     }
+
+    // A return ends the obligation. The chatter note that set the date stays
+    // where it is — it is history — but nothing on this device should still be
+    // counting down against an asset that is back on the shelf.
+    await _dues.clear(_remote.model, request.assetId);
 
     await _attachPhotos(request.assetId, request.photoPaths);
 
@@ -300,6 +317,40 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
   }
 
   @override
+  ResultFuture<int> moveToDepartment(List<int> ids, int departmentId) =>
+      guard(() async {
+        final unique = ids.toSet().toList(growable: false);
+        if (unique.isEmpty) return 0;
+
+        final supported = await _remote.writableFields();
+        if (!supported.contains(EquipmentFields.departmentId)) {
+          throw const InputValidationException(
+            'This Odoo has no department field on assets.',
+          );
+        }
+
+        // One `write` for the whole set: Odoo's ORM takes a list of ids, so
+        // forty assets move in one transaction. A loop would be forty writes,
+        // and a failure halfway would split the fleet across two departments
+        // with nothing recording where the boundary fell.
+        //
+        // No chatter note per asset, deliberately. `message_post` is a
+        // single-record call, so a note each would turn one round trip into
+        // two hundred — and the trail already exists: this is a field change,
+        // Odoo tracks field changes, and the history screen now reads those
+        // back. A bulk edit made here reads exactly like the same bulk edit
+        // made in the web client, which is the honest answer.
+        await _remote.updateMany(unique, <String, dynamic>{
+          EquipmentFields.departmentId: departmentId,
+        });
+
+        for (final id in unique) {
+          _announce(id);
+        }
+        return unique.length;
+      });
+
+  @override
   ResultFuture<AssetHistory> history(int id, {int offset = 0}) =>
       guard(() async {
         const limit = AppConstants.historyLimit;
@@ -320,19 +371,36 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
         return AssetHistory(
           entries: <AssetHistoryEntry>[
-            for (final entry in entries)
-              AssetHistoryEntry(
-                id: entry.id,
-                kind: AssetNoteVocabulary.classify(entry.body),
-                summary: entry.body,
-                occurredAt: entry.postedAt,
-                author: entry.author,
-              ),
+            for (final entry in entries) _toHistoryEntry(entry),
           ],
           registeredOn: asset?.readDate(EquipmentFields.createDate),
           hasMore: entries.length >= limit,
         );
       });
+
+  /// One chatter row as a history line.
+  ///
+  /// Two sources meet here and are deliberately kept apart. A row this app
+  /// wrote is classified from its wording; a row Odoo wrote for a *tracked
+  /// field change* has no wording of its own, so it is classified from the
+  /// field that changed. Reading the second is what put handovers made in the
+  /// web client onto this timeline at all.
+  static AssetHistoryEntry _toHistoryEntry(ChatterEntry entry) {
+    final isTracked = entry.changes.isNotEmpty;
+
+    return AssetHistoryEntry(
+      id: entry.id,
+      kind: isTracked
+          ? AssetNoteVocabulary.classifyChange(entry.changes)
+          : AssetNoteVocabulary.classify(entry.body),
+      summary: entry.body,
+      occurredAt: entry.postedAt,
+      author: entry.author,
+      holder: isTracked
+          ? AssetNoteVocabulary.holderInChange(entry.changes)
+          : AssetNoteVocabulary.holderIn(entry.body),
+    );
+  }
 
   @override
   ResultFuture<AssetPermissions> permissions() => guard(() async {
@@ -375,6 +443,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
     // Handing an asset over supersedes any Reserved marker, offline as well.
     await _states.clear(_remote.model, request.assetId);
+    await _dues.mirror(_remote.model, request.assetId, request.dueOn);
 
     await _outbox.add(
       kind: OutboxKind.assignAsset,
@@ -384,6 +453,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
         'employeeId': request.employeeId,
         'employeeName': request.employeeName,
         'assignedOn': request.assignedOn.toIso8601String(),
+        'dueOn': request.dueOn?.toIso8601String(),
         'notes': request.notes,
       },
     );
@@ -410,6 +480,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
       request.assetId,
       request.resultingStatus,
     );
+    await _dues.clear(_remote.model, request.assetId);
 
     await _outbox.add(
       kind: OutboxKind.returnAsset,
@@ -440,6 +511,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
     final id = record['id'] as int;
     final hasNative = await _nativeStatusField();
     final overlay = await _states.read(_remote.model, id);
+    final dueOn = await _dues.read(_remote.model, id);
     final pending = await _outbox.pending();
 
     return _applyPending(
@@ -450,6 +522,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
           hasNativeField: hasNative,
           overlay: overlay,
         ),
+        dueBackOn: dueOn,
       ),
       pending,
     );
@@ -484,6 +557,13 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
           assignmentDate:
               DateTime.tryParse('${entry.payload['assignedOn']}') ??
               entry.queuedAt,
+          // Re-evaluated rather than carried over: the asset is assigned as of
+          // this entry, which is the fact `ReturnDue` needs and the one the
+          // record read back from Odoo does not know yet.
+          dueBack: ReturnDue.evaluate(
+            date: DateTime.tryParse('${entry.payload['dueOn']}'),
+            isAssigned: true,
+          ),
         ),
         OutboxKind.returnAsset => result.copyWith(
           status: _queuedReturnStatus(entry),
@@ -522,6 +602,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
         .whereType<int>()
         .toList(growable: false);
     final overlays = await _states.readAll(_remote.model, ids);
+    final dues = await _dues.readAll(_remote.model, ids);
 
     // Read once for the page, not once per row: the queue is a whole-box scan.
     final pending = await _outbox.pending();
@@ -536,6 +617,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
                 hasNativeField: hasNative,
                 overlay: overlays[record['id']],
               ),
+              dueBackOn: dues[record['id']],
             ),
             pending,
           ),
@@ -563,6 +645,10 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
       result = result
           .where((a) => filters.warrantyStates.contains(a.warranty.state))
           .toList(growable: false);
+    }
+
+    if (filters.overdueOnly) {
+      result = result.where((a) => a.isOverdue).toList(growable: false);
     }
 
     return result;
@@ -645,12 +731,20 @@ abstract final class _OdooOperation {
 /// `<p>Assigned…</p>`. Sending text and letting Odoo do the wrapping is the
 /// only shape that reads correctly in the web client.
 abstract final class _AssetNote {
+  /// One note per handover, carrying the due date as a clause rather than as
+  /// a second note — `AssetNoteVocabulary.duePrefix` explains why.
+  ///
+  /// The clause is always present, including when nobody set a date. That is
+  /// what makes a handover *clear* the previous holder's loan date instead of
+  /// silently inheriting it.
   static String assigned({
     required String employee,
     required DateTime on,
+    DateTime? dueOn,
     String? notes,
   }) => AssetNoteVocabulary.compose(
-    '${AssetNoteVocabulary.assignedPrefix} $employee on ${_day(on)}.',
+    '${AssetNoteVocabulary.assignedPrefix} $employee on ${_day(on)}. '
+    '${AssetNoteVocabulary.dueClause(dueOn)}',
     notes,
   );
 

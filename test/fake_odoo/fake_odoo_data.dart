@@ -99,6 +99,7 @@ class FakeOdooData {
         OdooModels.maintenanceRequest,
         OdooModels.maintenanceEquipmentCategory,
         OdooModels.mailMessage,
+        OdooModels.mailTrackingValue,
       },
       records: {
         OdooModels.resUsers: [
@@ -232,6 +233,54 @@ class FakeOdooData {
             scrapDate: '2026-05-11',
           ),
         ],
+        // The half of an asset's history this app did not write.
+        //
+        // `ir.model.fields` is what turns a tracking row's label into a
+        // technical name, which is the only thing that can tell a handover
+        // made in the web client from any other field edit — "Used By" is
+        // "مستخدم بواسطة" on the same instance in another language.
+        OdooModels.irModelFields: [
+          {
+            'id': 4101,
+            'name': EquipmentFields.employeeId,
+            'field_description': 'Used By',
+          },
+          {
+            'id': 4102,
+            'name': EquipmentFields.departmentId,
+            'field_description': 'Department',
+          },
+        ],
+        // Odoo 17+ shape: `field_id`, and no separate `field_desc` column.
+        // Seeded this way on purpose — the app reads whichever of the two
+        // names the instance exposes, and a fake that offered both would let
+        // a regression in that fallback pass unnoticed.
+        OdooModels.mailTrackingValue: [
+          _tracking(
+            id: 7001,
+            messageId: 6001,
+            field: [4101, 'Used By'],
+            newChar: 'Ahmed Mohamed',
+          ),
+        ],
+        OdooModels.mailMessage: [
+          // A field change made in the Odoo web client: `message_type` is
+          // `notification`, the body is empty, and everything the entry says
+          // lives in the tracking rows. This is the message the app used to
+          // read, find blank, and drop — so a handover done in Odoo left no
+          // mark on the history screen at all.
+          {
+            'id': 6001,
+            'body': false,
+            'subject': false,
+            'date': '2025-10-15 08:12:00',
+            'author_id': [2, 'Mostafa Bader'],
+            'model': OdooModels.maintenanceEquipment,
+            'res_id': 102,
+            'message_type': 'notification',
+            'tracking_value_ids': [7001],
+          },
+        ],
         OdooModels.maintenanceRequest: [
           {
             'id': 501,
@@ -252,6 +301,36 @@ class FakeOdooData {
       },
     );
   }
+
+  /// Builds one `mail.tracking.value` row with Odoo's own column shapes.
+  ///
+  /// Every typed column is present and empty, because that is what Odoo sends:
+  /// a char change still returns `old_value_integer: 0`, and code that reads
+  /// the first *non-empty* pair has to survive that. A fake that omitted the
+  /// unused columns would be testing a payload nobody receives.
+  static Map<String, dynamic> _tracking({
+    required int id,
+    required int messageId,
+    required List<Object?> field,
+    Object oldChar = false,
+    Object newChar = false,
+  }) => {
+    'id': id,
+    'mail_message_id': [messageId, 'Message $messageId'],
+    'field_id': field,
+    'old_value_char': oldChar,
+    'new_value_char': newChar,
+    'old_value_text': false,
+    'new_value_text': false,
+    'old_value_integer': 0,
+    'new_value_integer': 0,
+    'old_value_float': 0.0,
+    'new_value_float': 0.0,
+    'old_value_monetary': 0.0,
+    'new_value_monetary': 0.0,
+    'old_value_datetime': false,
+    'new_value_datetime': false,
+  };
 
   /// Builds one `maintenance.equipment` record with Odoo's own field shapes.
   static Map<String, dynamic> _equipment({
@@ -393,6 +472,10 @@ class FakeOdooData {
       'model': model,
       'res_id': ids.isEmpty ? false : ids.first,
       'message_type': 'comment',
+      // Odoo sends an empty x2m as `[]`, not `false`. Present on every row
+      // because `fields_get` here is derived from one, and a key missing from
+      // the sample would read as a field this instance does not have.
+      'tracking_value_ids': <Object?>[],
     });
 
     return id;

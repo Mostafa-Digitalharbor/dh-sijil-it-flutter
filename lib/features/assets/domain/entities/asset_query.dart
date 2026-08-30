@@ -35,6 +35,7 @@ class AssetFilters extends Equatable {
     this.manufacturer,
     this.warrantyStates = const <WarrantyState>{},
     this.includeRetired = false,
+    this.overdueOnly = false,
   });
 
   /// Free-text, matched across name, tag, serial, model and manufacturer.
@@ -58,6 +59,12 @@ class AssetFilters extends Equatable {
   /// laptops" does not mean the scrapped ones.
   final bool includeRetired;
 
+  /// Only assets past the date they were promised back.
+  ///
+  /// Evaluated in Dart for the same reason the warranty buckets are: the date
+  /// lives in a chatter note, not a field Odoo can compare against today.
+  final bool overdueOnly;
+
   bool get isEmpty =>
       (query == null || query!.trim().isEmpty) &&
       statuses.isEmpty &&
@@ -66,7 +73,8 @@ class AssetFilters extends Equatable {
       departmentId == null &&
       manufacturer == null &&
       warrantyStates.isEmpty &&
-      !includeRetired;
+      !includeRetired &&
+      !overdueOnly;
 
   bool get isNotEmpty => !isEmpty;
 
@@ -78,7 +86,8 @@ class AssetFilters extends Equatable {
       (employeeId == null ? 0 : 1) +
       (departmentId == null ? 0 : 1) +
       (manufacturer == null ? 0 : 1) +
-      (warrantyStates.isEmpty ? 0 : 1);
+      (warrantyStates.isEmpty ? 0 : 1) +
+      (overdueOnly ? 1 : 0);
 
   /// True when any active filter can only be evaluated on the device.
   ///
@@ -87,7 +96,9 @@ class AssetFilters extends Equatable {
   /// result in Dart. Knowing this up front is what keeps the "showing N of M"
   /// counter honest.
   bool get needsClientSideNarrowing =>
-      warrantyStates.isNotEmpty || statuses.any((s) => s.isLocalOnly);
+      warrantyStates.isNotEmpty ||
+      overdueOnly ||
+      statuses.any((s) => s.isLocalOnly);
 
   AssetFilters copyWith({
     String? query,
@@ -98,6 +109,7 @@ class AssetFilters extends Equatable {
     String? manufacturer,
     Set<WarrantyState>? warrantyStates,
     bool? includeRetired,
+    bool? overdueOnly,
     bool clearQuery = false,
     bool clearEmployee = false,
     bool clearDepartment = false,
@@ -113,6 +125,7 @@ class AssetFilters extends Equatable {
         : (manufacturer ?? this.manufacturer),
     warrantyStates: warrantyStates ?? this.warrantyStates,
     includeRetired: includeRetired ?? this.includeRetired,
+    overdueOnly: overdueOnly ?? this.overdueOnly,
   );
 
   /// Drops every narrowing but keeps the typed search term, which is what the
@@ -129,6 +142,7 @@ class AssetFilters extends Equatable {
     manufacturer,
     warrantyStates,
     includeRetired,
+    overdueOnly,
   ];
 }
 

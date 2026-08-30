@@ -99,6 +99,18 @@ class AppPreferences {
     }
   }
 
+  // ── App lock ─────────────────────────────────────────────────────────────
+
+  /// Whether the device's own unlock is asked for before the app opens.
+  ///
+  /// Off by default, and stays a *preference* rather than a secret: it records
+  /// a choice, and the thing it guards — the Odoo credential — is in the
+  /// keychain either way. Nothing here is worth encrypting.
+  bool get appLockEnabled => _prefs.getBool(PrefKeys.appLockEnabled) ?? false;
+
+  Future<void> setAppLockEnabled({required bool value}) =>
+      _prefs.setBool(PrefKeys.appLockEnabled, value);
+
   // ── Appearance ───────────────────────────────────────────────────────────
 
   ThemeMode get themeMode => switch (_prefs.getString(PrefKeys.themeMode)) {

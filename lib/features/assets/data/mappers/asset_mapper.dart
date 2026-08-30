@@ -3,6 +3,7 @@ import '../../../../core/network/odoo/odoo_value.dart';
 import '../../../../core/utils/typedefs.dart';
 import '../../domain/entities/asset.dart';
 import '../../domain/entities/asset_draft.dart';
+import '../../domain/entities/return_due.dart';
 import '../../domain/entities/warranty.dart';
 import '../services/asset_status_resolver.dart';
 
@@ -18,14 +19,17 @@ abstract final class AssetMapper {
   ///
   /// [status] arrives already resolved, because deciding it needs the local
   /// overlay and a capability probe — both async, and neither the mapper's
-  /// business.
+  /// business. [dueBackOn] arrives the same way and for the same reason: it
+  /// lives in a chatter note, not in a column of this record.
   static Asset toEntity(
     OdooRecord record, {
     required ResolvedStatus status,
+    DateTime? dueBackOn,
     DateTime? now,
     bool hasPendingSync = false,
   }) {
     final warrantyEnd = record.readDate(EquipmentFields.warrantyDate);
+    final holder = record.readRef(EquipmentFields.employeeId);
 
     return Asset(
       id: record.recordId,
@@ -57,9 +61,18 @@ abstract final class AssetMapper {
         now: now,
       ),
 
-      assignedEmployee: record.readRef(EquipmentFields.employeeId),
+      assignedEmployee: holder,
       department: record.readRef(EquipmentFields.departmentId),
       assignmentDate: record.readDate(EquipmentFields.assignDate),
+
+      // Evaluated against the holder, not against the date alone. The note
+      // recording a due date stays in the chatter after the asset comes back,
+      // and an asset on the shelf cannot be late for anything.
+      dueBack: ReturnDue.evaluate(
+        date: dueBackOn,
+        isAssigned: holder != null,
+        now: now,
+      ),
 
       notes: record.readHtmlAsText(EquipmentFields.note),
       openMaintenanceCount: record.readCount(

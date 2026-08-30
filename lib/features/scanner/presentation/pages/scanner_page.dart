@@ -14,6 +14,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_segmented.dart';
+import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../cubit/scanner_cubit.dart';
 import '../widgets/camera_lifecycle.dart';
@@ -73,6 +74,7 @@ class _ScannerViewState extends State<_ScannerView>
                     children: <Widget>[
                       _TopBar(controller: controller, state: state),
                       Expanded(child: _CameraError(error: error)),
+                      const _ManualEntryFallback(),
                     ],
                   ),
                 );
@@ -96,7 +98,9 @@ class _ScannerViewState extends State<_ScannerView>
                         _Instructions(state: state),
                         const SizedBox(height: AppSpacing.lg),
                         _ModeSwitch(state: state),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.sm),
+                        const _ManualEntry(),
+                        const SizedBox(height: AppSpacing.md),
                         if (state.hasResult || state.isResolving)
                           ScanResultSheet(state: state),
                         const SizedBox(height: AppSpacing.lg),
@@ -245,6 +249,47 @@ class _ModeSwitch extends StatelessWidget {
   }
 }
 
+/// The way in when the camera is not the answer.
+///
+/// ## Why a scanner needs one
+///
+/// Until now the viewfinder was the only route to an asset by code, and it has
+/// three failure modes a technician meets every week: the sticker is scuffed,
+/// the store room is dark, or the label is on the underside of a desk nobody
+/// is going to crawl under. Each of those was a dead end — the screen kept
+/// telling the user to point the camera at a code it could not read.
+///
+/// The typed code goes through exactly the same path as a scanned one, so an
+/// `asset://118` payload, a serial and a manufacturer barcode all resolve the
+/// way they always did. There is no second lookup to keep in step.
+class _ManualEntry extends StatelessWidget {
+  const _ManualEntry();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final cubit = context.read<ScannerCubit>();
+
+    return Center(
+      child: AppTextAction(
+        label: l10n.scanEnterCode,
+        icon: Icons.keyboard_alt_outlined,
+        onPressed: () async {
+          final code = await AppPromptDialog.show(
+            context,
+            title: l10n.scanEnterCodeTitle,
+            message: l10n.scanEnterCodeBody,
+            hint: l10n.scanEnterCodeHint,
+            confirmLabel: l10n.actionOpen,
+          );
+          if (code == null) return;
+          await cubit.onDetected(code);
+        },
+      ),
+    );
+  }
+}
+
 /// Shown when the camera cannot start — most often a denied permission.
 ///
 /// ## What this used to say
@@ -297,4 +342,19 @@ class _CameraError extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The manual entry, repeated under the camera-failure screen.
+///
+/// This is where it matters most. A camera that will not start used to end the
+/// screen: the user was told what happened, told how to fix it, and left with
+/// no way to look up the asset they are standing in front of in the meantime.
+class _ManualEntryFallback extends StatelessWidget {
+  const _ManualEntryFallback();
+
+  @override
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsetsDirectional.only(bottom: AppSpacing.xxl),
+    child: _ManualEntry(),
+  );
 }

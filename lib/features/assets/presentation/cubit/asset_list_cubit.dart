@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/odoo/odoo_name_ref.dart';
 import '../../../../core/pagination/paginated_result.dart';
@@ -25,6 +27,10 @@ class AssetListState extends ViewState {
     this.departments = const <OdooNameRef>[],
     this.permissions = const AssetPermissions(),
     this.isLoadingMore = false,
+    this.isSelecting = false,
+    this.selectedIds = const <int>{},
+    this.isBulkWorking = false,
+    this.bulkMoved,
   });
 
   final PaginatedResult<Asset> page;
@@ -43,6 +49,22 @@ class AssetListState extends ViewState {
   /// which replaces the list rather than extending it.
   final bool isLoadingMore;
 
+  /// Whether the list is in multi-select mode.
+  ///
+  /// Held separately from [selectedIds] being empty, because "selecting, with
+  /// nothing picked yet" is a real state: the rows have to show their
+  /// checkboxes and a tap has to select rather than navigate, before anything
+  /// has been chosen.
+  final bool isSelecting;
+
+  final Set<int> selectedIds;
+
+  /// A bulk write is in flight.
+  final bool isBulkWorking;
+
+  /// The last completed bulk move, for the screen to confirm and acknowledge.
+  final BulkMoveResult? bulkMoved;
+
   List<Asset> get assets => page.items;
 
   AssetFilters get filters => query.filters;
@@ -54,6 +76,20 @@ class AssetListState extends ViewState {
   /// one offers to clear the filters, the other offers to create an asset.
   bool get isFilteredEmpty => assets.isEmpty && filters.isNotEmpty;
 
+  /// The selected rows, in the order they appear on screen.
+  ///
+  /// Resolved against the loaded page rather than kept as a second list: a
+  /// selection is a set of ids, and holding entities alongside them is how a
+  /// row that has since been refreshed gets acted on in its old shape.
+  List<Asset> get selectedAssets =>
+      assets.where((a) => selectedIds.contains(a.id)).toList(growable: false);
+
+  bool get hasSelection => selectedIds.isNotEmpty;
+
+  /// Whether one more row can be added to the selection.
+  bool get canSelectMore =>
+      selectedIds.length < AppConstants.bulkSelectionLimit;
+
   AssetListState copyWith({
     ViewStatus? status,
     PaginatedResult<Asset>? page,
@@ -63,8 +99,13 @@ class AssetListState extends ViewState {
     List<OdooNameRef>? departments,
     AssetPermissions? permissions,
     bool? isLoadingMore,
+    bool? isSelecting,
+    Set<int>? selectedIds,
+    bool? isBulkWorking,
+    BulkMoveResult? bulkMoved,
     Failure? failure,
     bool clearFailure = false,
+    bool clearBulkMoved = false,
   }) => AssetListState(
     status: status ?? this.status,
     failure: clearFailure ? null : (failure ?? this.failure),
@@ -75,6 +116,10 @@ class AssetListState extends ViewState {
     departments: departments ?? this.departments,
     permissions: permissions ?? this.permissions,
     isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    isSelecting: isSelecting ?? this.isSelecting,
+    selectedIds: selectedIds ?? this.selectedIds,
+    isBulkWorking: isBulkWorking ?? this.isBulkWorking,
+    bulkMoved: clearBulkMoved ? null : (bulkMoved ?? this.bulkMoved),
   );
 
   @override
@@ -89,7 +134,26 @@ class AssetListState extends ViewState {
     permissions.canEdit,
     permissions.canDelete,
     isLoadingMore,
+    isSelecting,
+    selectedIds,
+    isBulkWorking,
+    bulkMoved,
   ];
+}
+
+/// What a finished bulk move is worth telling the user.
+///
+/// A value rather than a formatted sentence: the wording lives in the ARB
+/// files, and a Cubit that built the message would be a Cubit that has to know
+/// which language the screen is in.
+class BulkMoveResult extends Equatable {
+  const BulkMoveResult({required this.count, required this.department});
+
+  final int count;
+  final String department;
+
+  @override
+  List<Object?> get props => <Object?>[count, department];
 }
 
 /// The assets screen's ViewModel.
@@ -102,10 +166,12 @@ class AssetListCubit extends Cubit<AssetListState> {
     required GetAssetsPage getAssets,
     required GetAssetListOptions getOptions,
     required GetDepartments getDepartments,
+    required MoveAssetsToDepartment moveToDepartment,
     required AssetRepository repository,
   }) : _getAssets = getAssets,
        _getOptions = getOptions,
        _getDepartments = getDepartments,
+       _moveToDepartment = moveToDepartment,
        _repository = repository,
        super(const AssetListState()) {
     // A row the user changed on the detail screen must not keep showing its old
@@ -119,6 +185,7 @@ class AssetListCubit extends Cubit<AssetListState> {
   /// Borrowed from the employees feature rather than duplicated: a department
   /// is the same record whichever screen filters by it.
   final GetDepartments _getDepartments;
+  final MoveAssetsToDepartment _moveToDepartment;
   final AssetRepository _repository;
 
   late final StreamSubscription<int> _subscription;
@@ -132,9 +199,20 @@ class AssetListCubit extends Cubit<AssetListState> {
   final RequestTicket _ticket = RequestTicket();
 
   /// First load, and pull-to-refresh.
-  Future<void> load({bool refresh = false}) async {
+  ///
+  /// [filters] opens the list already narrowed — how the overdue screen reuses
+  /// this ViewModel rather than growing a near-identical one of its own. Given
+  /// on the first load only: a refresh keeps whatever the user has since
+  /// chosen, which is what makes pull-to-refresh mean "again" rather than
+  /// "start over".
+  Future<void> load({bool refresh = false, AssetFilters? filters}) async {
+    final query = filters == null
+        ? state.query
+        : state.query.copyWith(filters: filters);
+
     emit(
       state.copyWith(
+        query: query,
         status: refresh ? ViewStatus.refreshing : ViewStatus.loading,
         clearFailure: true,
       ),
@@ -145,7 +223,7 @@ class AssetListCubit extends Cubit<AssetListState> {
       unawaited(_loadOptions());
     }
 
-    await _fetch(state.query.first(), append: false);
+    await _fetch(query.first(), append: false);
   }
 
   /// Loads the next page for infinite scroll.
@@ -187,6 +265,98 @@ class AssetListCubit extends Cubit<AssetListState> {
   }
 
   void clearFilters() => applyFilters(state.query.filters.cleared());
+
+  // ── Multi-select ─────────────────────────────────────────────────────────
+
+  /// Enters selection mode with [first] already picked.
+  ///
+  /// Takes a row rather than starting empty because selection is entered by
+  /// long-pressing one: arriving in the mode with nothing chosen would throw
+  /// away the press that got the user there.
+  void startSelection(int first) =>
+      emit(state.copyWith(isSelecting: true, selectedIds: <int>{first}));
+
+  /// Leaves selection mode and forgets what was picked.
+  void endSelection() => emit(
+    state.copyWith(
+      isSelecting: false,
+      selectedIds: const <int>{},
+      clearBulkMoved: true,
+    ),
+  );
+
+  /// Adds or removes one row.
+  ///
+  /// Deselecting the last row stays *in* selection mode. Dropping out of it
+  /// would mean an accidental double-tap silently turns the next tap into a
+  /// navigation, which is the one thing a user in the middle of picking forty
+  /// assets does not want.
+  void toggleSelection(int id) {
+    final next = Set<int>.from(state.selectedIds);
+    if (!next.remove(id)) {
+      if (!state.canSelectMore) return;
+      next.add(id);
+    }
+    emit(state.copyWith(selectedIds: next));
+  }
+
+  /// Selects every row currently loaded — not every row that matches.
+  ///
+  /// The distinction is the honest one: the app can only act on assets it has
+  /// read, and a control that claimed to select two thousand rows would be
+  /// promising a write nobody reviewed.
+  void selectAllLoaded() => emit(
+    state.copyWith(
+      isSelecting: true,
+      selectedIds: state.assets
+          .take(AppConstants.bulkSelectionLimit)
+          .map((a) => a.id)
+          .toSet(),
+    ),
+  );
+
+  void clearSelection() => emit(state.copyWith(selectedIds: const <int>{}));
+
+  /// Moves the selection to one department.
+  ///
+  /// The list is reloaded afterwards rather than patched row by row: a
+  /// department move is exactly the change that can drop a row out of an
+  /// active department filter, and leaving it on screen would show a list that
+  /// contradicts the filter chip above it.
+  Future<void> moveSelectionToDepartment(OdooNameRef department) async {
+    if (state.isBulkWorking || !state.hasSelection) return;
+
+    final ids = state.selectedIds.toList(growable: false);
+    emit(state.copyWith(isBulkWorking: true, clearFailure: true));
+
+    final result = await _moveToDepartment(
+      MoveToDepartmentParams(assetIds: ids, departmentId: department.id),
+    );
+    if (isClosed) return;
+
+    await result.fold(
+      (failure) async =>
+          emit(state.copyWith(isBulkWorking: false, failure: failure)),
+      (count) async {
+        emit(
+          state.copyWith(
+            isBulkWorking: false,
+            isSelecting: false,
+            selectedIds: const <int>{},
+            bulkMoved: BulkMoveResult(
+              count: count,
+              department: department.name,
+            ),
+          ),
+        );
+        await load(refresh: true);
+      },
+    );
+  }
+
+  void acknowledgeBulkMove() => emit(state.copyWith(clearBulkMoved: true));
+
+  void acknowledgeFailure() => emit(state.copyWith(clearFailure: true));
 
   /// Replaces one asset in place after a detail-screen action.
   ///
@@ -232,6 +402,11 @@ class AssetListCubit extends Cubit<AssetListState> {
         query: query,
         status: ViewStatus.loading,
         clearFailure: true,
+        // A selection survives a scroll but not a re-query: the rows it names
+        // may not be in the next answer, and acting on assets the user can no
+        // longer see is how a bulk write surprises somebody.
+        isSelecting: false,
+        selectedIds: const <int>{},
       ),
     );
     unawaited(_fetch(query.first(), append: false));

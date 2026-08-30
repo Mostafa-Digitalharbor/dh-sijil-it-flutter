@@ -3126,6 +3126,252 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Found out of scope'**
   String get auditReportUnexpected;
+
+  /// No description provided for @assignStepDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected return date'**
+  String get assignStepDue;
+
+  /// No description provided for @assignDueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this empty unless the asset is a loan somebody has to bring back.'**
+  String get assignDueHint;
+
+  /// No description provided for @assignDueNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No return date'**
+  String get assignDueNotSet;
+
+  /// No description provided for @assignDueClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the date'**
+  String get assignDueClear;
+
+  /// No description provided for @labelDueBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Due back'**
+  String get labelDueBack;
+
+  /// No description provided for @dueChipOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get dueChipOverdue;
+
+  /// No description provided for @dueChipSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Due soon'**
+  String get dueChipSoon;
+
+  /// How far past its expected return date an asset is.
+  ///
+  /// In en, this message translates to:
+  /// **'{days,plural, =1{1 day overdue} other{{days} days overdue}}'**
+  String dueOverdueBy(int days);
+
+  /// How long is left before an asset is expected back.
+  ///
+  /// In en, this message translates to:
+  /// **'{days,plural, =0{Due back today} =1{Due back tomorrow} other{Due back in {days} days}}'**
+  String dueInDays(int days);
+
+  /// No description provided for @overdueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue returns'**
+  String get overdueTitle;
+
+  /// No description provided for @overdueSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets past the date they were promised back'**
+  String get overdueSubtitle;
+
+  /// No description provided for @overdueEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is late'**
+  String get overdueEmptyTitle;
+
+  /// No description provided for @overdueEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every asset with a return date is still within it. Set a date when you hand something over and it will be watched here.'**
+  String get overdueEmptyBody;
+
+  /// Subtitle of the overdue-returns screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 asset is late} other{{count} assets are late}}'**
+  String overdueCount(int count);
+
+  /// No description provided for @filterOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue only'**
+  String get filterOverdue;
+
+  /// No description provided for @exportColumnDueBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Due back'**
+  String get exportColumnDueBack;
+
+  /// No description provided for @selectionStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Select assets'**
+  String get selectionStart;
+
+  /// No description provided for @selectionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave selection'**
+  String get selectionCancel;
+
+  /// Title of the assets screen while selecting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =0{Nothing selected} =1{1 selected} other{{count} selected}}'**
+  String selectionCount(int count);
+
+  /// No description provided for @selectionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all loaded'**
+  String get selectionAll;
+
+  /// No description provided for @selectionNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selection'**
+  String get selectionNone;
+
+  /// Shown when a selection hits its ceiling.
+  ///
+  /// In en, this message translates to:
+  /// **'You can act on {count} assets at a time.'**
+  String selectionLimitReached(int count);
+
+  /// No description provided for @bulkMoveDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to department'**
+  String get bulkMoveDepartment;
+
+  /// No description provided for @bulkMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which department?'**
+  String get bulkMoveTitle;
+
+  /// Confirmation after a bulk department move.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 asset moved to {department}} other{{count} assets moved to {department}}}'**
+  String bulkMoveDone(int count, String department);
+
+  /// No description provided for @bulkMoveNoDepartments.
+  ///
+  /// In en, this message translates to:
+  /// **'This Odoo has no departments to move assets to.'**
+  String get bulkMoveNoDepartments;
+
+  /// No description provided for @bulkPrintLabels.
+  ///
+  /// In en, this message translates to:
+  /// **'Label sheet'**
+  String get bulkPrintLabels;
+
+  /// No description provided for @labelSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset labels'**
+  String get labelSheetTitle;
+
+  /// Subtitle printed on the label sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 label} other{{count} labels}}'**
+  String labelSheetSubtitle(int count);
+
+  /// No description provided for @scanEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a code'**
+  String get scanEnterCode;
+
+  /// No description provided for @scanEnterCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the asset code'**
+  String get scanEnterCodeTitle;
+
+  /// No description provided for @scanEnterCodeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For a label the camera cannot read — scratched, in the dark, or behind a desk.'**
+  String get scanEnterCodeBody;
+
+  /// No description provided for @scanEnterCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial number or asset tag'**
+  String get scanEnterCodeHint;
+
+  /// No description provided for @lockSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Require unlock'**
+  String get lockSettingsTitle;
+
+  /// No description provided for @lockSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for this device’s fingerprint, face or passcode before Sijil IT opens.'**
+  String get lockSettingsSubtitle;
+
+  /// No description provided for @lockUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This device has no screen lock set up, so there is nothing to ask for.'**
+  String get lockUnavailable;
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sijil IT is locked'**
+  String get lockTitle;
+
+  /// No description provided for @lockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone holding an unlocked phone could reassign company equipment. Unlock to carry on.'**
+  String get lockBody;
+
+  /// No description provided for @lockUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get lockUnlock;
+
+  /// No description provided for @lockReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Sijil IT'**
+  String get lockReason;
+
+  /// No description provided for @lockFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That did not unlock. Try again.'**
+  String get lockFailed;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

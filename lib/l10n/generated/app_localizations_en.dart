@@ -1914,4 +1914,216 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get auditReportUnexpected => 'Found out of scope';
+
+  @override
+  String get assignStepDue => 'Expected return date';
+
+  @override
+  String get assignDueHint =>
+      'Leave this empty unless the asset is a loan somebody has to bring back.';
+
+  @override
+  String get assignDueNotSet => 'No return date';
+
+  @override
+  String get assignDueClear => 'Remove the date';
+
+  @override
+  String get labelDueBack => 'Due back';
+
+  @override
+  String get dueChipOverdue => 'Overdue';
+
+  @override
+  String get dueChipSoon => 'Due soon';
+
+  @override
+  String dueOverdueBy(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days overdue',
+      one: '1 day overdue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dueInDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Due back in $daysString days',
+      one: 'Due back tomorrow',
+      zero: 'Due back today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overdueTitle => 'Overdue returns';
+
+  @override
+  String get overdueSubtitle => 'Assets past the date they were promised back';
+
+  @override
+  String get overdueEmptyTitle => 'Nothing is late';
+
+  @override
+  String get overdueEmptyBody =>
+      'Every asset with a return date is still within it. Set a date when you hand something over and it will be watched here.';
+
+  @override
+  String overdueCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets are late',
+      one: '1 asset is late',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterOverdue => 'Overdue only';
+
+  @override
+  String get exportColumnDueBack => 'Due back';
+
+  @override
+  String get selectionStart => 'Select assets';
+
+  @override
+  String get selectionCancel => 'Leave selection';
+
+  @override
+  String selectionCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString selected',
+      one: '1 selected',
+      zero: 'Nothing selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectionAll => 'Select all loaded';
+
+  @override
+  String get selectionNone => 'Clear selection';
+
+  @override
+  String selectionLimitReached(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'You can act on $countString assets at a time.';
+  }
+
+  @override
+  String get bulkMoveDepartment => 'Move to department';
+
+  @override
+  String get bulkMoveTitle => 'Which department?';
+
+  @override
+  String bulkMoveDone(int count, String department) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets moved to $department',
+      one: '1 asset moved to $department',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkMoveNoDepartments =>
+      'This Odoo has no departments to move assets to.';
+
+  @override
+  String get bulkPrintLabels => 'Label sheet';
+
+  @override
+  String get labelSheetTitle => 'Asset labels';
+
+  @override
+  String labelSheetSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString labels',
+      one: '1 label',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanEnterCode => 'Type a code';
+
+  @override
+  String get scanEnterCodeTitle => 'Type the asset code';
+
+  @override
+  String get scanEnterCodeBody =>
+      'For a label the camera cannot read — scratched, in the dark, or behind a desk.';
+
+  @override
+  String get scanEnterCodeHint => 'Serial number or asset tag';
+
+  @override
+  String get lockSettingsTitle => 'Require unlock';
+
+  @override
+  String get lockSettingsSubtitle =>
+      'Ask for this device’s fingerprint, face or passcode before Sijil IT opens.';
+
+  @override
+  String get lockUnavailable =>
+      'This device has no screen lock set up, so there is nothing to ask for.';
+
+  @override
+  String get lockTitle => 'Sijil IT is locked';
+
+  @override
+  String get lockBody =>
+      'Anyone holding an unlocked phone could reassign company equipment. Unlock to carry on.';
+
+  @override
+  String get lockUnlock => 'Unlock';
+
+  @override
+  String get lockReason => 'Unlock Sijil IT';
+
+  @override
+  String get lockFailed => 'That did not unlock. Try again.';
 }

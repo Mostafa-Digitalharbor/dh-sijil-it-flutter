@@ -11,6 +11,7 @@ import '../../core/network/odoo/odoo_session_manager.dart';
 import '../../core/network/xmlrpc/xml_rpc_client.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/notifications/reminder_scheduler.dart';
+import '../../core/security/app_lock.dart';
 import '../../core/security/credential_vault.dart';
 import '../../core/services/photo_picker.dart';
 import '../../core/storage/cache/cache_store.dart';
@@ -23,6 +24,7 @@ import '../../core/sync/write_queue.dart';
 import '../../features/assets/data/datasources/asset_remote_data_source.dart';
 import '../../features/assets/data/datasources/caching_asset_data_source.dart';
 import '../../features/assets/data/repositories/asset_repository_impl.dart';
+import '../../features/assets/data/services/asset_due_date_store.dart';
 import '../../features/assets/data/services/asset_state_store.dart';
 import '../../features/assets/data/services/asset_status_resolver.dart';
 import '../../features/assets/data/services/local_asset_state_store.dart';
@@ -61,6 +63,7 @@ import '../../features/maintenance/data/repositories/maintenance_repository_impl
 import '../../features/maintenance/domain/repositories/maintenance_repository.dart';
 import '../../features/maintenance/presentation/cubit/maintenance_cubit.dart';
 import '../../features/scanner/presentation/cubit/scanner_cubit.dart';
+import '../../features/settings/presentation/cubit/app_lock_cubit.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../shared/cubit/sync_cubit.dart';
 
@@ -105,6 +108,7 @@ void registerAppGraph() {
 // ── Layer 0: platform & storage ────────────────────────────────────────────
 Future<void> _registerPlatform() async {
   sl.registerLazySingleton<CredentialVault>(CredentialVault.createDefault);
+  sl.registerLazySingleton<AppLock>(AppLock.new);
 
   final cacheStore = HiveCacheStore(sl<CredentialVault>());
   await cacheStore.init();
@@ -141,7 +145,10 @@ void _registerOdooServices() {
     () => OdooAttachmentService(sl<OdooObjectService>()),
   );
   sl.registerLazySingleton<OdooChatterService>(
-    () => OdooChatterService(sl<OdooObjectService>()),
+    () => OdooChatterService(
+      sl<OdooObjectService>(),
+      sl<OdooCapabilityService>(),
+    ),
   );
   sl.registerLazySingleton<PhotoPicker>(ImagePickerAdapter.new);
 }
@@ -213,6 +220,17 @@ void _registerRepositories() {
     () => AssetStatusResolver(sl<OdooCapabilityService>()),
   );
 
+  // Alongside the state store rather than inside it: they are recorded the
+  // same way — a clause in a chatter note, mirrored on the device — but one
+  // holds an enum and the other a date, and folding them together would be
+  // one box answering two questions with the wrong type half the time.
+  sl.registerLazySingleton<AssetDueDateStore>(
+    () => AssetDueDateStore(
+      cache: sl<CacheStore>(),
+      chatter: sl<OdooChatterService>(),
+    ),
+  );
+
   // The strategy that decides which standard model backs an asset. Registered
   // against the interface so adding a `stock.lot` source later is one line
   // here rather than an edit to every caller.
@@ -236,6 +254,7 @@ void _registerRepositories() {
       remote: sl<AssetRemoteDataSource>(),
       statusResolver: sl<AssetStatusResolver>(),
       states: sl<AssetStateStore>(),
+      dues: sl<AssetDueDateStore>(),
       chatter: sl<OdooChatterService>(),
       outbox: sl<OutboxStore>(),
       queue: sl<WriteQueue>(),
@@ -298,6 +317,7 @@ void _registerUseCases() {
     ..registerLazySingleton(() => AssignAsset(sl<AssetRepository>()))
     ..registerLazySingleton(() => ReturnAsset(sl<AssetRepository>()))
     ..registerLazySingleton(() => SetLocalAssetStatus(sl<AssetRepository>()))
+    ..registerLazySingleton(() => MoveAssetsToDepartment(sl<AssetRepository>()))
     ..registerLazySingleton(() => GetAssetListOptions(sl<AssetRepository>()))
     ..registerLazySingleton(() => GetAssetHistory(sl<AssetRepository>()))
     ..registerLazySingleton(() => GetEmployeesPage(sl<EmployeeRepository>()))
@@ -342,6 +362,13 @@ void _registerCubits() {
   // A singleton, unlike the screen Cubits: being offline is a fact about the
   // app, and the banner has to outlive the navigation a technician does while
   // walking back into signal.
+  // A singleton for the same reason as the sync banner: whether the app is
+  // locked outlives every screen, and a second instance would be a second
+  // opinion about it.
+  sl.registerLazySingleton<AppLockCubit>(
+    () => AppLockCubit(lock: sl<AppLock>(), preferences: sl<AppPreferences>()),
+  );
+
   sl.registerLazySingleton<SyncCubit>(
     () => SyncCubit(
       outbox: sl<OutboxStore>(),
@@ -375,6 +402,7 @@ void _registerCubits() {
         getAssets: sl<GetAssetsPage>(),
         getOptions: sl<GetAssetListOptions>(),
         getDepartments: sl<GetDepartments>(),
+        moveToDepartment: sl<MoveAssetsToDepartment>(),
         repository: sl<AssetRepository>(),
       ),
     )
@@ -446,6 +474,7 @@ void _registerCubits() {
       () => SettingsCubit(
         cache: sl<CacheStore>(),
         states: sl<AssetStateStore>(),
+        dues: sl<AssetDueDateStore>(),
         capabilities: sl<OdooCapabilityService>(),
         preferences: sl<AppPreferences>(),
         auth: sl<AuthRepository>(),

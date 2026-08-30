@@ -61,6 +61,48 @@ abstract final class AppConstants {
   /// quietly reverting to the derived one on a colleague's phone.
   static const int markerNoteScanLimit = 400;
 
+  /// How long the app may be in the background before the lock comes back on.
+  ///
+  /// Not zero, and the reason is the rest of the product: the camera
+  /// permission dialog, the photo picker, the OS share sheet and the unlock
+  /// prompt itself all background the app. Locking on every pause would put
+  /// the prompt in front of somebody who never left the room — twice during a
+  /// single return, once for the picker and once for the share.
+  ///
+  /// Half a minute is long enough to cover those and short enough that a phone
+  /// put down on a desk is locked before anybody else picks it up.
+  static const Duration appLockGrace = Duration(seconds: 30);
+
+  /// How close to its expected return date an asset has to be before the app
+  /// says so.
+  ///
+  /// Three days rather than a week: the point of the warning is that somebody
+  /// can still act on it — send a reminder, book the desk — and a badge that
+  /// lights up seven days out is one that is lit most of the time and read
+  /// none of it.
+  static const int returnDueSoonDays = 3;
+
+  /// How deep the due-date note scan goes when reading a page of assets.
+  ///
+  /// Matches [markerNoteScanLimit] and for the same reason: a due date is
+  /// recorded as a chatter note, and a limit too small means an asset quietly
+  /// loses the date somebody set for it.
+  static const int dueNoteScanLimit = markerNoteScanLimit;
+
+  /// How many assets one multi-select action may carry.
+  ///
+  /// A bulk write is a single `write` over the whole set, so the ceiling is
+  /// not Odoo's — it is the label sheet's and the user's. Past a couple of
+  /// hundred rows nobody is reviewing what they selected, and "move these to
+  /// Finance" stops being a decision and becomes an accident.
+  static const int bulkSelectionLimit = 200;
+
+  /// The label sheet's grid. Three across and eight down is the standard
+  /// 24-per-page address-label stock A4 sheets are sold in, so the output
+  /// lines up with paper somebody can actually buy.
+  static const int labelSheetColumns = 3;
+  static const int labelSheetRows = 8;
+
   /// How many category bars the dashboard draws before it stops being a chart.
   static const int categoryChartLimit = 6;
 

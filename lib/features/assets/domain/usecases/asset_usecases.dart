@@ -116,6 +116,31 @@ class SetLocalStatusParams extends Equatable {
   List<Object?> get props => [assetId, status];
 }
 
+/// Moves a selected set of assets to one department (the bulk action behind
+/// multi-select).
+class MoveAssetsToDepartment extends UseCase<int, MoveToDepartmentParams> {
+  const MoveAssetsToDepartment(this._repository);
+
+  final AssetRepository _repository;
+
+  @override
+  ResultFuture<int> call(MoveToDepartmentParams params) =>
+      _repository.moveToDepartment(params.assetIds, params.departmentId);
+}
+
+class MoveToDepartmentParams extends Equatable {
+  const MoveToDepartmentParams({
+    required this.assetIds,
+    required this.departmentId,
+  });
+
+  final List<int> assetIds;
+  final int departmentId;
+
+  @override
+  List<Object?> get props => [assetIds, departmentId];
+}
+
 /// The filter sheet's option lists plus the user's ACLs, fetched together.
 ///
 /// One use case rather than three, because the list screen needs all of it

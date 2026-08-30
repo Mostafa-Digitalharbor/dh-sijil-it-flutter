@@ -23,6 +23,7 @@ abstract final class AppRoutes {
   static const String maintenance = 'maintenance';
   static const String maintenanceDetail = 'maintenance/:requestId';
   static const String audit = 'audit';
+  static const String overdue = 'overdue';
   static const String handover = 'handover';
   static const String settings = 'settings';
   static const String sync = 'sync';
@@ -40,6 +41,7 @@ abstract final class AppRoutes {
 
   static const String maintenancePath = '$more/maintenance';
   static const String auditPath = '$more/audit';
+  static const String overduePath = '$more/overdue';
   static const String handoverPath = '$more/handover';
   static const String settingsPath = '$more/settings';
   static const String syncPath = '$more/sync';

@@ -9,6 +9,12 @@
          because "some time that morning" is the right precision for a
          warranty that expires in a month. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Settings -> Require unlock. USE_BIOMETRIC is a normal permission, so
+         it is granted at install and never prompts; without it AndroidX's
+         BiometricPrompt refuses to show. The prompt also accepts the device
+         PIN, pattern or password, which is what keeps the setting usable for
+         somebody the fingerprint sensor will not read. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <!-- QR / barcode scanning (spec sections 12 and 13). -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>

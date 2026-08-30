@@ -8,6 +8,7 @@ import '../../../../core/network/odoo/odoo_capability_service.dart';
 import '../../../../core/storage/cache/cache_store.dart';
 import '../../../../core/storage/preferences/app_preferences.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../assets/data/services/asset_due_date_store.dart';
 import '../../../assets/data/services/asset_state_store.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../connection/domain/entities/connection_probe.dart';
@@ -98,11 +99,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit({
     required CacheStore cache,
     required AssetStateStore states,
+    required AssetDueDateStore dues,
     required OdooCapabilityService capabilities,
     required AppPreferences preferences,
     required AuthRepository auth,
   }) : _cache = cache,
        _states = states,
+       _dues = dues,
        _capabilities = capabilities,
        _preferences = preferences,
        _auth = auth,
@@ -110,6 +113,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   final CacheStore _cache;
   final AssetStateStore _states;
+  final AssetDueDateStore _dues;
   final OdooCapabilityService _capabilities;
   final AppPreferences _preferences;
   final AuthRepository _auth;
@@ -150,7 +154,12 @@ class SettingsCubit extends Cubit<SettingsState> {
       for (final box in CacheBoxes.disposable) {
         await _cache.clearBox(box);
       }
-      if (!keepLocalStates) await _states.clearAll();
+      if (!keepLocalStates) {
+        await _states.clearAll();
+        // The due-date mirror goes with it: same recording mechanism, same
+        // guarantee that Odoo can rebuild it on the next read.
+        await _dues.clearAll();
+      }
 
       await _capabilities.invalidate();
       if (isClosed) return;

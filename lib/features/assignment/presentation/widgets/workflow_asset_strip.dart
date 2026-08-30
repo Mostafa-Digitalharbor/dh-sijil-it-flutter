@@ -5,6 +5,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/widgets/app_avatar.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -100,12 +101,23 @@ class WorkflowAssetStrip extends StatelessWidget {
 /// A thin composition of [AppPickerField] and [AppDatePicker]: the only thing
 /// it adds is the "Today" marker, which is the single most useful piece of
 /// feedback on a field that defaults to today and is usually left alone.
+///
+/// It also carries the *optional* case, for the expected return date. An
+/// optional date field needs two things a required one does not: something to
+/// say while it is empty, and a way back to empty once it is not — a user who
+/// opened the picker to look, or who decided the handover is permanent after
+/// all, otherwise has to abandon the screen to undo it.
 class WorkflowDateField extends StatelessWidget {
   const WorkflowDateField({
     required this.label,
     required this.value,
     required this.onChanged,
     this.showLabel = true,
+    this.emptyLabel,
+    this.onCleared,
+    this.clearLabel,
+    this.initialWhenEmpty,
+    this.firstDate,
     super.key,
   });
 
@@ -116,20 +128,61 @@ class WorkflowDateField extends StatelessWidget {
   /// False where a step header or section label already names the field.
   final bool showLabel;
 
+  /// What the field reads while empty. Defaults to the "unknown" placeholder,
+  /// which is right for a date that is missing and wrong for one that is
+  /// optional — "No return date" is a fact, "Unknown" is a gap.
+  final String? emptyLabel;
+
+  /// Makes the field clearable. Null keeps it required.
+  final VoidCallback? onCleared;
+  final String? clearLabel;
+
+  /// Where the picker opens when nothing is chosen yet.
+  final DateTime? initialWhenEmpty;
+
+  /// The earliest date the picker offers — a return cannot precede the
+  /// handover it ends.
+  final DateTime? firstDate;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
+    final isClearable = onCleared != null && value != null;
 
-    return AppPickerField(
+    final field = AppPickerField(
       label: label,
       showLabel: showLabel,
-      value: value == null ? l10n.labelUnknown : context.dates.dayLong(value),
+      value: value == null
+          ? (emptyLabel ?? l10n.labelUnknown)
+          : context.dates.dayLong(value),
       icon: Icons.calendar_month_rounded,
       trailingLabel: _isToday(value) ? l10n.actionToday : null,
       onTap: () async {
-        final picked = await AppDatePicker.show(context, initial: value);
+        final picked = await AppDatePicker.show(
+          context,
+          initial: value ?? initialWhenEmpty,
+          firstDate: firstDate,
+        );
         if (picked != null) onChanged(picked);
       },
+    );
+
+    if (!isClearable) return field;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        field,
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: AppTextAction(
+            label: clearLabel ?? l10n.actionClear,
+            icon: Icons.close_rounded,
+            onPressed: onCleared,
+          ),
+        ),
+      ],
     );
   }
 

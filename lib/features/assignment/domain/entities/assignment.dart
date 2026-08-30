@@ -13,6 +13,7 @@ class AssignmentRequest extends Equatable {
     required this.employeeId,
     required this.employeeName,
     required this.assignedOn,
+    this.dueOn,
     this.notes,
   });
 
@@ -20,6 +21,16 @@ class AssignmentRequest extends Equatable {
   final int employeeId;
   final String employeeName;
   final DateTime assignedOn;
+
+  /// When the asset is expected back, if anybody said.
+  ///
+  /// Optional and normally absent: a laptop issued to a permanent employee
+  /// comes back when they leave, and inventing a date for it would put every
+  /// asset in the fleet on an overdue list. It earns its place on the loans —
+  /// the spare handed out for a week, the projector taken to a conference —
+  /// which are exactly the ones that quietly never come back.
+  final DateTime? dueOn;
+
   final String? notes;
 
   @override
@@ -28,6 +39,7 @@ class AssignmentRequest extends Equatable {
     employeeId,
     employeeName,
     assignedOn,
+    dueOn,
     notes,
   ];
 }

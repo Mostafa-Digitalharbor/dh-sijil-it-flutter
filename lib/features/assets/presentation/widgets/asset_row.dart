@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_dimens.dart';
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/utils/app_text.dart';
@@ -20,6 +22,9 @@ class AssetRow extends StatelessWidget {
   const AssetRow({
     required this.asset,
     required this.onTap,
+    this.onLongPress,
+    this.selectable = false,
+    this.selected = false,
     this.showWarranty = true,
     this.showHolder = true,
     this.trailing,
@@ -28,6 +33,19 @@ class AssetRow extends StatelessWidget {
 
   final Asset asset;
   final VoidCallback onTap;
+
+  /// Starts multi-select from this row. Null on the screens that do not have
+  /// it — the employee profile and the scanner's recent results.
+  final VoidCallback? onLongPress;
+
+  /// Whether the list is currently choosing rows.
+  ///
+  /// Replaces the leading category glyph with a checkbox and the trailing
+  /// chevron with nothing, because in this mode a tap picks rather than opens
+  /// and the row must not promise otherwise.
+  final bool selectable;
+
+  final bool selected;
 
   /// The employee profile already groups by person and has no room for a
   /// second chip, so it turns the warranty chip off.
@@ -52,10 +70,15 @@ class AssetRow extends StatelessWidget {
       // Tinted by status, not neutral. It is the first thing the eye lands
       // on, so it carries the state; the glyph inside carries the kind of
       // device. Two facts in the space of one, before a word is read.
-      leading: AppLeadingTile(
-        icon: AssetIcons.forCategory(asset.category?.name),
-        tone: StatusChip.colorFor(asset.status),
-      ),
+      leading: selectable
+          ? _SelectionBox(selected: selected)
+          : AppLeadingTile(
+              icon: AssetIcons.forCategory(asset.category?.name),
+              tone: StatusChip.colorFor(asset.status),
+            ),
+      onLongPress: onLongPress,
+      selected: selected,
+      showChevron: !selectable,
       title: asset.name,
       subtitle: _subtitle(context, l10n),
       // Tag, manufacturer and holder are Latin identifiers even in an Arabic
@@ -81,6 +104,11 @@ class AssetRow extends StatelessWidget {
                   tone: AppColors.warning,
                   dense: true,
                 ),
+              // Ahead of the warranty chip too, and for the same kind of
+              // reason: a warranty running out is a purchase decision months
+              // away, and a laptop that should have come back last week is
+              // somebody to ring today.
+              DueChip(due: asset.dueBack),
               if (showWarranty) WarrantyChip(warranty: asset.warranty),
             ],
     );
@@ -102,5 +130,50 @@ class AssetRow extends StatelessWidget {
     ];
 
     return AppText.joinedOrNull(parts);
+  }
+}
+
+/// The checkbox that stands in for the category glyph while selecting.
+///
+/// Sized to the tile it replaces so the rows do not jump when the list enters
+/// selection mode — a list that reflows under the finger that long-pressed it
+/// is a list where the user loses their place.
+class _SelectionBox extends StatelessWidget {
+  const _SelectionBox({required this.selected});
+
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      width: AppDimens.tileMd,
+      height: AppDimens.tileMd,
+      child: Center(
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          width: AppDimens.radioSize,
+          height: AppDimens.radioSize,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.sm),
+            color: selected ? AppColors.mint : Colors.transparent,
+            border: selected
+                ? null
+                : Border.all(
+                    color: theme.colorScheme.outlineVariant,
+                    width: AppDimens.focusedBorder,
+                  ),
+          ),
+          child: selected
+              ? const Icon(
+                  Icons.check_rounded,
+                  size: AppDimens.iconSm,
+                  color: AppColors.navy,
+                )
+              : null,
+        ),
+      ),
+    );
   }
 }

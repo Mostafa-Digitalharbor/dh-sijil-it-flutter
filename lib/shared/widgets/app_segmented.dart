@@ -178,7 +178,15 @@ class AppCheckRow extends StatelessWidget {
 
   final String label;
   final bool value;
-  final ValueChanged<bool> onChanged;
+
+  /// Null disables the row.
+  ///
+  /// Nullable rather than always-callable so a control the app cannot honour
+  /// — a device unlock on a phone with no screen lock — reads as unavailable
+  /// instead of accepting a tap and silently doing nothing.
+  final ValueChanged<bool>? onChanged;
+
+  bool get _enabled => onChanged != null;
 
   @override
   Widget build(BuildContext context) {
@@ -187,10 +195,11 @@ class AppCheckRow extends StatelessWidget {
 
     return Semantics(
       checked: value,
+      enabled: _enabled,
       label: label,
       child: ExcludeSemantics(
         child: InkWell(
-          onTap: () => onChanged(!value),
+          onTap: _enabled ? () => onChanged!(!value) : null,
           borderRadius: BorderRadius.circular(AppRadii.sm),
           child: Padding(
             padding: const EdgeInsetsDirectional.symmetric(
@@ -203,15 +212,15 @@ class AppCheckRow extends StatelessWidget {
                   width: AppDimens.checkboxSize,
                   height: AppDimens.checkboxSize,
                   decoration: BoxDecoration(
-                    color: value
+                    color: value && _enabled
                         ? (isDark ? AppColors.mint : AppColors.navy)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppRadii.xs),
-                    border: value
+                    border: value && _enabled
                         ? null
                         : Border.all(color: theme.colorScheme.outlineVariant),
                   ),
-                  child: value
+                  child: value && _enabled
                       ? Icon(
                           Icons.check_rounded,
                           size: AppDimens.iconControl,
@@ -224,7 +233,9 @@ class AppCheckRow extends StatelessWidget {
                   child: Text(
                     label,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
+                      color: _enabled
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),

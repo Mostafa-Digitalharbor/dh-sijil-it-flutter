@@ -26,6 +26,7 @@ class AssetHistoryEntry extends Equatable {
     required this.summary,
     this.occurredAt,
     this.author,
+    this.holder,
   });
 
   final int id;
@@ -35,10 +36,28 @@ class AssetHistoryEntry extends Equatable {
   final String summary;
 
   final DateTime? occurredAt;
+
+  /// Who wrote the entry — not who received the asset.
   final OdooNameRef? author;
 
+  /// Who this entry handed the asset *to*, when it handed it to anybody.
+  ///
+  /// Separate from [summary] because the holder count is a count of people,
+  /// and the two ways an asset changes hands — a note this app wrote and a
+  /// tracked field change somebody made in the web client — say the same thing
+  /// in two different sentences. Counting sentences made one person look like
+  /// two.
+  final String? holder;
+
   @override
-  List<Object?> get props => <Object?>[id, kind, summary, occurredAt, author];
+  List<Object?> get props => <Object?>[
+    id,
+    kind,
+    summary,
+    occurredAt,
+    author,
+    holder,
+  ];
 }
 
 /// An asset's whole service life.
@@ -102,9 +121,17 @@ class AssetHistory extends Equatable {
   /// Paired with time in service on the summary line, because together they
   /// answer the replacement question: a device on its fourth holder in two
   /// years is being passed around, not settled.
+  ///
+  /// Counted over the *names*, not the entries. A handover recorded in this
+  /// app and the same handover seen as a tracked field change in Odoo are one
+  /// person receiving one device — and an entry that names nobody (a bundled
+  /// handover, a change whose field could not be resolved) is not counted at
+  /// all, rather than counted as an anonymous extra holder.
   int get holderCount => entries
-      .where((entry) => entry.kind == AssetEventKind.assigned)
-      .map((entry) => entry.summary)
+      .map((entry) => entry.holder)
+      .whereType<String>()
+      .map((name) => name.trim())
+      .where((name) => name.isNotEmpty)
       .toSet()
       .length;
 

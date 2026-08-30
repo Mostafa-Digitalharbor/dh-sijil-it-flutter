@@ -8,10 +8,12 @@ import 'package:sijil_it/app/theme/app_theme.dart';
 import 'package:sijil_it/core/network/connectivity/network_info.dart';
 import 'package:sijil_it/core/network/odoo/odoo_connection.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
+import 'package:sijil_it/core/security/app_lock.dart';
 import 'package:sijil_it/core/security/credential_vault.dart';
 import 'package:sijil_it/core/storage/cache/cache_store.dart';
 import 'package:sijil_it/core/storage/preferences/app_preferences.dart';
 import 'package:sijil_it/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:sijil_it/features/settings/presentation/cubit/app_lock_cubit.dart';
 import 'package:sijil_it/features/settings/presentation/cubit/app_settings_cubit.dart';
 import 'package:sijil_it/l10n/generated/app_localizations.dart';
 import 'package:sijil_it/shared/cubit/sync_cubit.dart';
@@ -36,6 +38,11 @@ Future<InProcessOdooClient> configureTestDependencies({
   SharedPreferences.setMockInitialValues(preferences);
 
   sl.registerLazySingleton<CredentialVault>(InMemoryVault.new);
+  // The fourth platform-bound piece. Left as the real object rather than a
+  // double: with no plugin behind it every call throws, `AppLock` catches and
+  // answers "no device lock", and every screen renders exactly as it does on a
+  // phone that has none — which is the state these tests are asserting about.
+  sl.registerLazySingleton<AppLock>(AppLock.new);
   sl.registerLazySingleton<CacheStore>(InMemoryCache.new);
   sl.registerSingleton<AppPreferences>(await AppPreferences.create());
   sl.registerLazySingleton<NetworkInfo>(() => network ?? FakeNetworkInfo());
@@ -260,6 +267,11 @@ Widget withAppProviders({required Widget child, AuthCubit? auth}) =>
           create: (_) => AppSettingsCubit(sl<AppPreferences>()),
         ),
         BlocProvider<SyncCubit>.value(value: sl<SyncCubit>()..start()),
+        // Started, like the sync Cubit above it and like `SijilApp` does:
+        // an unstarted lock Cubit has not asked the OS whether this device
+        // has a screen lock, and every screen that reads it would be
+        // asserting about a question nobody has posed.
+        BlocProvider<AppLockCubit>.value(value: sl<AppLockCubit>()..start()),
       ],
       child: child,
     );
