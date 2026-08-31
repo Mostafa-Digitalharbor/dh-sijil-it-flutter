@@ -21,7 +21,6 @@ import '../../domain/entities/asset_draft.dart';
 import '../../domain/entities/asset_history.dart';
 import '../../domain/entities/asset_query.dart';
 import '../../domain/entities/asset_status.dart';
-import '../../domain/entities/return_due.dart';
 import '../../domain/repositories/asset_repository.dart';
 import '../datasources/asset_remote_data_source.dart';
 import '../mappers/asset_mapper.dart';
@@ -29,6 +28,7 @@ import '../services/asset_due_date_store.dart';
 import '../services/asset_note_vocabulary.dart';
 import '../services/asset_state_store.dart';
 import '../services/asset_status_resolver.dart';
+import '../services/pending_write_overlay.dart';
 
 /// The data-layer implementation of [AssetRepository].
 ///
@@ -514,7 +514,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
     final dueOn = await _dues.read(_remote.model, id);
     final pending = await _outbox.pending();
 
-    return _applyPending(
+    return PendingWriteOverlay.apply(
       AssetMapper.toEntity(
         record,
         status: _statusResolver.resolve(
@@ -527,69 +527,6 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
       pending,
     );
   }
-
-  /// Shows the queue's version of an asset until Odoo has it.
-  ///
-  /// Without this the app tells two stories at once: the banner says a
-  /// handover is waiting to send, and the screen underneath still says the
-  /// laptop is on the shelf — because the cached record it re-read is the one
-  /// from before the technician gave it away.
-  ///
-  /// Applied here rather than by patching the cached record, so there is one
-  /// place that knows what a queued write means, it is applied on every read
-  /// consistently, and it disappears by itself the moment the entry leaves
-  /// the outbox.
-  Asset _applyPending(Asset asset, List<OutboxEntry> queue) {
-    var result = asset;
-    var touched = false;
-
-    // Oldest first, so assign-then-return lands the same way it will on Odoo.
-    for (final entry in queue.where((e) => e.subjectId == asset.id)) {
-      touched = true;
-      result = switch (entry.kind) {
-        OutboxKind.assignAsset => result.copyWith(
-          status: AssetStatus.assigned,
-          isStatusLocal: false,
-          assignedEmployee: OdooNameRef(
-            entry.payload['employeeId'] as int? ?? 0,
-            '${entry.payload['employeeName'] ?? ''}',
-          ),
-          assignmentDate:
-              DateTime.tryParse('${entry.payload['assignedOn']}') ??
-              entry.queuedAt,
-          // Re-evaluated rather than carried over: the asset is assigned as of
-          // this entry, which is the fact `ReturnDue` needs and the one the
-          // record read back from Odoo does not know yet.
-          dueBack: ReturnDue.evaluate(
-            date: DateTime.tryParse('${entry.payload['dueOn']}'),
-            isAssigned: true,
-          ),
-        ),
-        OutboxKind.returnAsset => result.copyWith(
-          status: _queuedReturnStatus(entry),
-          isStatusLocal: _queuedReturnStatus(entry).isLocalOnly,
-          clearAssignment: true,
-        ),
-        OutboxKind.setAssetStatus => result.copyWith(
-          status: _queuedStatus(entry) ?? result.status,
-          isStatusLocal: true,
-        ),
-      };
-    }
-
-    return touched ? result.copyWith(hasPendingSync: true) : result;
-  }
-
-  static AssetStatus _queuedReturnStatus(OutboxEntry entry) =>
-      ReturnCondition.values
-          .where((c) => c.name == entry.payload['condition'])
-          .firstOrNull
-          ?.resultingStatus ??
-      AssetStatus.available;
-
-  static AssetStatus? _queuedStatus(OutboxEntry entry) => AssetStatus.values
-      .where((s) => s.name == entry.payload['status'])
-      .firstOrNull;
 
   /// Maps a whole page, reading the overlay once for every id rather than
   /// once per row.
@@ -609,7 +546,7 @@ class AssetRepositoryImpl with RepositoryGuard implements AssetRepository {
 
     return records
         .map(
-          (record) => _applyPending(
+          (record) => PendingWriteOverlay.apply(
             AssetMapper.toEntity(
               record,
               status: _statusResolver.resolve(

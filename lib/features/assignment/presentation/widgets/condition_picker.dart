@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/responsive/responsive.dart';
@@ -130,7 +131,7 @@ class _ConditionCard extends StatelessWidget {
                   child: const Icon(
                     Icons.check_rounded,
                     size: AppDimens.iconSm,
-                    color: Colors.white,
+                    color: AppColors.onAccent,
                   ),
                 ),
             ],

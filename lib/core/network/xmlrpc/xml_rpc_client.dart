@@ -45,7 +45,11 @@ class DioXmlRpcClient implements XmlRpcClient {
           'Content-Type': 'text/xml; charset=UTF-8',
           'Accept': 'text/xml',
         },
-        validateStatus: (status) => status != null && status < 500,
+        // Every status is handled below by hand. Letting Dio decide which
+        // ones are exceptional collapses them all into one `badResponse`,
+        // and 404 (wrong path), 403 (a proxy in front of Odoo) and 503 (Odoo
+        // restarting) need three different sentences told to the user.
+        validateStatus: (_) => true,
       ),
     );
     return DioXmlRpcClient(dio);
@@ -63,19 +67,7 @@ class DioXmlRpcClient implements XmlRpcClient {
     try {
       final response = await _dio.postUri<String>(endpoint, data: body);
 
-      final status = response.statusCode ?? 0;
-      if (status == 404) {
-        throw const app.ConnectionException(
-          'The XML-RPC endpoint was not found on this server.',
-          technicalDetails: 'HTTP 404 for the XML-RPC path.',
-        );
-      }
-      if (status >= 400) {
-        throw app.ConnectionException(
-          'The server rejected the request.',
-          technicalDetails: 'HTTP $status',
-        );
-      }
+      _throwForStatus(response.statusCode ?? 0);
 
       final payload = response.data;
       if (payload == null || payload.isEmpty) {
@@ -84,7 +76,7 @@ class DioXmlRpcClient implements XmlRpcClient {
         );
       }
 
-      return XmlRpcCodec.decodeResponse(payload);
+      return await XmlRpcCodec.decode(payload);
     } on XmlRpcFault catch (fault) {
       throw app.OdooFaultException(
         fault.faultString,
@@ -94,6 +86,42 @@ class DioXmlRpcClient implements XmlRpcClient {
     } on DioException catch (e) {
       throw _mapDioException(e);
     }
+  }
+
+  /// Turns an HTTP status into the exception that produces the right advice.
+  ///
+  /// Ordered by what the user has to do about it, not by numeric range.
+  static void _throwForStatus(int status) {
+    if (status < 400) return;
+
+    // The instance is up and broke while answering. The address is right, so
+    // sending the user to the connection screen would be sending them to fix
+    // something that is not wrong.
+    if (status >= 500) {
+      throw app.ServerException(
+        'The Odoo server failed while handling the request.',
+        statusCode: status,
+        technicalDetails: 'HTTP $status',
+      );
+    }
+
+    // The host answered but has no XML-RPC at that path: a wrong base URL, or
+    // a domain that is not the Odoo one.
+    if (status == 404) {
+      throw const app.ConnectionException(
+        'The XML-RPC endpoint was not found on this server.',
+        technicalDetails: 'HTTP 404 for the XML-RPC path.',
+      );
+    }
+
+    // Odoo returns its own auth failures as XML-RPC faults, never as HTTP
+    // 401/403. Reaching here means something in front of Odoo — a reverse
+    // proxy, a WAF, an SSO gateway — refused the request before Odoo saw it,
+    // which the connection screen is where you go to fix.
+    throw app.ConnectionException(
+      'The server rejected the request.',
+      technicalDetails: 'HTTP $status',
+    );
   }
 
   /// Whether the OS refused the request because it was not encrypted.
@@ -124,6 +152,15 @@ class DioXmlRpcClient implements XmlRpcClient {
         'The server certificate could not be verified.',
         technicalDetails: '${e.message}',
       ),
+      // validateStatus lets every status through, so this is reachable only
+      // from a Dio path that bypasses it. Classified the same way regardless,
+      // so the two routes cannot disagree about what a 503 means.
+      DioExceptionType.badResponse when (e.response?.statusCode ?? 0) >= 500 =>
+        app.ServerException(
+          'The Odoo server failed while handling the request.',
+          statusCode: e.response?.statusCode,
+          technicalDetails: 'HTTP ${e.response?.statusCode}',
+        ),
       DioExceptionType.badResponse => app.ConnectionException(
         'The server returned an unexpected response.',
         technicalDetails: 'HTTP ${e.response?.statusCode}',

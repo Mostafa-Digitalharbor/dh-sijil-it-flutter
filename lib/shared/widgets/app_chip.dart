@@ -79,7 +79,7 @@ class AppChip extends StatelessWidget {
 
     if (selected) {
       background = isDark ? AppColors.mint : AppColors.navy;
-      ink = isDark ? AppColors.navy : Colors.white;
+      ink = isDark ? AppColors.navy : AppColors.onAccent;
       borderColor = null;
     } else if (tone == null) {
       background = isDark ? AppColors.borderDark : AppColors.surfaceLight;

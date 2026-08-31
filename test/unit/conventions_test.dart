@@ -197,6 +197,72 @@ void main() {
     });
   });
 
+  group('no hardcoded colours outside the palette (continued)', () {
+    test('named Material colours are not used as design decisions', () {
+      // `Color(0x…)` was already banned, and `Colors.white` walked straight
+      // past it — twenty-odd call sites, each one an unnamed decision about
+      // what ink goes on a saturated fill, a camera preview or a printed QR
+      // code. They are not the same decision and they do not have to keep the
+      // same value.
+      //
+      // `Colors.transparent` is exempt: it is "none", the same kind of thing
+      // as `EdgeInsets.zero`, not a colour anybody would want to restyle.
+      final offenders = <String>[];
+      final named = RegExp(r'\bColors\.(?!transparent\b)([a-z][A-Za-z0-9]*)');
+
+      for (final file in all) {
+        if (file.path.endsWith('app_colors.dart')) continue;
+        file.forEachLine((line, number, raw) {
+          final match = named.firstMatch(line);
+          if (match == null) return;
+          offenders.add('${file.path}:$number  Colors.${match.group(1)}');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Name the decision in AppColors (onAccent, onBrand, onCamera, '
+            'qrPaper) and reference that.\n${offenders.join('\n')}',
+      );
+    });
+  });
+
+  group('no bare durations', () {
+    test('animation and timeout lengths come from AppDurations', () {
+      // AppDurations already says "no bare `Duration` literals in feature
+      // code" in its own doc comment. Nothing enforced it, and one had
+      // already drifted back in.
+      final offenders = <String>[];
+      final literal = RegExp(r'\bDuration\(\s*(?:milli|micro)?seconds:');
+
+      for (final file in all) {
+        // The scales themselves, and `AppConstants`, are where the numbers
+        // are supposed to be written.
+        if (file.path.endsWith('app_dimens.dart') ||
+            file.path.endsWith('app_constants.dart')) {
+          continue;
+        }
+        file.forEachLine((line, number, raw) {
+          if (!literal.hasMatch(line)) return;
+          // `Duration(days: …)` computed from a constant is arithmetic, not a
+          // design token — the warranty buckets are the real case.
+          if (line.contains('AppConstants.')) return;
+          offenders.add('${file.path}:$number  ${line.trim()}');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Add it to AppDurations and reference it.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+  });
+
   group('secrets never bypass the sanitizer', () {
     test('nothing in lib prints directly', () {
       // Every line AppLogger emits goes through LogSanitizer, whose redaction
@@ -319,6 +385,51 @@ void main() {
   });
 
   group('RTL safety', () {
+    test('no absolute Border(left:/right:)', () {
+      // The same mistake as `EdgeInsets.only(left:)`, one class over, and it
+      // is harder to spot: a bracket drawn with an absolute left border still
+      // looks like a bracket in Arabic, it is just the wrong one.
+      final offenders = <String>[];
+      final absolute = RegExp(r'\bBorder\([^)]*\b(?:left|right):');
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          if (!absolute.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use BorderDirectional with start/end.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+
+    test('no absolute BorderRadius.only(topLeft:/…)', () {
+      final offenders = <String>[];
+      final absolute = RegExp(
+        r'\bBorderRadius\.only\([^)]*\b(?:topLeft|topRight|bottomLeft|bottomRight):',
+      );
+
+      for (final file in ui) {
+        file.forEachLine((line, number, raw) {
+          if (!absolute.hasMatch(line)) return;
+          offenders.add('${file.path}:$number');
+        });
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Use BorderRadiusDirectional with topStart/topEnd.\n'
+            '${offenders.join('\n')}',
+      );
+    });
+
     test('no directional EdgeInsets.only(left:/right:)', () {
       final offenders = <String>[];
       final leftRight = RegExp(r'EdgeInsets\.only\([^)]*\b(?:left|right):');

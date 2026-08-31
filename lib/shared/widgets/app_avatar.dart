@@ -34,7 +34,7 @@ class AppAvatar extends StatelessWidget {
         ? AppColors.navy
         : (isDark ? AppColors.borderDark : AppColors.surfaceLight);
     final foreground = emphasised && !isDark
-        ? Colors.white
+        ? AppColors.onAccent
         : theme.colorScheme.onSurface;
 
     return Semantics(

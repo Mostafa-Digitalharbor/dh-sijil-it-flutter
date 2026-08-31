@@ -8,6 +8,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../utils/app_number.dart';
+import '../utils/decoded_image.dart';
 
 /// Photographs attached to a record, with the controls to add and remove them.
 ///
@@ -63,7 +64,7 @@ class PhotoStrip extends StatelessWidget {
         children: <Widget>[
           for (var i = 0; i < shown.length; i++) ...<Widget>[
             Expanded(
-              child: _Tile(
+              child: PhotoTile(
                 image: shown[i],
                 extra: photos.length > slots && i == shown.length - 1
                     ? photos.length - slots
@@ -76,7 +77,7 @@ class PhotoStrip extends StatelessWidget {
           ],
           if (onAdd != null)
             Expanded(
-              child: _AddTile(onTap: onAdd!, label: addLabel),
+              child: PhotoAddTile(onTap: onAdd!, label: addLabel),
             ),
         ],
       ),
@@ -100,8 +101,8 @@ class _Featured extends StatelessWidget {
           Expanded(
             flex: 2,
             child: photos.isEmpty
-                ? _AddTile(onTap: strip.onAdd, label: strip.addLabel)
-                : _Tile(
+                ? PhotoAddTile(onTap: strip.onAdd, label: strip.addLabel)
+                : PhotoTile(
                     image: photos.first,
                     counter: photos.length > 1
                         ? AppL10n.of(context).photosPosition(1, photos.length)
@@ -116,7 +117,7 @@ class _Featured extends StatelessWidget {
                 children: <Widget>[
                   Expanded(
                     child: photos.length > 1
-                        ? _Tile(
+                        ? PhotoTile(
                             image: photos[1],
                             onTap: strip.onOpen == null
                                 ? null
@@ -128,7 +129,7 @@ class _Featured extends StatelessWidget {
                     if (photos.length > 1)
                       const SizedBox(height: AppSpacing.sm),
                     Expanded(
-                      child: _AddTile(
+                      child: PhotoAddTile(
                         onTap: strip.onAdd,
                         label: strip.addLabel,
                       ),
@@ -144,13 +145,21 @@ class _Featured extends StatelessWidget {
   }
 }
 
-class _Tile extends StatelessWidget {
-  const _Tile({
+/// One photograph, framed.
+///
+/// Public because the return flow draws the same tile over a local file that
+/// has not been uploaded yet. Two implementations of "a photo with an × on
+/// it" drifted apart once already: one grew a dashed add target and a "+N"
+/// overlay, the other kept a solid border and a plain icon, and the two
+/// screens stopped looking like the same app.
+class PhotoTile extends StatelessWidget {
+  const PhotoTile({
     required this.image,
     this.onTap,
     this.onRemove,
     this.counter,
     this.extra,
+    super.key,
   });
 
   final ImageProvider image;
@@ -175,10 +184,42 @@ class _Tile extends StatelessWidget {
           color: palette.sunken,
           borderRadius: shape,
           clipBehavior: Clip.antiAlias,
-          child: Ink.image(
-            image: image,
-            fit: BoxFit.cover,
-            child: InkWell(onTap: onTap),
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              // Measured rather than passed in: the tile is sized by its
+              // parent (an Expanded in a Row, a square in a scroller), and a
+              // caller that has to remember to declare its own size is a
+              // caller that will eventually forget and put a 48 MB decode
+              // behind a 64-pt thumbnail.
+              LayoutBuilder(
+                builder: (context, constraints) => Image(
+                  image: DecodedImage.thumbnail(
+                    context,
+                    image,
+                    side: constraints.biggest.shortestSide,
+                  ),
+                  fit: BoxFit.cover,
+                  // A camera-intent temp file Android has since reclaimed, or
+                  // an `ir.attachment` that came back corrupt. Neither is
+                  // worth a red error box in a form somebody is still
+                  // filling in.
+                  errorBuilder: (context, _, _) => Center(
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      size: AppDimens.iconXl,
+                      color: palette.faint,
+                    ),
+                  ),
+                ),
+              ),
+              // Transparent so the ripple lands on top of the photograph
+              // rather than behind it.
+              Material(
+                color: Colors.transparent,
+                child: InkWell(onTap: onTap),
+              ),
+            ],
           ),
         ),
         IgnorePointer(
@@ -264,21 +305,25 @@ class _RemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: context.palette.sunken.withValues(
-        alpha: AppOpacities.photoControl,
-      ),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: SizedBox(
-          width: AppDimens.photoRemoveButton,
-          height: AppDimens.photoRemoveButton,
-          child: Icon(
-            Icons.close_rounded,
-            size: AppDimens.iconXs,
-            color: AppPalette.dark.dim,
+    return Semantics(
+      button: true,
+      label: AppL10n.of(context).actionRemove,
+      child: Material(
+        color: context.palette.sunken.withValues(
+          alpha: AppOpacities.photoControl,
+        ),
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            width: AppDimens.photoRemoveButton,
+            height: AppDimens.photoRemoveButton,
+            child: Icon(
+              Icons.close_rounded,
+              size: AppDimens.iconXs,
+              color: AppPalette.dark.dim,
+            ),
           ),
         ),
       ),
@@ -286,8 +331,12 @@ class _RemoveButton extends StatelessWidget {
   }
 }
 
-class _AddTile extends StatelessWidget {
-  const _AddTile({required this.onTap, this.label});
+/// The "add a photo" target: a dashed slot rather than a filled button.
+///
+/// The dash says "this is empty and you can fill it", which a solid border
+/// does not.
+class PhotoAddTile extends StatelessWidget {
+  const PhotoAddTile({required this.onTap, this.label, super.key});
 
   final VoidCallback? onTap;
   final String? label;
@@ -297,41 +346,47 @@ class _AddTile extends StatelessWidget {
     final palette = context.palette;
     final shape = BorderRadius.circular(AppRadii.photo);
 
-    return CustomPaint(
-      painter: _DashedBorderPainter(
-        color: palette.line,
-        radius: shape.topLeft.x,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: shape,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.add_rounded,
-                  size: AppDimens.iconSm,
-                  color: palette.faint,
-                ),
-                if (label != null)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      top: AppSpacing.xxs,
-                    ),
-                    child: Text(
-                      label!,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontSize: AppTextSize.badge,
-                        letterSpacing: AppTypography.noTracking,
-                        color: palette.faint,
+    return Semantics(
+      button: true,
+      // The icon alone announces nothing, and this is how a screen-reader
+      // user reaches the camera at all.
+      label: label ?? AppL10n.of(context).actionAdd,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(
+          color: palette.line,
+          radius: shape.topLeft.x,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: shape,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.add_rounded,
+                    size: AppDimens.iconSm,
+                    color: palette.faint,
+                  ),
+                  if (label != null)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        top: AppSpacing.xxs,
+                      ),
+                      child: Text(
+                        label!,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontSize: AppTextSize.badge,
+                          letterSpacing: AppTypography.noTracking,
+                          color: palette.faint,
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -104,7 +104,7 @@ class _LockScreenState extends State<_LockScreen> {
                     textAlign: TextAlign.center,
                     style: Theme.of(
                       context,
-                    ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                    ).textTheme.titleLarge?.copyWith(color: AppColors.onBrand),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(

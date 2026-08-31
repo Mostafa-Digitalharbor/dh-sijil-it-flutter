@@ -100,6 +100,7 @@ class FakeOdooData {
         OdooModels.maintenanceEquipmentCategory,
         OdooModels.mailMessage,
         OdooModels.mailTrackingValue,
+        OdooModels.irAttachment,
       },
       records: {
         OdooModels.resUsers: [
@@ -298,9 +299,66 @@ class FakeOdooData {
             'duration': 2.0,
           },
         ],
+
+        // Photographs. The strip and the viewer had no fixture at all before
+        // this, so the whole attachment path — list, download, delete — was
+        // only ever exercised against hand-written doubles.
+        //
+        // `datas` holds a real 1x1 PNG, base64 as Odoo stores it, so a
+        // download decodes rather than merely returning bytes. The third row
+        // is a PDF: `list` filters on mimetype server-side, and a quote
+        // attached to a repair must not put a broken tile in the strip.
+        OdooModels.irAttachment: [
+          {
+            'id': 9001,
+            'name': 'front-damage.png',
+            'res_model': OdooModels.maintenanceRequest,
+            'res_id': 501,
+            'mimetype': 'image/png',
+            'file_size': 2400000,
+            'datas': onePixelPng,
+          },
+          {
+            'id': 9002,
+            'name': 'serial-plate.png',
+            'res_model': OdooModels.maintenanceRequest,
+            'res_id': 501,
+            'mimetype': 'image/png',
+            'file_size': 1800000,
+            'datas': onePixelPng,
+          },
+          {
+            'id': 9003,
+            'name': 'repair-quote.pdf',
+            'res_model': OdooModels.maintenanceRequest,
+            'res_id': 501,
+            'mimetype': 'application/pdf',
+            'file_size': 90000,
+            'datas': onePixelPng,
+          },
+          {
+            'id': 9004,
+            'name': 'asset-photo.png',
+            'res_model': OdooModels.maintenanceEquipment,
+            'res_id': 101,
+            'mimetype': 'image/png',
+            'file_size': 3100000,
+            'datas': onePixelPng,
+          },
+        ],
       },
     );
   }
+
+  /// A 1x1 PNG, base64-encoded the way `ir.attachment.datas` holds one.
+  ///
+  /// Real image bytes rather than a placeholder string: a download that only
+  /// returned *something* would pass a test while handing the decoder
+  /// nonsense, which is exactly the failure mode the photo strip's
+  /// `errorBuilder` exists for.
+  static const String onePixelPng =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8'
+      'z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
   /// Builds one `mail.tracking.value` row with Odoo's own column shapes.
   ///
@@ -839,13 +897,53 @@ class FakeOdooData {
       '>=' => _comparable(normalised).compareTo(_comparable(expected)) >= 0,
       '<' => _comparable(normalised).compareTo(_comparable(expected)) < 0,
       '<=' => _comparable(normalised).compareTo(_comparable(expected)) <= 0,
-      'ilike' => '$actual'.toLowerCase().contains('$expected'.toLowerCase()),
-      'not ilike' => !'$actual'.toLowerCase().contains(
-        '$expected'.toLowerCase(),
-      ),
-      'like' => '$actual'.contains('$expected'),
+      'ilike' => _like(actual, expected, caseSensitive: false),
+      'not ilike' => !_like(actual, expected, caseSensitive: false),
+      'like' => _like(actual, expected),
+      'not like' => !_like(actual, expected),
       _ => throw FakeOdooFault(1, 'Unsupported domain operator: $operator'),
     };
+  }
+
+  /// Odoo's `like`, including its SQL wildcards.
+  ///
+  /// This used to be a plain `contains`, which is right for the *unanchored*
+  /// pattern Odoo's typeahead sends and wrong for every anchored one. The app
+  /// filters the photo strip with `mimetype like 'image/%'`, and against a
+  /// substring match `'image/png'.contains('image/%')` is false — so the fake
+  /// returned no photos at all, and the one filter standing between a repair's
+  /// PDF quote and a broken tile in the strip had never been exercised.
+  ///
+  /// `%` matches any run, `_` matches one character, and a pattern with
+  /// neither is treated as `%pattern%`, which is what Odoo does.
+  static bool _like(
+    Object? actual,
+    Object? expected, {
+    bool caseSensitive = true,
+  }) {
+    final subject = '$actual';
+    final pattern = '$expected';
+
+    if (!pattern.contains('%') && !pattern.contains('_')) {
+      return caseSensitive
+          ? subject.contains(pattern)
+          : subject.toLowerCase().contains(pattern.toLowerCase());
+    }
+
+    final regex = StringBuffer('^');
+    for (final char in pattern.split('')) {
+      regex.write(switch (char) {
+        '%' => '.*',
+        '_' => '.',
+        _ => RegExp.escape(char),
+      });
+    }
+    regex.write(r'$');
+
+    return RegExp(
+      regex.toString(),
+      caseSensitive: caseSensitive,
+    ).hasMatch(subject);
   }
 
   static Comparable<Object> _comparable(Object? value) {

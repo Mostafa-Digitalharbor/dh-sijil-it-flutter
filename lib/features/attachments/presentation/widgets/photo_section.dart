@@ -14,6 +14,7 @@ import '../../../../shared/widgets/photo_strip.dart';
 import '../../domain/entities/record_photo.dart';
 import '../cubit/photo_cubit.dart';
 import '../pages/photo_viewer_page.dart';
+import 'record_photo_image.dart';
 
 /// The photo block on a detail screen.
 ///
@@ -91,9 +92,14 @@ class PhotoSection extends StatelessWidget {
               PhotoStrip(
                 featured: featured,
                 addLabel: featured ? l10n.photosAdd : null,
+                // Every photo, not only the ones whose bytes have arrived.
+                // The provider does the fetching, so a tile appears
+                // immediately and fills in — and the strip's indices line up
+                // with `state.photos`, which they did not when a half-loaded
+                // set was filtered out from under them.
                 photos: <ImageProvider>[
                   for (final photo in state.photos)
-                    if (photo.bytes case final bytes?) MemoryImage(bytes),
+                    RecordPhotoImage(photo.id, cubit.loadData),
                 ],
                 onAdd: cubit.canEdit ? () => _pick(context) : null,
                 onRemove: cubit.canEdit
@@ -101,7 +107,8 @@ class PhotoSection extends StatelessWidget {
                     : null,
                 onOpen: (index) => PhotoViewerPage.open(
                   context,
-                  photos: state.photos.where((p) => p.isLoaded).toList(),
+                  photos: state.photos,
+                  loadData: cubit.loadData,
                   initialIndex: index,
                 ),
               ),
@@ -151,8 +158,7 @@ class PhotoSection extends StatelessWidget {
     List<RecordPhoto> photos,
     int index,
   ) async {
-    final loaded = photos.where((p) => p.isLoaded).toList(growable: false);
-    if (index >= loaded.length) return;
+    if (index >= photos.length) return;
 
     final l10n = AppL10n.of(context);
     final cubit = context.read<PhotoCubit>();
@@ -164,7 +170,7 @@ class PhotoSection extends StatelessWidget {
       isDestructive: true,
     );
     if (!confirmed) return;
-    await cubit.remove(loaded[index].id);
+    await cubit.remove(photos[index].id);
   }
 }
 
@@ -180,23 +186,42 @@ class _Header extends StatelessWidget {
     final palette = context.palette;
     final text = Theme.of(context).textTheme;
 
+    // Two pieces of text at opposite ends of one row, and both of them
+    // translate. Written as a `Spacer` between two unbounded `Text`s this
+    // overflowed the moment a record actually had photos — which is the only
+    // time the right-hand half renders at all, and was therefore invisible
+    // until the fake Odoo grew an `ir.attachment` fixture.
+    //
+    // Both halves are flexible now, so whichever one runs out of room
+    // ellipsises instead of the row running off the card.
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Icon(
-          Icons.photo_camera_outlined,
-          size: AppDimens.iconSm,
-          color: palette.mint,
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.photo_camera_outlined,
+                size: AppDimens.iconSm,
+                color: palette.mint,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Text(
+                  l10n.photosTitle,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.titleSmall?.copyWith(color: palette.mint),
+                ),
+              ),
+              if (count > 0) ...<Widget>[
+                const SizedBox(width: AppSpacing.sm),
+                _CountBadge(count: count),
+              ],
+            ],
+          ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        Text(
-          l10n.photosTitle,
-          style: text.titleSmall?.copyWith(color: palette.mint),
-        ),
-        if (count > 0) ...<Widget>[
-          const SizedBox(width: AppSpacing.sm),
-          _CountBadge(count: count),
-        ],
-        const Spacer(),
         if (isBusy)
           SizedBox(
             width: AppDimens.iconSm,
@@ -209,11 +234,15 @@ class _Header extends StatelessWidget {
         else if (count > 0)
           // Says the bytes left the phone. Without it people re-upload the
           // same photo because nothing on screen confirmed it stuck.
-          Text(
-            l10n.photosSavedToOdoo,
-            style: text.bodySmall?.copyWith(
-              fontSize: AppTextSize.nav,
-              color: palette.faint,
+          Flexible(
+            child: Text(
+              l10n.photosSavedToOdoo,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: text.bodySmall?.copyWith(
+                fontSize: AppTextSize.nav,
+                color: palette.faint,
+              ),
             ),
           ),
       ],

@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show SynchronousFuture;
 
 import 'package:xml/xml.dart';
 
 import '../../error/exceptions.dart';
+import '../odoo/odoo_binary.dart';
 
 /// An XML-RPC `<fault>` returned by the server.
 ///
@@ -116,6 +120,34 @@ abstract final class XmlRpcCodec {
 
   // ── Decoding ─────────────────────────────────────────────────────────────
 
+  /// Payload size past which parsing moves off the UI isolate.
+  ///
+  /// Most responses are a few kilobytes and parse in under a millisecond, so
+  /// the isolate handoff — spawn, copy the string in, copy the result out —
+  /// would cost more than it saves. The ones that are not are the ones that
+  /// matter: `ir.attachment.datas` carries a photograph as base64 *inside*
+  /// the XML, so downloading one 3 MB photo means parsing a 4 MB document.
+  /// On a low-end handset that is several hundred milliseconds of frozen UI,
+  /// on a screen the user is actively scrolling.
+  ///
+  /// 64 KB sits above every list page the app requests and below every
+  /// attachment it downloads.
+  static const int offloadThreshold = 64 * 1024;
+
+  /// Parses a `methodResponse` body, off the UI isolate when it is large.
+  ///
+  /// Errors surface exactly as [decodeResponse] raises them: [XmlRpcFault] and
+  /// [ResponseParsingException] carry only strings and ints, so they cross the
+  /// isolate boundary unchanged.
+  static Future<Object?> decode(String body) {
+    if (body.length < offloadThreshold) {
+      // Synchronous on purpose. An await here would push every small response
+      // to the next microtask and turn one round trip into two frames.
+      return SynchronousFuture<Object?>(decodeResponse(body));
+    }
+    return Isolate.run(() => decodeResponse(body));
+  }
+
   /// Parses a `methodResponse` body.
   ///
   /// Throws [XmlRpcFault] for a `<fault>` response and
@@ -196,7 +228,17 @@ abstract final class XmlRpcCodec {
       case 'dateTime.iso8601':
         return _parseDateTime(text.trim());
       case 'base64':
-        return base64Decode(text.trim());
+        // Python's own encoder wraps at 76 characters, so the strict decoder
+        // would throw on a perfectly valid document — and throw *out of the
+        // transport*, as a FormatException nothing below classifies.
+        final decoded = OdooBinary.tryDecode(text);
+        if (decoded == null && OdooBinary.normalize(text).isNotEmpty) {
+          throw const ResponseParsingException(
+            'The server returned a binary value that could not be decoded.',
+            technicalDetails: 'Malformed <base64> element.',
+          );
+        }
+        return decoded ?? Uint8List(0);
       case 'array':
         final data = typed.getElement('data');
         if (data == null) return <Object?>[];

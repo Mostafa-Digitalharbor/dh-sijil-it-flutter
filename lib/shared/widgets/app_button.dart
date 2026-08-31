@@ -173,7 +173,7 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.filled =>
         isDark
             ? (AppColors.mint, AppColors.navy, null)
-            : (AppColors.navy, Colors.white, null),
+            : (AppColors.navy, AppColors.onAccent, null),
       AppButtonVariant.accent => (AppColors.mint, AppColors.navy, null),
       AppButtonVariant.outlined => (
         scheme.surface,

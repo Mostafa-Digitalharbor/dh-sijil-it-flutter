@@ -147,7 +147,7 @@ class AppHeroCard extends StatelessWidget {
       ),
       child: DefaultTextStyle.merge(
         style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : Colors.white,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.onAccent,
         ),
         child: child,
       ),
@@ -164,7 +164,7 @@ class AppHeroCard extends StatelessWidget {
   static Color primaryText(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
       ? AppColors.textPrimaryDark
-      : Colors.white;
+      : AppColors.onAccent;
 }
 
 /// A card with a small uppercase heading, optional trailing action, and a

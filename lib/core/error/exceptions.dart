@@ -101,6 +101,26 @@ class FieldNotAvailableException extends AppException {
   final String field;
 }
 
+/// The server answered, and the answer was a failure of its own making.
+///
+/// Distinct from [ConnectionException], and the distinction is the whole
+/// point: an Odoo behind a reverse proxy answers 502/503/504 for the minutes
+/// it takes to restart, and answers 500 for longer than that during a module
+/// upgrade. The address is correct in every one of those cases. Folding them
+/// into "could not reach the server" sent the user to the connection screen to
+/// re-check a URL that was never wrong, and left the one thing that would have
+/// worked — waiting, then trying again — unsaid.
+class ServerException extends AppException {
+  const ServerException(
+    super.message, {
+    this.statusCode,
+    super.technicalDetails,
+  });
+
+  /// The HTTP status, when the failure came in over HTTP.
+  final int? statusCode;
+}
+
 /// The XML-RPC payload could not be parsed into the expected shape.
 class ResponseParsingException extends AppException {
   const ResponseParsingException(super.message, {super.technicalDetails});

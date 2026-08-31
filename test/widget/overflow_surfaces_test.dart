@@ -7,6 +7,9 @@ import 'package:sijil_it/core/network/odoo/odoo_name_ref.dart';
 import 'package:sijil_it/features/assets/domain/entities/asset_query.dart';
 import 'package:sijil_it/features/assets/domain/entities/asset_status.dart';
 import 'package:sijil_it/features/assets/presentation/widgets/asset_filter_sheet.dart';
+import 'package:sijil_it/features/attachments/domain/entities/record_photo.dart';
+import 'package:sijil_it/features/attachments/domain/usecases/attachment_usecases.dart';
+import 'package:sijil_it/features/attachments/presentation/pages/photo_viewer_page.dart';
 import 'package:sijil_it/shared/widgets/app_sheets.dart';
 import 'package:sijil_it/shared/widgets/state_views.dart';
 
@@ -251,6 +254,64 @@ void main() {
       await pumpWorstCase(tester, host());
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
+      expectNoOverflow(tester);
+    });
+  });
+
+  group('photo viewer', () {
+    // Pushed with `rootNavigator: true` as a fullscreen dialog, so no page
+    // test ever builds it. Its chrome is a counter, a caption and a close
+    // button laid over an image whose aspect ratio it does not control.
+
+    /// A filename long enough to be the caption that breaks the row, which is
+    /// what a phone camera actually produces.
+    final photos = <RecordPhoto>[
+      for (var i = 1; i <= 3; i++)
+        RecordPhoto(
+          id: i,
+          name: 'IMG_20260831_${i}_تلف_في_الشاشة_الأمامية_عند_الاستلام.jpg',
+          sizeBytes: 2400000,
+        ),
+    ];
+
+    // The pixels come from an ImageProvider now, so the page needs the
+    // fetcher rather than the bytes. Nothing here resolves — which is the
+    // interesting frame anyway: chrome over a photo that has not arrived.
+    LoadPhotoData loadData() => sl<LoadPhotoData>();
+
+    for (final (sizeName, size) in TestSizes.all) {
+      testWidgets('fits a $sizeName', (tester) async {
+        await tester.pumpWidget(
+          TestApp(
+            size: size,
+            child: PhotoViewerPage(photos: photos, loadData: loadData()),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expectNoOverflow(tester);
+      });
+    }
+
+    testWidgets('fits the worst case', (tester) async {
+      await pumpWorstCase(
+        tester,
+        PhotoViewerPage(photos: photos, loadData: loadData()),
+      );
+      expectNoOverflow(tester);
+    });
+
+    testWidgets('a photo still downloading does not overflow', (tester) async {
+      // The list arrives before the bytes do, so the very first frame has
+      // metadata and no image — a placeholder sized from `sizeBytes`.
+      await pumpWorstCase(
+        tester,
+        PhotoViewerPage(
+          photos: const <RecordPhoto>[
+            RecordPhoto(id: 1, name: 'pending.jpg', sizeBytes: 2400000),
+          ],
+          loadData: loadData(),
+        ),
+      );
       expectNoOverflow(tester);
     });
   });

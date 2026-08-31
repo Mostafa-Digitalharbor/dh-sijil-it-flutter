@@ -1,37 +1,29 @@
-import 'dart:typed_data';
-
 import 'package:equatable/equatable.dart';
 
 /// A photograph attached to an Odoo record.
 ///
-/// [bytes] is filled lazily. Listing a record's photos returns the metadata
-/// only; the image data arrives when something actually renders that photo.
-/// A repair with six photos is several megabytes of base64, and a detail
-/// screen that eagerly downloaded all of them would stall on open over the
-/// mobile connection an IT technician is standing in a server room with.
+/// Metadata only, deliberately. This used to carry a `Uint8List` of the image
+/// itself, filled in by the Cubit after the list arrived — which put a
+/// three-megabyte JPEG per photo into Bloc state, on top of the decoded bitmap
+/// the image cache was already holding, for as long as the screen was open. A
+/// repair with six photos parked about eighteen megabytes there, and nothing
+/// evicted them, because state is not a cache.
+///
+/// The pixels now travel through `RecordPhotoImage`, an [ImageProvider], so
+/// they are fetched when something paints them and their lifetime belongs to
+/// Flutter's `ImageCache`, which has an eviction policy. This holds what a
+/// Cubit should: which photos exist.
 class RecordPhoto extends Equatable {
-  const RecordPhoto({
-    required this.id,
-    required this.name,
-    this.bytes,
-    this.sizeBytes,
-  });
+  const RecordPhoto({required this.id, required this.name, this.sizeBytes});
 
+  /// The `ir.attachment` id — also the key the image provider caches on.
   final int id;
+
   final String name;
 
-  /// Decoded image data, once loaded.
-  final Uint8List? bytes;
-
-  /// Size Odoo reports, used to show a placeholder of the right weight before
-  /// the bytes arrive.
+  /// Size Odoo reports, used to size a placeholder before the image arrives.
   final int? sizeBytes;
 
-  bool get isLoaded => bytes != null;
-
-  RecordPhoto withBytes(Uint8List data) =>
-      RecordPhoto(id: id, name: name, bytes: data, sizeBytes: sizeBytes);
-
   @override
-  List<Object?> get props => <Object?>[id, name, sizeBytes, bytes?.length];
+  List<Object?> get props => <Object?>[id, name, sizeBytes];
 }

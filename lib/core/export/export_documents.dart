@@ -123,7 +123,7 @@ abstract final class AssetLabelSheetExport {
         subtitle: copy.subtitle,
         product: copy.product,
       ),
-      pw.SizedBox(height: 12),
+      pw.SizedBox(height: PdfMetrics.block),
       // A single wrap rather than a table: the labels are uniform, and a wrap
       // flows the last, short row correctly instead of padding it with empty
       // bordered cells that look like labels somebody forgot to fill in.
@@ -144,10 +144,10 @@ abstract final class AssetLabelSheetExport {
   static pw.Widget _label(Asset asset) => pw.Container(
     width: _labelWidth,
     height: _labelHeight,
-    padding: const pw.EdgeInsets.all(6),
+    padding: const pw.EdgeInsets.all(PdfMetrics.badgePadding),
     decoration: pw.BoxDecoration(
       border: pw.Border.all(color: PdfParts.line),
-      borderRadius: pw.BorderRadius.circular(4),
+      borderRadius: pw.BorderRadius.circular(PdfMetrics.badgeRadius),
     ),
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -160,7 +160,7 @@ abstract final class AssetLabelSheetExport {
           drawText: false,
           color: PdfParts.navy,
         ),
-        pw.SizedBox(width: 6),
+        pw.SizedBox(width: PdfMetrics.snug),
         pw.Expanded(
           // Left-to-right whatever the document's direction: an asset tag is
           // an identifier, and bidi would reorder "DH-LAP-0027" on an Arabic
@@ -176,18 +176,18 @@ abstract final class AssetLabelSheetExport {
                   maxLines: 2,
                   overflow: pw.TextOverflow.clip,
                   style: pw.TextStyle(
-                    fontSize: 8,
+                    fontSize: PdfMetrics.captionSize,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
                 if (asset.subtitle != null) ...<pw.Widget>[
-                  pw.SizedBox(height: 2),
+                  pw.SizedBox(height: PdfMetrics.hair),
                   pw.Text(
                     asset.subtitle!,
                     maxLines: 1,
                     overflow: pw.TextOverflow.clip,
                     style: const pw.TextStyle(
-                      fontSize: 7,
+                      fontSize: PdfMetrics.microSize,
                       color: PdfParts.faint,
                     ),
                   ),
@@ -239,7 +239,7 @@ abstract final class HandoverReceiptExport {
         subtitle: copy.subtitle,
         product: copy.product,
       ),
-      pw.SizedBox(height: 16),
+      pw.SizedBox(height: PdfMetrics.section),
 
       for (final entry in copy.facts.entries)
         PdfParts.fact(entry.key, entry.value),
@@ -261,10 +261,13 @@ abstract final class HandoverReceiptExport {
 
       if (notes != null && notes.trim().isNotEmpty) ...<pw.Widget>[
         PdfParts.sectionTitle(copy.sections['notes'] ?? ''),
-        pw.Text(notes, style: const pw.TextStyle(fontSize: 10)),
+        pw.Text(
+          notes,
+          style: const pw.TextStyle(fontSize: PdfMetrics.bodySize),
+        ),
       ],
 
-      pw.SizedBox(height: 24),
+      pw.SizedBox(height: PdfMetrics.major),
       _signatureBlock(
         label: copy.sections['signature'] ?? '',
         name: recipient.name,
@@ -288,11 +291,14 @@ abstract final class HandoverReceiptExport {
     children: <pw.Widget>[
       pw.Text(
         label,
-        style: const pw.TextStyle(color: PdfParts.faint, fontSize: 9),
+        style: const pw.TextStyle(
+          color: PdfParts.faint,
+          fontSize: PdfMetrics.labelSize,
+        ),
       ),
-      pw.SizedBox(height: 4),
+      pw.SizedBox(height: PdfMetrics.tight),
       pw.Container(
-        width: 200,
+        width: PdfMetrics.signatureLineWidth,
         height: 70,
         decoration: const pw.BoxDecoration(
           border: pw.Border(bottom: pw.BorderSide(color: PdfParts.line)),
@@ -301,8 +307,8 @@ abstract final class HandoverReceiptExport {
             ? pw.SizedBox.shrink()
             : pw.Image(pw.MemoryImage(signature), fit: pw.BoxFit.contain),
       ),
-      pw.SizedBox(height: 4),
-      pw.Text(name, style: const pw.TextStyle(fontSize: 10)),
+      pw.SizedBox(height: PdfMetrics.tight),
+      pw.Text(name, style: const pw.TextStyle(fontSize: PdfMetrics.bodySize)),
     ],
   );
 }
@@ -325,7 +331,7 @@ abstract final class AuditReportExport {
         subtitle: copy.subtitle,
         product: copy.product,
       ),
-      pw.SizedBox(height: 16),
+      pw.SizedBox(height: PdfMetrics.section),
 
       for (final entry in copy.facts.entries)
         PdfParts.fact(entry.key, entry.value),

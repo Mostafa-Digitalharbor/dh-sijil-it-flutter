@@ -63,6 +63,31 @@ abstract final class AppColors {
   static const Color camera = Color(0xFF05091A);
   static const Color cameraInk = Color(0xFFC6D0EC);
 
+  // ── Ink that is white on purpose ─────────────────────────────────────────
+  //
+  // Four separate decisions that happen to share a value. They are named
+  // rather than written as `Colors.white` at the call site because each can
+  // move independently — [qrPaper] in particular is a *functional* white, not
+  // a stylistic one, and must never follow a palette change.
+
+  /// Ink on a saturated fill: a mint button, a filled status chip, a selected
+  /// tile, an avatar on a coloured ground.
+  static const Color onAccent = Color(0xFFFFFFFF);
+
+  /// Ink on the navy brand band — the login hero, the splash, the lock gate.
+  /// Follows the band, which is navy in both themes, not the theme.
+  static const Color onBrand = Color(0xFFFFFFFF);
+
+  /// Ink and rules drawn over a live camera preview or a photo thumbnail.
+  /// The ground underneath is whatever the lens is pointed at, so this is the
+  /// one value that stays legible over all of it.
+  static const Color onCamera = Color(0xFFFFFFFF);
+
+  /// The quiet zone a QR code needs. A code rendered in the dark palette does
+  /// not scan once printed, and printing is the entire point of that screen,
+  /// so this stays white in both themes.
+  static const Color qrPaper = Color(0xFFFFFFFF);
+
   // ── Status fills (tuned for a dark ground) ───────────────────────────────
   static const Color statusAvailable = Color(0xFF2FE3A8);
   static const Color statusAssigned = Color(0xFF4C82F7);

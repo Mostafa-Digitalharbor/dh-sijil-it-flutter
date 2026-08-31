@@ -103,14 +103,14 @@ class _QrBody extends StatelessWidget {
               Container(
                 padding: const EdgeInsetsDirectional.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.qrPaper,
                   borderRadius: BorderRadius.circular(AppRadii.md),
                 ),
                 child: QrImageView(
                   data: asset.qrPayload,
                   size: side,
                   version: QrVersions.auto,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.qrPaper,
                   eyeStyle: const QrEyeStyle(
                     eyeShape: QrEyeShape.square,
                     color: AppColors.navy,

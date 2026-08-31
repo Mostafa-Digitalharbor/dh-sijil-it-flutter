@@ -8,6 +8,7 @@ import 'package:sijil_it/features/assets/presentation/pages/asset_form_page.dart
 import 'package:sijil_it/features/assets/presentation/pages/asset_history_page.dart';
 import 'package:sijil_it/features/assets/presentation/pages/asset_list_page.dart';
 import 'package:sijil_it/features/assets/presentation/pages/asset_qr_page.dart';
+import 'package:sijil_it/features/assets/presentation/pages/overdue_assets_page.dart';
 import 'package:sijil_it/features/assignment/presentation/pages/assign_asset_page.dart';
 import 'package:sijil_it/features/assignment/presentation/pages/return_asset_page.dart';
 import 'package:sijil_it/features/audit/presentation/pages/audit_page.dart';
@@ -22,6 +23,7 @@ import 'package:sijil_it/features/maintenance/presentation/pages/maintenance_det
 import 'package:sijil_it/features/maintenance/presentation/pages/maintenance_list_page.dart';
 import 'package:sijil_it/features/settings/presentation/pages/debug_log_page.dart';
 import 'package:sijil_it/features/settings/presentation/pages/settings_page.dart';
+import 'package:sijil_it/features/sync/presentation/pages/sync_page.dart';
 
 import '../fake_odoo/fake_odoo_data.dart';
 import '../fake_odoo/test_app_harness.dart';
@@ -61,6 +63,7 @@ void main() {
     'asset edit': const AssetFormPage(assetId: assetId),
     'asset QR': const AssetQrPage(assetId: assetId),
     'asset history': const AssetHistoryPage(assetId: assetId),
+    'overdue assets': const OverdueAssetsPage(),
     'assign asset': const AssignAssetPage(assetId: assetId),
     'return asset': const ReturnAssetPage(assetId: assetId),
     'employee list': const EmployeeListPage(),
@@ -75,6 +78,7 @@ void main() {
     'more': const MorePage(),
     'settings': const SettingsPage(),
     'diagnostics': const DebugLogPage(),
+    'sync': const SyncPage(),
     // Pre-auth. They render without a session, and they are the two
     // screens a first-time user meets on whatever handset they own.
     'connection': const ConnectionPage(),

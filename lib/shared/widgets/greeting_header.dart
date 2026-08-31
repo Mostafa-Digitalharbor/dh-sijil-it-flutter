@@ -142,6 +142,10 @@ class UserAvatar extends StatelessWidget {
             : Image.memory(
                 photo,
                 fit: BoxFit.cover,
+                // `image_128` normally, but an instance can be configured to
+                // hand back `image_1920` — and the avatar is on every screen,
+                // so an unbounded decode here is one that never gets evicted.
+                cacheWidth: _avatarDecodeWidth(context),
                 // An instance that has been through a bad migration can hold a
                 // non-image in image_128. Initials beat an exception in the
                 // frame callback.
@@ -157,4 +161,9 @@ class UserAvatar extends StatelessWidget {
       ),
     );
   }
+
+  /// Physical pixels across the avatar circle, which is all that is worth
+  /// decoding for it.
+  int _avatarDecodeWidth(BuildContext context) =>
+      (size * MediaQuery.devicePixelRatioOf(context)).round();
 }

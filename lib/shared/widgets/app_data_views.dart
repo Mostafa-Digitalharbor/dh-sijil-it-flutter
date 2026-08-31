@@ -388,7 +388,7 @@ class AppStepHeader extends StatelessWidget {
         ? (isDark ? AppColors.mint : AppColors.navy)
         : theme.colorScheme.outlineVariant;
     final badgeInk = isActive
-        ? (isDark ? AppColors.navy : Colors.white)
+        ? (isDark ? AppColors.navy : AppColors.onAccent)
         : theme.colorScheme.onSurfaceVariant;
 
     return Row(

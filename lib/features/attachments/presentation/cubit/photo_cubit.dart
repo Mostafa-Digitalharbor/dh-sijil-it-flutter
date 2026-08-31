@@ -82,15 +82,16 @@ class PhotoState extends ViewState {
 /// in the model string, so one Cubit serves both and there is a single place
 /// where "uploading a photo" is defined.
 ///
-/// Image data is fetched **per photo, after the list arrives**. Listing is one
-/// cheap call; the bytes are megabytes each. Loading them lazily is what keeps
-/// opening a repair with six photos from stalling on a server-room connection.
+/// Image data is **not** fetched here. Listing is one cheap call; the bytes
+/// are megabytes each, and they belong to `RecordPhotoImage` — which pulls
+/// them when something actually paints the photo and lets Flutter's image
+/// cache own them afterwards. This Cubit holds which photos exist.
 class PhotoCubit extends Cubit<PhotoState> {
   PhotoCubit({
     required String model,
     required int recordId,
     required GetRecordPhotos getPhotos,
-    required LoadPhotoData loadData,
+    required this.loadData,
     required AddRecordPhoto addPhoto,
     required RemoveRecordPhoto removePhoto,
     required PhotoPicker picker,
@@ -98,7 +99,6 @@ class PhotoCubit extends Cubit<PhotoState> {
   }) : _model = model,
        _recordId = recordId,
        _getPhotos = getPhotos,
-       _loadData = loadData,
        _addPhoto = addPhoto,
        _removePhoto = removePhoto,
        _picker = picker,
@@ -107,7 +107,11 @@ class PhotoCubit extends Cubit<PhotoState> {
   final String _model;
   final int _recordId;
   final GetRecordPhotos _getPhotos;
-  final LoadPhotoData _loadData;
+
+  /// Handed to `RecordPhotoImage` so the *provider* fetches the pixels, at
+  /// the point something paints them, instead of this Cubit fetching all of
+  /// them the moment the list arrives.
+  final LoadPhotoData loadData;
   final AddRecordPhoto _addPhoto;
   final RemoveRecordPhoto _removePhoto;
   final PhotoPicker _picker;
@@ -124,34 +128,9 @@ class PhotoCubit extends Cubit<PhotoState> {
     result.fold(
       (failure) =>
           emit(state.copyWith(status: ViewStatus.failure, failure: failure)),
-      (photos) {
-        emit(state.copyWith(status: ViewStatus.success, photos: photos));
-        for (final photo in photos) {
-          unawaited(_hydrate(photo.id));
-        }
-      },
+      (photos) =>
+          emit(state.copyWith(status: ViewStatus.success, photos: photos)),
     );
-  }
-
-  /// Pulls one photo's bytes and swaps it into the list in place.
-  ///
-  /// A failure here is deliberately silent: the tile keeps its placeholder.
-  /// One unreadable thumbnail is not worth an error banner over a screen whose
-  /// actual content — the repair, the asset — loaded fine.
-  Future<void> _hydrate(int photoId) async {
-    final result = await _loadData(photoId);
-
-    result.fold((_) {}, (bytes) {
-      if (bytes == null || isClosed) return;
-      emit(
-        state.copyWith(
-          photos: <RecordPhoto>[
-            for (final photo in state.photos)
-              if (photo.id == photoId) photo.withBytes(bytes) else photo,
-          ],
-        ),
-      );
-    });
   }
 
   Future<void> add(PhotoSource source) async {

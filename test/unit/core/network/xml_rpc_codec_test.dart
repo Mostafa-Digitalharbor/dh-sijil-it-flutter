@@ -112,4 +112,76 @@ void main() {
       );
     });
   });
+  group('XmlRpcCodec.decode', () {
+    /// A response big enough to cross the offload threshold, shaped like the
+    /// one that motivated it: an attachment's base64 payload.
+    String largeResponse(String payload) =>
+        '<?xml version="1.0"?><methodResponse><params><param>'
+        '<value><string>$payload</string></value>'
+        '</param></params></methodResponse>';
+
+    test('a small payload decodes without leaving the isolate', () async {
+      const body =
+          '<?xml version="1.0"?><methodResponse><params><param>'
+          '<value><int>7</int></value></param></params></methodResponse>';
+
+      expect(body.length, lessThan(XmlRpcCodec.offloadThreshold));
+      // Synchronous completion: an await for every small round trip would
+      // cost a frame each time.
+      expect(await XmlRpcCodec.decode(body), 7);
+    });
+
+    test(
+      'a large payload decodes to the same value as the sync path',
+      () async {
+        final payload = 'A' * XmlRpcCodec.offloadThreshold;
+        final body = largeResponse(payload);
+
+        expect(body.length, greaterThan(XmlRpcCodec.offloadThreshold));
+        expect(await XmlRpcCodec.decode(body), payload);
+        expect(XmlRpcCodec.decodeResponse(body), payload);
+      },
+    );
+
+    test(
+      'a fault raised off-isolate still arrives as an XmlRpcFault',
+      () async {
+        // The exception has to cross the isolate boundary intact, or a server
+        // error on a large response degrades into a generic one.
+        final filler = 'x' * XmlRpcCodec.offloadThreshold;
+        final body =
+            '<?xml version="1.0"?><methodResponse><fault><value><struct>'
+            '<member><name>faultCode</name><value><int>3</int></value></member>'
+            '<member><name>faultString</name>'
+            '<value><string>AccessDenied $filler</string></value></member>'
+            '</struct></value></fault></methodResponse>';
+
+        expect(body.length, greaterThan(XmlRpcCodec.offloadThreshold));
+        await expectLater(
+          XmlRpcCodec.decode(body),
+          throwsA(
+            isA<XmlRpcFault>()
+                .having((f) => f.faultCode, 'faultCode', 3)
+                .having(
+                  (f) => f.faultString,
+                  'faultString',
+                  contains('AccessDenied'),
+                ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'a malformed large payload still becomes a parsing exception',
+      () async {
+        final body = '<html>${'y' * XmlRpcCodec.offloadThreshold}';
+
+        await expectLater(
+          XmlRpcCodec.decode(body),
+          throwsA(isA<ResponseParsingException>()),
+        );
+      },
+    );
+  });
 }

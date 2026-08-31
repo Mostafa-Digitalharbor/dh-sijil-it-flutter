@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import '../../../../core/constants/odoo_models.dart';
@@ -7,6 +6,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/guard.dart';
 import '../../../../core/network/connectivity/network_info.dart';
 import '../../../../core/network/odoo/odoo_auth_service.dart';
+import '../../../../core/network/odoo/odoo_binary.dart';
 import '../../../../core/network/odoo/odoo_capability_service.dart';
 import '../../../../core/network/odoo/odoo_connection.dart';
 import '../../../../core/network/odoo/odoo_object_service.dart';
@@ -194,14 +194,7 @@ class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
   /// Odoo sends `false` for an unset image, and a corrupt value is possible
   /// on an instance that has been through a bad migration. Neither is worth
   /// failing a sign-in over, so both become "no photo".
-  static Uint8List? _decodeImage(Object? value) {
-    if (value is! String || value.isEmpty) return null;
-    try {
-      return base64Decode(value);
-    } on FormatException {
-      return null;
-    }
-  }
+  static Uint8List? _decodeImage(Object? value) => OdooBinary.tryDecode(value);
 
   Future<void> _persist(OdooConnection connection, OdooSession session) async {
     await _preferences.saveConnection(connection);

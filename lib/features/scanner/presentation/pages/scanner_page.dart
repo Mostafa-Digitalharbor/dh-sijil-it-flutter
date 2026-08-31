@@ -139,8 +139,8 @@ class _TopBar extends StatelessWidget {
             icon: Icons.close_rounded,
             tooltip: l10n.actionClose,
             bordered: false,
-            color: Colors.white,
-            backgroundColor: Colors.white.withValues(
+            color: AppColors.onCamera,
+            backgroundColor: AppColors.onCamera.withValues(
               alpha: AppOpacities.overlay,
             ),
             onPressed: () => context.go(AppRoutes.dashboard),
@@ -149,7 +149,9 @@ class _TopBar extends StatelessWidget {
             child: Text(
               l10n.scanTitle,
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: AppColors.onCamera,
+              ),
             ),
           ),
           AppIconButton(
@@ -195,7 +197,9 @@ class _Instructions extends StatelessWidget {
           Text(
             l10n.scanInstruction,
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: AppColors.onCamera,
+            ),
           ),
           const SizedBox(height: AppSpacing.fine),
           Text(

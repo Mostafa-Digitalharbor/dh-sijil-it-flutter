@@ -26,12 +26,28 @@ class HiveCacheStore implements CacheStore {
   static const String _timestampKey = 't';
 
   /// Opens every box declared in [CacheBoxes]. Called once during bootstrap.
+  ///
+  /// Concurrently, not one after another. `runApp` waits behind this, and each
+  /// box is a separate file to read off disk and decrypt.
+  ///
+  /// Measured honestly: on a **first** launch this changes nothing, because
+  /// every box is empty and each open is a few hundred microseconds — an A/B
+  /// on an emulator put the two within noise of each other. What it bounds is
+  /// the case that is not measured on a fresh install and is the one that
+  /// matters on a cheap handset: eleven populated boxes, on eMMC storage, on a
+  /// device whose flash is the slowest part of it. Independent files, so the
+  /// wait is the slowest open rather than the sum of all eleven.
   Future<void> init() async {
     await Hive.initFlutter();
     final cipher = HiveAesCipher(await _resolveEncryptionKey());
 
-    for (final name in CacheBoxes.all) {
-      _boxes[name] = await Hive.openBox<String>(name, encryptionCipher: cipher);
+    final opened = await Future.wait(<Future<Box<String>>>[
+      for (final name in CacheBoxes.all)
+        Hive.openBox<String>(name, encryptionCipher: cipher),
+    ]);
+
+    for (var i = 0; i < CacheBoxes.all.length; i++) {
+      _boxes[CacheBoxes.all[i]] = opened[i];
     }
   }
 

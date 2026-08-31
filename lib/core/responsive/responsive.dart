@@ -23,6 +23,24 @@ enum ScreenSize {
 
   /// Medium and up: enough room for a rail and a two-pane layout.
   bool get isWide => this != ScreenSize.compact;
+
+  /// The bucket a window width falls in.
+  ///
+  /// The single place the breakpoints are compared, so `context.pagePadding`
+  /// — which reads the width directly, to avoid subscribing to anything else
+  /// — cannot drift from [ResponsiveInfo].
+  static ScreenSize forWidth(double width) => switch (width) {
+    < AppBreakpoints.phone => ScreenSize.compact,
+    < AppBreakpoints.tablet => ScreenSize.medium,
+    _ => ScreenSize.expanded,
+  };
+
+  /// Horizontal page gutter for this size class.
+  double get gutter => switch (this) {
+    ScreenSize.compact => AppSpacing.pageGutter,
+    ScreenSize.medium => AppSpacing.xxl,
+    ScreenSize.expanded => AppSpacing.pageGutterWide,
+  };
 }
 
 /// Layout facts derived once from the current [MediaQuery].
@@ -36,44 +54,40 @@ class ResponsiveInfo {
     required this.size,
     required this.width,
     required this.height,
-    required this.isLandscape,
     required this.textScale,
-    required this.viewPadding,
   });
 
   final ScreenSize size;
   final double width;
   final double height;
-  final bool isLandscape;
   final double textScale;
 
-  /// System intrusions (status bar, notch, home indicator).
-  final EdgeInsets viewPadding;
-
+  /// Reads the current [MediaQuery], one aspect at a time.
+  ///
+  /// Deliberately *not* `MediaQuery.of(context)`. That subscribes the calling
+  /// widget to every field of the MediaQueryData — including `viewInsets`,
+  /// which changes on **every frame of the keyboard animation**. Thirty-odd
+  /// widgets read this, several of them page roots, so a single tap on a text
+  /// field was rebuilding most of the screen twenty times on the way up and
+  /// twenty more on the way down. On a low-end handset that is the difference
+  /// between a keyboard that slides and one that stutters.
+  ///
+  /// The aspect-scoped accessors subscribe to one field each, so a widget that
+  /// asks about width is not woken by the keyboard.
   factory ResponsiveInfo.of(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final width = media.size.width;
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
 
     return ResponsiveInfo(
-      size: switch (width) {
-        < AppBreakpoints.phone => ScreenSize.compact,
-        < AppBreakpoints.tablet => ScreenSize.medium,
-        _ => ScreenSize.expanded,
-      },
+      size: ScreenSize.forWidth(width),
       width: width,
-      height: media.size.height,
-      isLandscape: media.orientation == Orientation.landscape,
-      textScale: media.textScaler.scale(1),
-      viewPadding: media.viewPadding,
+      height: size.height,
+      textScale: MediaQuery.textScalerOf(context).scale(1),
     );
   }
 
   /// Horizontal page gutter for this size class.
-  double get gutter => switch (size) {
-    ScreenSize.compact => AppSpacing.pageGutter,
-    ScreenSize.medium => AppSpacing.xxl,
-    ScreenSize.expanded => AppSpacing.pageGutterWide,
-  };
+  double get gutter => size.gutter;
 
   /// Columns for a tile grid (KPI tiles, condition pickers).
   int get tileColumns => switch (size) {
@@ -126,22 +140,28 @@ class ResponsiveInfo {
       other.size == size &&
       other.width == width &&
       other.height == height &&
-      other.isLandscape == isLandscape &&
       other.textScale == textScale;
 
   @override
-  int get hashCode => Object.hash(size, width, height, isLandscape, textScale);
+  int get hashCode => Object.hash(size, width, height, textScale);
 }
 
 /// `context.screen` — the entry point used everywhere in the UI.
+///
+/// The two shorthands read the window size and nothing else. They are the
+/// most-called accessors in the app, and going through [ResponsiveInfo] would
+/// have subscribed each caller to the text scaler as well — so a row that
+/// only wants to know "am I on a phone" would rebuild when somebody changed
+/// their font size in Settings.
 extension ResponsiveContext on BuildContext {
   ResponsiveInfo get screen => ResponsiveInfo.of(this);
 
   /// Shorthand for the most common check.
-  bool get isCompact => ResponsiveInfo.of(this).size.isCompact;
+  bool get isCompact =>
+      ScreenSize.forWidth(MediaQuery.sizeOf(this).width).isCompact;
 
   /// Horizontal page padding, already size-aware.
   EdgeInsetsGeometry get pagePadding => EdgeInsetsDirectional.symmetric(
-    horizontal: ResponsiveInfo.of(this).gutter,
+    horizontal: ScreenSize.forWidth(MediaQuery.sizeOf(this).width).gutter,
   );
 }

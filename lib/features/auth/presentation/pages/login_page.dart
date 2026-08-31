@@ -228,7 +228,7 @@ class _BrandBand extends StatelessWidget {
                 icon: Icons.arrow_back_rounded,
                 tooltip: l10n.loginBackToServer,
                 bordered: false,
-                color: Colors.white,
+                color: AppColors.onBrand,
                 onPressed: onBack,
               ),
             ),
@@ -244,7 +244,7 @@ class _BrandBand extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
+                color: AppColors.onBrand,
               ),
             ),
             const SizedBox(height: AppSpacing.xs),

@@ -224,7 +224,7 @@ class AppCheckRow extends StatelessWidget {
                       ? Icon(
                           Icons.check_rounded,
                           size: AppDimens.iconControl,
-                          color: isDark ? AppColors.navy : Colors.white,
+                          color: isDark ? AppColors.navy : AppColors.onAccent,
                         )
                       : null,
                 ),

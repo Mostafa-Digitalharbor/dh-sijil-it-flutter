@@ -222,6 +222,10 @@ abstract final class AppDurations {
   /// Scanner cooldown so one physical code is not read twice.
   static const Duration scanCooldown = Duration(milliseconds: 1200);
 
+  /// One pass of the scanner's sweep line across the viewfinder. Slow enough
+  /// to read as "still looking" rather than as a progress bar that is stuck.
+  static const Duration scannerSweep = Duration(seconds: 2);
+
   const AppDurations._();
 }
 

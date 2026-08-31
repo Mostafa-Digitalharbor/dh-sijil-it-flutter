@@ -93,15 +93,7 @@ class AttachmentRepositoryImpl
       mimetype: OdooAttachmentService.mimetypeFor(filename),
     );
 
-    // Returned already loaded: the bytes are in hand, and re-downloading what
-    // was just uploaded to draw the thumbnail would be a pointless round trip
-    // on the connection that just carried it up.
-    return RecordPhoto(
-      id: id,
-      name: filename,
-      bytes: data,
-      sizeBytes: data.length,
-    );
+    return RecordPhoto(id: id, name: filename, sizeBytes: data.length);
   }
 
   @override

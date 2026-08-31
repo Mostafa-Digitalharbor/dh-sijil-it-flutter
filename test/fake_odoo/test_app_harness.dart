@@ -196,6 +196,12 @@ Future<AppL10n> loadL10n([String languageCode = 'en']) =>
     AppL10n.delegate.load(Locale(languageCode));
 
 /// Common phone and tablet sizes to run a layout assertion across.
+///
+/// [all] deliberately covers all three of [ScreenSize]'s buckets. It used to
+/// stop at 844 dp, which is still `medium` — so every `isExpanded` branch in
+/// the app (the two-pane detail, the centred content column, the three-column
+/// fact grid, the six-across stat row) was written and never rendered by a
+/// test. [tabletLandscape] and [desktop] are the two shapes that reach it.
 abstract final class TestSizes {
   /// Flutter's own default test viewport.
   static const Size classic = Size(800, 600);
@@ -205,11 +211,20 @@ abstract final class TestSizes {
   static const Size tablet = Size(834, 1194);
   static const Size landscape = Size(844, 390);
 
+  /// An iPad turned sideways: the narrowest thing that is `expanded`, and by
+  /// far the most common one in the field.
+  static const Size tabletLandscape = Size(1194, 834);
+
+  /// A foldable open, or the app on a desktop window.
+  static const Size desktop = Size(1280, 800);
+
   static const List<(String, Size)> all = [
     ('small phone', smallPhone),
     ('phone', phone),
     ('tablet', tablet),
     ('landscape phone', landscape),
+    ('tablet landscape', tabletLandscape),
+    ('desktop', desktop),
   ];
 
   const TestSizes._();

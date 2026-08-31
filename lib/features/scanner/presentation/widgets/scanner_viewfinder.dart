@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../shared/widgets/viewfinder_brackets.dart';
 
 /// Darkens everything outside the viewfinder square.
 ///
@@ -46,7 +47,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
     // left a ticker running that nothing would ever stop.
     _sweep = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: AppDurations.scannerSweep,
     )..repeat(reverse: true);
   }
 
@@ -78,22 +79,14 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
             children: <Widget>[
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(
+                  color: AppColors.onCamera.withValues(
                     alpha: AppOpacities.viewfinderFill,
                   ),
                   borderRadius: BorderRadius.circular(AppRadii.viewfinder),
                 ),
                 child: const SizedBox.expand(),
               ),
-              for (final corner in _Corner.values)
-                Positioned.directional(
-                  textDirection: Directionality.of(context),
-                  top: corner.isTop ? 0 : null,
-                  bottom: corner.isTop ? null : 0,
-                  start: corner.isStart ? 0 : null,
-                  end: corner.isStart ? null : 0,
-                  child: _CornerBracket(corner: corner),
-                ),
+              const ViewfinderBrackets.scanner(),
               AnimatedBuilder(
                 animation: _sweep,
                 builder: (context, _) => Positioned(
@@ -107,54 +100,6 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
           ),
         );
       },
-    );
-  }
-}
-
-/// Which corner a bracket is drawn in.
-enum _Corner {
-  topStart,
-  topEnd,
-  bottomStart,
-  bottomEnd;
-
-  bool get isTop => this == _Corner.topStart || this == _Corner.topEnd;
-
-  bool get isStart => this == _Corner.topStart || this == _Corner.bottomStart;
-}
-
-class _CornerBracket extends StatelessWidget {
-  const _CornerBracket({required this.corner});
-
-  final _Corner corner;
-
-  @override
-  Widget build(BuildContext context) {
-    const side = BorderSide(
-      color: AppColors.mint,
-      width: AppDimens.scannerCornerWidth,
-    );
-    const radius = Radius.circular(AppRadii.viewfinder);
-
-    return SizedBox(
-      width: AppDimens.scannerCorner,
-      height: AppDimens.scannerCorner,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            top: corner.isTop ? side : BorderSide.none,
-            bottom: corner.isTop ? BorderSide.none : side,
-            start: corner.isStart ? side : BorderSide.none,
-            end: corner.isStart ? BorderSide.none : side,
-          ),
-          borderRadius: BorderRadiusDirectional.only(
-            topStart: corner == _Corner.topStart ? radius : Radius.zero,
-            topEnd: corner == _Corner.topEnd ? radius : Radius.zero,
-            bottomStart: corner == _Corner.bottomStart ? radius : Radius.zero,
-            bottomEnd: corner == _Corner.bottomEnd ? radius : Radius.zero,
-          ).resolve(Directionality.of(context)),
-        ),
-      ),
     );
   }
 }

@@ -54,6 +54,60 @@ class PdfTheme {
   );
 }
 
+/// The print type and spacing scale.
+///
+/// Paper has its own scale — these are PDF points, not logical pixels, and a
+/// 9-pt table cell has no counterpart on screen — so this is deliberately a
+/// separate ladder from [AppSpacing] rather than an import of it. The rule is
+/// the same one the app follows everywhere else: no bare numbers at a call
+/// site, so a document that needs to breathe is one edit rather than a hunt
+/// through two builders.
+abstract final class PdfMetrics {
+  // ── Page ─────────────────────────────────────────────────────────────────
+  /// A4 margin. Comfortably inside the unprintable edge of every office
+  /// printer we have seen, including the ones that claim 5 mm and lie.
+  static const double pageMargin = 28;
+
+  // ── Type ─────────────────────────────────────────────────────────────────
+  static const double titleSize = 18;
+  static const double headingSize = 11;
+  static const double bodySize = 10;
+  static const double labelSize = 9;
+  static const double captionSize = 8;
+  static const double microSize = 7;
+
+  // ── Spacing ──────────────────────────────────────────────────────────────
+  static const double hair = 2;
+  static const double tight = 4;
+  static const double snug = 6;
+  static const double compact = 8;
+  static const double block = 12;
+  static const double section = 16;
+  static const double major = 24;
+
+  // ── Blocks ───────────────────────────────────────────────────────────────
+  static const double headerPadding = 16;
+
+  /// The label column in a label/value fact row. Wide enough for the longest
+  /// Arabic field label at [labelSize] without wrapping to a second line.
+  static const double factLabelWidth = 130;
+  static const double factRowPadding = 3;
+
+  static const double sectionTitleTop = 14;
+  static const double sectionTitleBottom = 6;
+
+  static const double cellPaddingX = 6;
+  static const double cellPaddingY = 5;
+
+  static const double badgePadding = 6;
+  static const double badgeRadius = 4;
+
+  /// The rule a signature is written above.
+  static const double signatureLineWidth = 200;
+
+  const PdfMetrics._();
+}
+
 /// Shared page furniture, so a receipt and an audit report are recognisably
 /// the same document family.
 abstract final class PdfParts {
@@ -62,13 +116,20 @@ abstract final class PdfParts {
   static const PdfColor faint = PdfColor.fromInt(0xFF8492B4);
   static const PdfColor line = PdfColor.fromInt(0xFFE3E8F2);
 
+  /// Alternating table fill. A row per asset and a bundle can run long; this
+  /// is what keeps a printed page readable across its width.
+  static const PdfColor zebra = PdfColor.fromInt(0xFFF7F9FC);
+
+  /// Ink on the navy header band.
+  static const PdfColor onNavy = PdfColors.white;
+
   /// The band across the top of every generated document.
   static pw.Widget header({
     required String title,
     required String subtitle,
     required String product,
   }) => pw.Container(
-    padding: const pw.EdgeInsets.all(16),
+    padding: const pw.EdgeInsets.all(PdfMetrics.headerPadding),
     decoration: const pw.BoxDecoration(color: navy),
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -80,48 +141,66 @@ abstract final class PdfParts {
             pw.Text(
               title,
               style: pw.TextStyle(
-                color: PdfColors.white,
-                fontSize: 18,
+                color: onNavy,
+                fontSize: PdfMetrics.titleSize,
                 fontWeight: pw.FontWeight.bold,
               ),
             ),
-            pw.SizedBox(height: 2),
+            pw.SizedBox(height: PdfMetrics.hair),
             pw.Text(
               subtitle,
-              style: const pw.TextStyle(color: faint, fontSize: 10),
+              style: const pw.TextStyle(
+                color: faint,
+                fontSize: PdfMetrics.bodySize,
+              ),
             ),
           ],
         ),
-        pw.Text(product, style: const pw.TextStyle(color: mint, fontSize: 10)),
+        pw.Text(
+          product,
+          style: const pw.TextStyle(color: mint, fontSize: PdfMetrics.bodySize),
+        ),
       ],
     ),
   );
 
   /// A label/value pair, the shape the detail screens use.
   static pw.Widget fact(String label, String value) => pw.Padding(
-    padding: const pw.EdgeInsets.symmetric(vertical: 3),
+    padding: const pw.EdgeInsets.symmetric(vertical: PdfMetrics.factRowPadding),
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: <pw.Widget>[
         pw.SizedBox(
-          width: 130,
+          width: PdfMetrics.factLabelWidth,
           child: pw.Text(
             label,
-            style: const pw.TextStyle(color: faint, fontSize: 9),
+            style: const pw.TextStyle(
+              color: faint,
+              fontSize: PdfMetrics.labelSize,
+            ),
           ),
         ),
         pw.Expanded(
-          child: pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
+          child: pw.Text(
+            value,
+            style: const pw.TextStyle(fontSize: PdfMetrics.bodySize),
+          ),
         ),
       ],
     ),
   );
 
   static pw.Widget sectionTitle(String text) => pw.Padding(
-    padding: const pw.EdgeInsets.only(top: 14, bottom: 6),
+    padding: const pw.EdgeInsets.only(
+      top: PdfMetrics.sectionTitleTop,
+      bottom: PdfMetrics.sectionTitleBottom,
+    ),
     child: pw.Text(
       text,
-      style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+      style: pw.TextStyle(
+        fontSize: PdfMetrics.headingSize,
+        fontWeight: pw.FontWeight.bold,
+      ),
     ),
   );
 
@@ -133,30 +212,38 @@ abstract final class PdfParts {
     headers: headers,
     data: rows,
     border: null,
-    headerStyle: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-    headerDecoration: const pw.BoxDecoration(color: line),
-    cellStyle: const pw.TextStyle(fontSize: 9),
-    cellPadding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-    // A row per asset, and a bundle can be long; alternating fill is what
-    // keeps a printed page readable across its width.
-    oddRowDecoration: const pw.BoxDecoration(
-      color: PdfColor.fromInt(0xFFF7F9FC),
+    headerStyle: pw.TextStyle(
+      fontSize: PdfMetrics.labelSize,
+      fontWeight: pw.FontWeight.bold,
     ),
+    headerDecoration: const pw.BoxDecoration(color: line),
+    cellStyle: const pw.TextStyle(fontSize: PdfMetrics.labelSize),
+    cellPadding: const pw.EdgeInsets.symmetric(
+      horizontal: PdfMetrics.cellPaddingX,
+      vertical: PdfMetrics.cellPaddingY,
+    ),
+    oddRowDecoration: const pw.BoxDecoration(color: zebra),
   );
 
   /// The line at the bottom of every page.
   static pw.Widget footer(pw.Context context, String generatedOn) => pw.Padding(
-    padding: const pw.EdgeInsets.only(top: 8),
+    padding: const pw.EdgeInsets.only(top: PdfMetrics.compact),
     child: pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: <pw.Widget>[
         pw.Text(
           generatedOn,
-          style: const pw.TextStyle(color: faint, fontSize: 8),
+          style: const pw.TextStyle(
+            color: faint,
+            fontSize: PdfMetrics.captionSize,
+          ),
         ),
         pw.Text(
           _pageLabel(context.pageNumber, context.pagesCount),
-          style: const pw.TextStyle(color: faint, fontSize: 8),
+          style: const pw.TextStyle(
+            color: faint,
+            fontSize: PdfMetrics.captionSize,
+          ),
         ),
       ],
     ),
@@ -179,7 +266,7 @@ abstract final class PdfParts {
     document.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(28),
+        margin: const pw.EdgeInsets.all(PdfMetrics.pageMargin),
         textDirection: theme.direction,
         footer: (context) => footer(context, generatedOn),
         build: body,

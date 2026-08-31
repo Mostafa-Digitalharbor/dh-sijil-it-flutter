@@ -61,6 +61,10 @@ abstract final class ErrorMapper {
         model: error.model,
         technicalDetails: error.message,
       ),
+      ServerException() => Failure(
+        kind: FailureKind.server,
+        technicalDetails: error.technicalDetails ?? error.message,
+      ),
       OdooFaultException() => _fromFault(error),
       ResponseParsingException() => Failure(
         kind: FailureKind.notAnOdooServer,

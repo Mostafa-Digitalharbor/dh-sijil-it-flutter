@@ -32,6 +32,25 @@ class FakeOdooServer {
   /// Set to fail every request, simulating an unreachable host.
   bool refuseEverything = false;
 
+  /// Answer every request with this HTTP status instead of 200.
+  ///
+  /// Odoo behind a reverse proxy is the normal deployment, and the proxy has
+  /// its own opinions: 502 while the workers restart, 503 during an upgrade,
+  /// 403 from a WAF, 401 from an SSO gateway. None of those are XML-RPC
+  /// faults, and each needs its own sentence.
+  int? httpStatus;
+
+  /// Answer with this body verbatim instead of an XML-RPC document.
+  ///
+  /// The shape a parked domain, a captive portal or a proxy login page
+  /// returns — an HTTP 200 carrying HTML — which is the case most likely to
+  /// be mistaken for a working server.
+  String? rawBody;
+
+  /// Content type for [rawBody]. Defaults to XML so an XML-RPC body served
+  /// through it is still treated as one.
+  ContentType? rawContentType;
+
   /// Artificial latency, for exercising timeouts and loading states.
   Duration delay = Duration.zero;
 
@@ -67,6 +86,9 @@ class FakeOdooServer {
     calls.clear();
     faults.clear();
     refuseEverything = false;
+    httpStatus = null;
+    rawBody = null;
+    rawContentType = null;
     delay = Duration.zero;
   }
 
@@ -80,6 +102,29 @@ class FakeOdooServer {
     }
 
     final body = await utf8.decoder.bind(request).join();
+
+    // Served before parsing, so a test can return a body that is not XML-RPC
+    // at all — which is exactly what the cases this covers do.
+    final canned = rawBody;
+    if (canned != null) {
+      request.response
+        ..statusCode = httpStatus ?? HttpStatus.ok
+        ..headers.contentType =
+            rawContentType ?? ContentType('text', 'xml', charset: 'utf-8')
+        ..write(canned);
+      await request.response.close();
+      return;
+    }
+
+    if (httpStatus != null) {
+      request.response
+        ..statusCode = httpStatus!
+        ..headers.contentType = ContentType('text', 'html', charset: 'utf-8')
+        ..write('<html><body>$httpStatus</body></html>');
+      await request.response.close();
+      return;
+    }
+
     final path = request.uri.path;
 
     String reply;

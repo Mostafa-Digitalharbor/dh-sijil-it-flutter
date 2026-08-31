@@ -26,6 +26,7 @@ import '../../../../shared/widgets/export_action.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/mono_text.dart';
 import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/viewfinder_brackets.dart';
 import '../../../assets/domain/entities/asset.dart';
 import '../../../assets/presentation/widgets/asset_icons.dart';
 import '../../../scanner/presentation/widgets/camera_lifecycle.dart';
@@ -507,7 +508,9 @@ class _Viewfinder extends StatelessWidget {
                 ),
               ),
             ),
-            const Center(child: _AuditBrackets()),
+            const Center(
+              child: ViewfinderBrackets(size: AppDimens.viewfinderCompact),
+            ),
             Positioned(
               left: 0,
               right: 0,
@@ -521,73 +524,6 @@ class _Viewfinder extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Four corner brackets rather than a closed box.
-///
-/// A full outline reads as a frame you must fit the code *inside*, which makes
-/// people back away until the whole sticker is in it and the code gets too
-/// small to decode. Corners read as an aim point.
-class _AuditBrackets extends StatelessWidget {
-  const _AuditBrackets();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: AppDimens.viewfinderCompact,
-      height: AppDimens.viewfinderCompact,
-      child: Stack(
-        children: <Widget>[
-          for (final corner in const <Alignment>[
-            Alignment.topLeft,
-            Alignment.topRight,
-            Alignment.bottomLeft,
-            Alignment.bottomRight,
-          ])
-            Align(
-              alignment: corner,
-              child: _Corner(corner: corner),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Corner extends StatelessWidget {
-  const _Corner({required this.corner});
-
-  final Alignment corner;
-
-  @override
-  Widget build(BuildContext context) {
-    const side = BorderSide(
-      color: AppColors.mint,
-      width: AppDimens.viewfinderCornerWeight,
-    );
-    const radius = Radius.circular(AppRadii.md);
-    final top = corner.y < 0;
-    final left = corner.x < 0;
-
-    return Container(
-      width: AppDimens.viewfinderCorner,
-      height: AppDimens.viewfinderCorner,
-      decoration: BoxDecoration(
-        border: Border(
-          top: top ? side : BorderSide.none,
-          bottom: top ? BorderSide.none : side,
-          left: left ? side : BorderSide.none,
-          right: left ? BorderSide.none : side,
-        ),
-        borderRadius: BorderRadius.only(
-          topLeft: top && left ? radius : Radius.zero,
-          topRight: top && !left ? radius : Radius.zero,
-          bottomLeft: !top && left ? radius : Radius.zero,
-          bottomRight: !top && !left ? radius : Radius.zero,
         ),
       ),
     );

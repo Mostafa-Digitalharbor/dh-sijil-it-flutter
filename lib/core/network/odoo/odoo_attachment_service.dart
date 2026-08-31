@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import '../../constants/app_constants.dart';
 import '../../constants/odoo_models.dart';
+import 'odoo_binary.dart';
 import 'odoo_object_service.dart';
 import 'odoo_value.dart';
 
@@ -89,14 +90,7 @@ class OdooAttachmentService {
     );
     if (records.isEmpty) return null;
 
-    final encoded = records.first.readString(AttachmentFields.datas);
-    if (encoded == null) return null;
-
-    try {
-      return base64Decode(encoded);
-    } on FormatException {
-      return null;
-    }
+    return OdooBinary.tryDecode(records.first[AttachmentFields.datas]);
   }
 
   /// Attaches [data] to [id] and returns the new attachment's id.

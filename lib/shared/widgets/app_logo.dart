@@ -78,12 +78,26 @@ class AppLogo extends StatelessWidget {
       assetFor(mark, isDark: isDark),
       width: width,
       height: height,
+      // The artwork ships at print resolution — the monogram is 1024 square,
+      // which decodes to 4 MB — and every screen draws it at forty-odd
+      // points. Without these the splash pays for three of those decodes on
+      // its first frame, which is both the slowest moment of startup and the
+      // one a user is watching.
+      cacheWidth: _decodeBound(context, width),
+      cacheHeight: _decodeBound(context, height),
       // The mark is decoration beside a title that already names the product;
       // announcing it again would just make a screen reader say "Sijil IT"
       // twice.
       excludeFromSemantics: true,
     );
   }
+
+  /// [logical] in physical pixels, or null when the caller left the dimension
+  /// to the artwork's own — in which case there is nothing to bound it by.
+  static int? _decodeBound(BuildContext context, double? logical) =>
+      logical == null
+      ? null
+      : (logical * MediaQuery.devicePixelRatioOf(context)).round();
 
   /// The asset path for a mark on a light or dark ground.
   static String assetFor(BrandMark mark, {required bool isDark}) =>

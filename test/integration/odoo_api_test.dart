@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sijil_it/core/constants/odoo_models.dart';
 import 'package:sijil_it/core/error/error_mapper.dart';
 import 'package:sijil_it/core/error/exceptions.dart' as app;
+import 'package:sijil_it/core/error/failure_presenter.dart';
 import 'package:sijil_it/core/error/failures.dart';
 import 'package:sijil_it/core/network/odoo/odoo_auth_service.dart';
 import 'package:sijil_it/core/network/odoo/odoo_capability_service.dart';
@@ -14,6 +17,7 @@ import 'package:sijil_it/core/pagination/page_request.dart';
 
 import '../fake_odoo/fake_odoo_data.dart';
 import '../fake_odoo/fake_odoo_server.dart';
+import '../fake_odoo/test_app_harness.dart';
 import '../fake_odoo/test_doubles.dart';
 
 /// Exercises every XML-RPC operation the spec requires (§19) against a real
@@ -443,17 +447,168 @@ void main() {
       }
     });
 
-    test('a 5xx response becomes serverUnreachable, not a crash', () async {
-      server.refuseEverything = true;
-
+    /// Runs one request against the fake and returns the mapped failure.
+    Future<Failure> failureFrom(Future<void> Function() request) async {
       try {
-        await auth.version(connection);
+        await request();
         fail('expected a failure');
       } on Object catch (error) {
-        final failure = ErrorMapper.map(error);
-        expect(failure.isRetryable, isTrue);
+        return ErrorMapper.map(error);
       }
+    }
+
+    // Odoo is deployed behind a reverse proxy in every install we have seen,
+    // and the proxy answers for it whenever Odoo itself cannot. Each status
+    // has to reach the user as different advice: "wait and retry" for the
+    // server's own failures, "check the address" for everything else. Getting
+    // this wrong is not cosmetic — it sends somebody to re-type a URL that
+    // was correct, during the exact minutes their instance is restarting.
+    group('an HTTP status the proxy answered with', () {
+      const serverSide = <int>[500, 502, 503, 504];
+
+      for (final status in serverSide) {
+        test('$status is the instance failing, not the address', () async {
+          server.httpStatus = status;
+
+          final failure = await failureFrom(() => auth.version(connection));
+
+          expect(
+            failure.kind,
+            FailureKind.server,
+            reason:
+                'HTTP $status means the address is right and the instance '
+                'is having a problem.',
+          );
+          expect(failure.action, FailureAction.retry);
+          expect(failure.isRetryable, isTrue);
+        });
+      }
+
+      test('404 sends the user to the connection screen', () async {
+        server.httpStatus = 404;
+
+        final failure = await failureFrom(() => auth.version(connection));
+
+        expect(failure.kind, FailureKind.serverUnreachable);
+        expect(failure.action, FailureAction.editConnection);
+      });
+
+      // Odoo returns its own auth failures as XML-RPC faults, never as an
+      // HTTP 401/403. These come from something in front of it.
+      for (final status in <int>[401, 403]) {
+        test('$status is a gateway refusing, not Odoo', () async {
+          server.httpStatus = status;
+
+          final failure = await failureFrom(() => auth.version(connection));
+
+          expect(failure.kind, FailureKind.serverUnreachable);
+          expect(failure.technicalDetails, contains('$status'));
+        });
+      }
+
+      test('the status never reaches the user as a number', () async {
+        server.httpStatus = 502;
+
+        final failure = await failureFrom(() => auth.version(connection));
+        final l10n = await loadL10n();
+        final presented = FailurePresenter.present(l10n, failure);
+
+        for (final line in <String>[
+          presented.title,
+          presented.body,
+          presented.fix,
+        ]) {
+          expect(line, isNot(contains('502')));
+          expect(line, isNot(contains('HTTP')));
+          expect(line, isNotEmpty);
+        }
+      });
     });
+
+    group('a body that is not XML-RPC', () {
+      test('an HTML login page is not mistaken for a server', () async {
+        // A parked domain, a captive portal, or the base URL of a site that
+        // happens to answer on 443. All of them return 200 and HTML.
+        server.rawBody =
+            '<!doctype html><html><body><form>Sign in</form></body></html>';
+        server.rawContentType = ContentType.html;
+
+        final failure = await failureFrom(() => auth.version(connection));
+
+        expect(failure.kind, FailureKind.notAnOdooServer);
+        expect(failure.action, FailureAction.editConnection);
+      });
+
+      test('a truncated document does not escape as an XML error', () async {
+        server.rawBody = '<?xml version="1.0"?><methodResponse><params>';
+
+        final failure = await failureFrom(() => auth.version(connection));
+
+        expect(failure.kind, FailureKind.notAnOdooServer);
+      });
+
+      test('well-formed XML that is not a methodResponse is caught', () async {
+        server.rawBody = '<?xml version="1.0"?><error>nope</error>';
+
+        final failure = await failureFrom(() => auth.version(connection));
+
+        expect(failure.kind, FailureKind.notAnOdooServer);
+      });
+
+      test('an empty 200 is caught rather than decoded as null', () async {
+        server.rawBody = '';
+
+        final failure = await failureFrom(() => auth.version(connection));
+
+        expect(failure.kind, FailureKind.notAnOdooServer);
+      });
+    });
+
+    test(
+      'every failure the transport can raise has user-facing copy',
+      () async {
+        // The presenter is exhaustive over FailureKind by construction, but
+        // "exhaustive" only guarantees a branch exists — not that it says
+        // anything. A blank fix line is the failure mode this catches: the user
+        // is shown a problem and no way out of it.
+        final l10n = await loadL10n();
+
+        for (final kind in FailureKind.values) {
+          final presented = FailurePresenter.present(
+            l10n,
+            Failure(
+              kind: kind,
+              technicalDetails: 'HTTP 500 at /xmlrpc/2/object',
+            ),
+          );
+
+          expect(
+            presented.title,
+            isNotEmpty,
+            reason: '${kind.name} has no title',
+          );
+          expect(
+            presented.body,
+            isNotEmpty,
+            reason: '${kind.name} has no body',
+          );
+          expect(presented.fix, isNotEmpty, reason: '${kind.name} has no fix');
+
+          // The diagnostic string is for Settings → Diagnostics only.
+          for (final line in <String>[
+            presented.title,
+            presented.body,
+            presented.fix,
+          ]) {
+            expect(line, isNot(contains('/xmlrpc/')));
+          }
+
+          if (presented.action != FailureAction.none) {
+            expect(presented.actionLabel, isNotEmpty);
+          }
+        }
+      },
+    );
 
     test('every failure kind resolves to an action the user can take', () {
       for (final kind in FailureKind.values) {

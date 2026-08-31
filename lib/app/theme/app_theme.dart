@@ -32,7 +32,7 @@ abstract final class AppTheme {
           primary: palette.mint,
           onPrimary: palette.onMint,
           secondary: AppColors.statusAssigned,
-          onSecondary: Colors.white,
+          onSecondary: AppColors.onAccent,
           surface: palette.raised,
           onSurface: palette.ink,
           surfaceContainerHighest: palette.ground,
@@ -200,7 +200,7 @@ abstract final class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: isLight ? AppColors.textPrimaryLight : palette.raised,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: isLight ? Colors.white : palette.ink,
+          color: isLight ? AppColors.onAccent : palette.ink,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.lg),

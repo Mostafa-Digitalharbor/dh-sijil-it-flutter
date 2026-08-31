@@ -22,6 +22,7 @@ import 'package:sijil_it/l10n/generated/app_localizations.dart';
 import 'package:sijil_it/shared/cubit/view_state.dart';
 import 'package:sijil_it/shared/widgets/app_avatar.dart';
 import 'package:sijil_it/shared/widgets/app_tiles.dart';
+import 'package:sijil_it/shared/widgets/photo_strip.dart';
 import 'package:sijil_it/shared/widgets/status_chip.dart';
 
 import '../fake_odoo/fake_odoo_data.dart';
@@ -511,8 +512,8 @@ void main() {
         ),
       );
 
-      expect(find.byType(DottedBorderBox), findsOneWidget);
-      expect(find.byIcon(Icons.add_a_photo_outlined), findsOneWidget);
+      expect(find.byType(PhotoAddTile), findsOneWidget);
+      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
     });
 
     testWidgets('the add tile disappears at the cap rather than failing after '
@@ -527,7 +528,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(DottedBorderBox), findsNothing);
+      expect(find.byType(PhotoAddTile), findsNothing);
     });
 
     testWidgets('a file the OS has cleaned up shows a placeholder, not a red '
@@ -596,7 +597,7 @@ void main() {
       expectNoOverflow(tester);
       await tester.drag(find.byType(ListView), const Offset(-400, 0));
       await tester.pump();
-      expect(find.byType(DottedBorderBox), findsOneWidget);
+      expect(find.byType(PhotoAddTile), findsOneWidget);
     });
 
     testWidgets('both controls are named for a screen reader', (tester) async {
@@ -618,16 +619,21 @@ void main() {
     });
   });
 
-  group('DottedBorderBox', () {
+  group('PhotoAddTile', () {
     testWidgets('it is a square the size of a thumbnail', (tester) async {
       // So the add target lines up with the photos it sits beside.
       await pump(
         tester,
-        const Align(child: DottedBorderBox(child: SizedBox.shrink())),
+        Align(
+          child: SizedBox.square(
+            dimension: AppDimens.photoThumb,
+            child: PhotoAddTile(onTap: () {}),
+          ),
+        ),
       );
 
       expect(
-        tester.getSize(find.byType(DottedBorderBox)),
+        tester.getSize(find.byType(PhotoAddTile)),
         const Size(AppDimens.photoThumb, AppDimens.photoThumb),
       );
     });
