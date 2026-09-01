@@ -221,13 +221,25 @@ void main() {
     });
 
     testWidgets('an overdue asset says so on its own screen', (tester) async {
+      // Both dates are relative to now, and the count below is derived from
+      // the same number rather than written out.
+      //
+      // This used to pin `dueOn` to 2020-01-06 and assert that
+      // `dueOverdueBy(2429)` was *absent*. That passed for years by
+      // coincidence: 2,429 days after that date is a single specific day, so
+      // on every other day the string simply did not match and the assertion
+      // proved nothing. On the day it did match, a correct screen failed the
+      // test — the app was right and the expectation was inverted.
+      const overdueDays = 30;
+      final now = DateTime.now();
+
       await sl<AssignAsset>()(
         AssignmentRequest(
           assetId: 104,
           employeeId: 12,
           employeeName: 'Ahmed Mohamed',
-          assignedOn: DateTime(2026, 8, 20),
-          dueOn: DateTime(2020, 1, 6),
+          assignedOn: now.subtract(const Duration(days: 60)),
+          dueOn: now.subtract(const Duration(days: overdueDays)),
         ),
       );
 
@@ -235,9 +247,14 @@ void main() {
 
       expect(await reveal(tester, find.text(l10n.labelDueBack)), findsWidgets);
       // The long form, not the list row's one-word chip: this is the screen
-      // somebody is on when they decide whether to chase it.
-      expect(find.text(l10n.dueOverdueBy(2429)), findsNothing);
-      expect(find.textContaining(l10n.labelDueBack), findsWidgets);
+      // somebody is on when they decide whether to chase it, so the number of
+      // days has to be on it.
+      expect(find.text(l10n.dueOverdueBy(overdueDays)), findsOneWidget);
+      expect(
+        find.text(l10n.dueChipOverdue),
+        findsNothing,
+        reason: 'the one-word chip belongs on a list row, not here',
+      );
     });
 
     testWidgets('settings offers the unlock, enabled on this device', (

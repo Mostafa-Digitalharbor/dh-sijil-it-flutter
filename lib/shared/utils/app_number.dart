@@ -39,6 +39,34 @@ abstract final class AppNumber {
     NumberFormat.decimalPattern(_localeName(context)).format(value),
   );
 
+  /// An amount of money, grouped and rounded to whole units.
+  ///
+  /// ## Why whole units
+  ///
+  /// Every figure this renders is either a purchase price or a price divided
+  /// by a number of years, and nobody deciding whether to replace a laptop
+  /// cares about the pence. "2,400" is a number somebody reads at a glance;
+  /// "2,399.97" is one they have to parse.
+  ///
+  /// ## Why the symbol is optional and trailing-agnostic
+  ///
+  /// Odoo reports the company currency's symbol, and where it belongs is a
+  /// property of the *language*, not of the currency — Arabic puts it after
+  /// the number, English before. `NumberFormat.currency` with a locale gets
+  /// that right; concatenating by hand does not, which is what the purchase
+  /// figure used to do by not showing a symbol at all.
+  static String money(BuildContext context, num? value, {String? symbol}) {
+    if (value == null) return '';
+
+    return latinDigits(
+      NumberFormat.currency(
+        locale: _localeName(context),
+        symbol: symbol ?? '',
+        decimalDigits: 0,
+      ).format(value).trim(),
+    );
+  }
+
   /// A fraction rendered as a percentage — `0.72` becomes `72%`.
   static String percent(BuildContext context, double fraction) => latinDigits(
     NumberFormat.percentPattern(_localeName(context)).format(fraction),

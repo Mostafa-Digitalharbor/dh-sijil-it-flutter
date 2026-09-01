@@ -14,6 +14,7 @@ import '../../core/notifications/reminder_scheduler.dart';
 import '../../core/security/app_lock.dart';
 import '../../core/security/credential_vault.dart';
 import '../../core/services/photo_picker.dart';
+import '../../core/services/voice_input.dart';
 import '../../core/storage/cache/cache_store.dart';
 import '../../core/storage/cache/hive_cache_store.dart';
 import '../../core/storage/preferences/app_preferences.dart';
@@ -118,6 +119,13 @@ Future<void> _registerPlatform() async {
   sl.registerSingleton<AppPreferences>(preferences);
 
   sl.registerLazySingleton<NetworkInfo>(ConnectivityNetworkInfo.createDefault);
+
+  // Here rather than beside `PhotoPicker` in the Odoo layer, for the same
+  // reason the vault and the network are here: it needs a microphone, a
+  // recogniser and a permission, so it is one of the pieces a test replaces
+  // wholesale. Registering it in `registerAppGraph` put it beyond the reach of
+  // the harness, which then collided with it.
+  sl.registerLazySingleton<VoiceInput>(PlatformVoiceInput.new);
 }
 
 // ── Layer 1: transport ─────────────────────────────────────────────────────
@@ -165,6 +173,7 @@ void _registerSync() {
   sl.registerLazySingleton<ReminderScheduler>(
     () => ReminderScheduler(
       assets: sl<AssetRepository>(),
+      maintenance: sl<MaintenanceRepository>(),
       notifications: sl<NotificationService>(),
       preferences: sl<AppPreferences>(),
     ),

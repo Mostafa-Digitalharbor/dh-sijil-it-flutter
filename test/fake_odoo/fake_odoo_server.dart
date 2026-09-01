@@ -40,6 +40,13 @@ class FakeOdooServer {
   /// faults, and each needs its own sentence.
   int? httpStatus;
 
+  /// Extra response headers sent with [httpStatus].
+  ///
+  /// Exists for `Retry-After`, which is the one header the app reads and the
+  /// difference between "wait 30 seconds" and a guess. A throttling proxy is
+  /// the only thing that sends it, so it is only ever set alongside a 429.
+  final Map<String, String> responseHeaders = {};
+
   /// Answer with this body verbatim instead of an XML-RPC document.
   ///
   /// The shape a parked domain, a captive portal or a proxy login page
@@ -89,6 +96,7 @@ class FakeOdooServer {
     httpStatus = null;
     rawBody = null;
     rawContentType = null;
+    responseHeaders.clear();
     delay = Duration.zero;
   }
 
@@ -107,6 +115,7 @@ class FakeOdooServer {
     // at all — which is exactly what the cases this covers do.
     final canned = rawBody;
     if (canned != null) {
+      responseHeaders.forEach(request.response.headers.set);
       request.response
         ..statusCode = httpStatus ?? HttpStatus.ok
         ..headers.contentType =
@@ -117,6 +126,7 @@ class FakeOdooServer {
     }
 
     if (httpStatus != null) {
+      responseHeaders.forEach(request.response.headers.set);
       request.response
         ..statusCode = httpStatus!
         ..headers.contentType = ContentType('text', 'html', charset: 'utf-8')

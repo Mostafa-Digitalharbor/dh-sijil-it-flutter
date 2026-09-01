@@ -5,6 +5,7 @@ import '../../../../app/theme/app_dimens.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
+import '../../../../shared/utils/app_number.dart';
 import '../../../../shared/utils/app_text.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_card.dart';
@@ -14,6 +15,7 @@ import '../../../../shared/widgets/state_views.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../maintenance/domain/entities/maintenance_request.dart';
 import '../../domain/entities/asset.dart';
+import '../../domain/entities/asset_lifecycle.dart';
 import '../../domain/entities/return_due.dart';
 import '../../domain/entities/warranty.dart';
 import 'asset_icons.dart';
@@ -388,6 +390,158 @@ class _WarrantyBar extends StatelessWidget {
 
     final remaining = warranty.daysRemaining ?? 0;
     return (1 - remaining / total).clamp(0.0, 1.0);
+  }
+}
+
+/// How far through its working life the asset is, and what it has cost.
+///
+/// ## Why this is on the detail screen and not only in a report
+///
+/// The two numbers behind it were already on the record and the app did
+/// nothing with either: a purchase date and a purchase value, printed as facts
+/// and left there. Read together they answer the question an IT manager
+/// actually has — "do I replace this one?" — and the moment they are most
+/// useful is the moment somebody is looking at the asset, not a quarter later
+/// in a spreadsheet.
+///
+/// The cost line is the one that changes conversations. A laptop bought four
+/// years ago for 2,400 has cost 600 a year; the same laptop replaced after
+/// eighteen months cost 1,600 a year. Neither figure is visible from a
+/// purchase price on its own, and the second is the argument for buying the
+/// better machine.
+class AssetLifecycleSection extends StatelessWidget {
+  const AssetLifecycleSection({required this.asset, super.key});
+
+  final Asset asset;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final theme = Theme.of(context);
+    final lifecycle = asset.lifecycle;
+
+    // Shown even with nothing to measure, unlike the warranty section, and for
+    // the opposite reason: a missing warranty date is Odoo's business, while a
+    // missing purchase date is a gap somebody here can close — and the section
+    // is the only place that says so.
+    if (lifecycle.state == LifecycleState.unknown) {
+      return SectionCard(
+        title: l10n.lifecycleTitle,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(l10n.lifecycleUnknown, style: theme.textTheme.titleSmall),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.lifecycleUnknownHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final tone = lifecycleTone(lifecycle.state);
+
+    return SectionCard(
+      title: l10n.lifecycleTitle,
+      trailing: lifecycle.state.needsAttention
+          ? AppChip(
+              label: lifecycle.isOverdue
+                  ? l10n.lifecycleOverdue
+                  : l10n.lifecycleAgeing,
+              tone: tone,
+              icon: Icons.autorenew_rounded,
+              dense: true,
+            )
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _LifecycleBar(lifecycle: lifecycle, tone: tone),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            l10n.lifecycleAge(lifecycle.ageInMonths ?? 0),
+            style: theme.textTheme.titleSmall,
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            lifecycle.isOverdue
+                ? l10n.lifecycleOverdueBy(lifecycle.monthsOverdue)
+                : l10n.lifecycleRemaining(lifecycle.remainingMonths ?? 0),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: lifecycle.state.needsAttention
+                  ? tone
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (lifecycle.annualisedCost != null) ...<Widget>[
+            const SizedBox(height: AppSpacing.sm),
+            InlineFact(
+              icon: Icons.savings_outlined,
+              label: l10n.lifecycleCostPerYear,
+              value: AppNumber.money(
+                context,
+                lifecycle.annualisedCost,
+                symbol: asset.currencySymbol,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// The colour a lifecycle state is drawn in.
+  ///
+  /// Static and public so a list row and an export can use the same mapping
+  /// rather than each deciding what "ageing" looks like.
+  static Color lifecycleTone(LifecycleState state) => switch (state) {
+    LifecycleState.unknown => AppColors.navy300,
+    LifecycleState.healthy => AppColors.success,
+    LifecycleState.ageing => AppColors.warning,
+    LifecycleState.overdue => AppColors.danger,
+  };
+}
+
+/// How much of the expected life has been used.
+class _LifecycleBar extends StatelessWidget {
+  const _LifecycleBar({required this.lifecycle, required this.tone});
+
+  final AssetLifecycle lifecycle;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadii.pill),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            height: AppDimens.progressBarHeight,
+            color: theme.colorScheme.outlineVariant.withValues(
+              alpha: AppOpacities.divider,
+            ),
+          ),
+          FractionallySizedBox(
+            widthFactor: lifecycle.progress,
+            child: Container(
+              height: AppDimens.progressBarHeight,
+              decoration: BoxDecoration(
+                color: tone,
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

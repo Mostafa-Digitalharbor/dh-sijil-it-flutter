@@ -111,6 +111,77 @@ class AppPreferences {
   Future<void> setAppLockEnabled({required bool value}) =>
       _prefs.setBool(PrefKeys.appLockEnabled, value);
 
+  // ── Session lifetime ─────────────────────────────────────────────────────
+
+  /// When the stored credential last proved itself against Odoo.
+  ///
+  /// Written on sign-in and on every successful restore, so the window is
+  /// *idle* time rather than time since the password was typed: somebody who
+  /// opens the app every morning is never signed out, and a handset in a
+  /// drawer stops being a working key to the company's asset register.
+  DateTime? get lastAuthenticated {
+    final raw = _prefs.getString(PrefKeys.lastAuthenticated);
+    return raw == null ? null : DateTime.tryParse(raw);
+  }
+
+  Future<void> setLastAuthenticated(DateTime? value) async {
+    if (value == null) {
+      await _prefs.remove(PrefKeys.lastAuthenticated);
+    } else {
+      await _prefs.setString(
+        PrefKeys.lastAuthenticated,
+        value.toIso8601String(),
+      );
+    }
+  }
+
+  /// How long the app may reuse the stored credential without the user typing
+  /// it again. [sessionNeverExpires] turns the check off.
+  int get sessionMaxAgeDays =>
+      _prefs.getInt(PrefKeys.sessionMaxAgeDays) ?? defaultSessionMaxAgeDays;
+
+  Future<void> setSessionMaxAgeDays(int days) =>
+      _prefs.setInt(PrefKeys.sessionMaxAgeDays, days);
+
+  /// Thirty days, and on by default.
+  ///
+  /// The credential in the keychain is a working Odoo login. Before this it
+  /// stayed valid for as long as the app was installed, so a phone lost in
+  /// month one was still a way into the asset register in month nine.
+  ///
+  /// Thirty rather than seven because the window is idle time and the people
+  /// this is built for go on leave; a technician back from three weeks off
+  /// should find the app as they left it. And it is a *setting*, so a customer
+  /// whose policy is stricter can say so without a new build.
+  static const int defaultSessionMaxAgeDays = 30;
+
+  /// The sentinel for "never sign me out".
+  static const int sessionNeverExpires = 0;
+
+  /// The windows the settings screen offers.
+  static const List<int> sessionMaxAgeOptions = <int>[
+    7,
+    30,
+    90,
+    sessionNeverExpires,
+  ];
+
+  /// Whether [lastAuthenticated] is far enough in the past to require the
+  /// credential to be typed again.
+  ///
+  /// A missing timestamp is *not* expired: it means the session predates this
+  /// setting, and signing everybody out on the upgrade that introduced it
+  /// would be a security feature that reads as a bug.
+  bool isSessionExpired({DateTime? now}) {
+    final maxAge = sessionMaxAgeDays;
+    if (maxAge <= sessionNeverExpires) return false;
+
+    final last = lastAuthenticated;
+    if (last == null) return false;
+
+    return (now ?? DateTime.now()).difference(last) > Duration(days: maxAge);
+  }
+
   // ── Appearance ───────────────────────────────────────────────────────────
 
   ThemeMode get themeMode => switch (_prefs.getString(PrefKeys.themeMode)) {

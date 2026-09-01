@@ -14,6 +14,7 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/app_tiles.dart';
 import '../../../../shared/widgets/paginated_list_view.dart';
 import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/voice_search_button.dart';
 import '../../domain/entities/employee.dart';
 import '../cubit/employee_list_cubit.dart';
 
@@ -128,6 +129,14 @@ class _SearchAndDepartments extends StatelessWidget {
             hint: l10n.employeeSearchHint,
             onChanged: onSearch,
             onClear: () => onSearch(''),
+            // A name is the hardest thing to type and the easiest to say,
+            // which makes this the search that benefits most.
+            trailing: VoiceSearchButton(
+              onTranscript: (text) {
+                controller.text = text;
+                onSearch(text);
+              },
+            ),
           ),
         ),
         if (state.departments.isNotEmpty) ...<Widget>[

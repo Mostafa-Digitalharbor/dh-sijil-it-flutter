@@ -6,6 +6,7 @@ import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/notifications/reminder_scheduler.dart';
 import '../../../../core/storage/preferences/app_preferences.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/utils/reminder_copy_l10n.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_segmented.dart';
 
@@ -70,12 +71,7 @@ class _RemindersCardState extends State<RemindersCard> {
 
   /// Rebuilds the whole reminder set from what Odoo currently says.
   Future<void> _apply(AppL10n l10n) async {
-    final count = await sl<ReminderScheduler>().refresh(
-      ReminderCopy(
-        title: l10n.reminderNotificationTitle,
-        body: l10n.reminderNotificationBody,
-      ),
-    );
+    final count = await sl<ReminderScheduler>().refresh(l10n.reminderCopy);
     if (mounted) setState(() => (_scheduled = count, _busy = false));
   }
 

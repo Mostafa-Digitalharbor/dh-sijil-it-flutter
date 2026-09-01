@@ -235,7 +235,12 @@ void main() {
       // code" in its own doc comment. Nothing enforced it, and one had
       // already drifted back in.
       final offenders = <String>[];
-      final literal = RegExp(r'\bDuration\(\s*(?:milli|micro)?seconds:');
+      // A *literal* timing. `Duration(seconds: retryAfter)` built from a
+      // value the server sent is data, not a design decision: there is
+      // nothing to name in `AppDurations`, so a digit is required to offend.
+      final literal = RegExp(
+        r'\bDuration\(\s*(?:milli|micro)?seconds:\s*[\d.]',
+      );
 
       for (final file in all) {
         // The scales themselves, and `AppConstants`, are where the numbers

@@ -31,6 +31,10 @@ abstract final class ErrorMapper {
         kind: FailureKind.invalidCredentials,
         technicalDetails: error.technicalDetails,
       ),
+      SessionExpiredException() => Failure(
+        kind: FailureKind.sessionExpired,
+        technicalDetails: error.message,
+      ),
       AccessDeniedException() => Failure(
         kind: FailureKind.accessDenied,
         model: error.model,
@@ -60,6 +64,11 @@ abstract final class ErrorMapper {
         kind: FailureKind.fieldUnavailable,
         model: error.model,
         technicalDetails: error.message,
+      ),
+      RateLimitedException() => Failure(
+        kind: FailureKind.rateLimited,
+        retryAfter: error.retryAfter,
+        technicalDetails: error.technicalDetails ?? error.message,
       ),
       ServerException() => Failure(
         kind: FailureKind.server,
@@ -113,6 +122,19 @@ abstract final class ErrorMapper {
         kind: FailureKind.accessDenied,
         model: _extractModel(fault.message),
         operation: _extractOperation(text),
+        technicalDetails: fault.message,
+      );
+    }
+
+    // Odoo's login throttle answers as a fault, not as HTTP 429: repeated bad
+    // passwords produce "Too many login attempts" rather than a status code.
+    // Without this it read as a generic server error and the user was told to
+    // retry immediately, which is what extends the lockout.
+    if (text.contains('too many login attempts') ||
+        text.contains('too many requests') ||
+        text.contains('rate limit')) {
+      return Failure(
+        kind: FailureKind.rateLimited,
         technicalDetails: fault.message,
       );
     }

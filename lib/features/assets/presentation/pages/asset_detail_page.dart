@@ -221,6 +221,10 @@ class _DetailBody extends StatelessWidget {
           onOpenRequest: (request) =>
               context.go(AppRoutes.maintenanceDetailPath(request.id)),
         ),
+        // Directly above the purchase block, which is where its two inputs
+        // are: somebody who reads "four years old, 600 a year" and wants to
+        // know what it cost finds the answer in the next card down.
+        AssetLifecycleSection(asset: asset),
         AssetPurchaseSection(asset: asset),
         AssetNotesSection(asset: asset),
       ],

@@ -535,6 +535,26 @@ flutter test integration_test/... -d <device>            # on a phone
 dart run test/fake_odoo/serve.dart                       # drive it by hand
 ```
 
+**Two things that will cost an afternoon otherwise.**
+
+`serve.dart` binds plain HTTP, and the app will not talk to it from a device.
+`OdooConnection.normalize` rejects any scheme but `https`, and Android's
+manifest sets `usesCleartextTraffic="false"` on top of that — both deliberate,
+and neither worth weakening for a fixture. So the fake server is reachable from
+a **host-side** test and from a desktop build, and driving the installed app by
+hand against it needs a TLS terminator in front (a local reverse proxy with a
+certificate the device trusts). For everything else the on-device suite is the
+faster answer, because it carries the fake Odoo in-process and needs no socket
+at all.
+
+An emulator that has been used for other projects runs out of room long before
+anything says so plainly. The debug APK is ~170 MB, and a full `/data` reports
+itself as `INSTALL_FAILED_INSUFFICIENT_STORAGE` on a fresh install but as a
+misleading `Activity class ... does not exist` at launch when a *previous*
+install landed short — the package record exists, the manifest is merged, and
+`am start` still cannot find the class. `adb uninstall` whatever else is on the
+device before concluding the build is broken.
+
 ---
 
 ## 13. CI/CD

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/error/failure_presenter.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/sync/outbox_entry.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/cubit/sync_cubit.dart';
@@ -31,17 +33,37 @@ class SyncPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
 
-    return BlocBuilder<SyncCubit, SyncViewState>(
+    return BlocConsumer<SyncCubit, SyncViewState>(
+      // Only when a replay finishes, and only when it actually sent something.
+      // Without this the screen answered "Sync now" by quietly emptying: the
+      // queue vanished, the empty state appeared, and nothing said whether
+      // that was because Odoo took the writes or because they were discarded.
+      listenWhen: (previous, current) =>
+          previous.isSyncing && !current.isSyncing,
+      listener: (context, state) {
+        final sent = state.lastReport?.sent ?? 0;
+        if (sent > 0) AppSnack.success(context, l10n.syncSentCount(sent));
+      },
       builder: (context, state) {
         final cubit = context.read<SyncCubit>();
 
+        final hasAnything = state.hasPending || state.hasQuarantined;
+
         return AppScaffold(
           title: l10n.syncTitle,
-          subtitle: state.hasPending
-              ? l10n.syncPendingBanner(state.pending.length)
-              : null,
+          // The failures lead, because they are the half of the screen that
+          // will not resolve itself.
+          subtitle: switch (state) {
+            _ when state.hasQuarantined => l10n.syncFailedCount(
+              state.quarantined.length,
+            ),
+            _ when state.hasPending => l10n.syncPendingBanner(
+              state.pending.length,
+            ),
+            _ => null,
+          },
           showBack: true,
-          body: state.hasPending ? _Queue(state: state) : _Empty(state: state),
+          body: hasAnything ? _Queue(state: state) : _Empty(state: state),
           bottomBar: state.hasPending
               ? _Actions(state: state, cubit: cubit)
               : null,
@@ -77,24 +99,112 @@ class _Queue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final theme = Theme.of(context);
+    final cubit = context.read<SyncCubit>();
+
     return AppPageBody(
       children: <Widget>[
+        // Failures first. A write that will never go out on its own is the
+        // one thing on this screen that needs a decision, and burying it under
+        // a list that empties itself is how it goes unnoticed.
+        if (state.hasQuarantined) ...<Widget>[
+          _SectionHeader(
+            label: l10n.syncFailedSection,
+            tone: AppColors.danger,
+            trailing: AppTextAction(
+              label: l10n.syncDiscardFailedAll,
+              icon: Icons.delete_sweep_outlined,
+              onPressed: () => _confirmDiscardAll(context, cubit),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: AppSpacing.sm),
+            child: Text(
+              l10n.syncFailedBody,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          for (final entry in state.quarantined)
+            _QueuedRow(entry: entry, cubit: cubit),
+        ],
+        if (state.hasQuarantined && state.hasPending)
+          _SectionHeader(
+            label: l10n.syncPendingBanner(state.pending.length),
+            tone: AppColors.warning,
+          ),
         for (final entry in state.pending) _QueuedRow(entry: entry),
       ],
+    );
+  }
+
+  Future<void> _confirmDiscardAll(BuildContext context, SyncCubit cubit) async {
+    final l10n = AppL10n.of(context);
+
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: l10n.syncDiscardFailedAllConfirm,
+      message: l10n.syncDiscardFailedAllBody,
+      confirmLabel: l10n.syncDiscardFailedAll,
+      isDestructive: true,
+    );
+
+    if (confirmed) await cubit.discardAllQuarantined();
+  }
+}
+
+/// A labelled divider between the two halves of the queue.
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.label,
+    required this.tone,
+    this.trailing,
+  });
+
+  final String label;
+  final Color tone;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(
+        top: AppSpacing.sm,
+        bottom: AppSpacing.xs,
+      ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(color: tone),
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
+      ),
     );
   }
 }
 
 class _QueuedRow extends StatelessWidget {
-  const _QueuedRow({required this.entry});
+  const _QueuedRow({required this.entry, this.cubit});
 
   final OutboxEntry entry;
+
+  /// Present only for a quarantined entry, which is the only kind with
+  /// controls of its own.
+  final SyncCubit? cubit;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
-    final tone = entry.isBlocked ? AppColors.danger : AppColors.warning;
+    final tone = entry.isQuarantined ? AppColors.danger : AppColors.warning;
 
     final card = AppCard.row(
       child: Row(
@@ -127,10 +237,13 @@ class _QueuedRow extends StatelessWidget {
       ),
     );
 
-    if (!entry.isBlocked) return card;
+    final owner = cubit;
+    if (!entry.isQuarantined || owner == null) return card;
 
-    // Said under the row rather than inside it: this is why the entry stopped
-    // trying, and a row that carries it silently is a badge that never clears.
+    // Why it stopped, and the two things that can be done about it. Said under
+    // the row rather than inside it, and with controls rather than only a
+    // sentence: the reason on its own was a badge that never cleared, because
+    // the only way to act on it was to discard the entire queue.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -139,14 +252,63 @@ class _QueuedRow extends StatelessWidget {
         Padding(
           padding: const EdgeInsetsDirectional.only(
             start: AppSpacing.md,
+            end: AppSpacing.md,
             top: AppSpacing.xs,
           ),
           child: Text(
-            l10n.syncBlocked,
+            _reason(l10n, entry),
             style: theme.textTheme.bodySmall?.copyWith(color: AppColors.danger),
           ),
         ),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
+          child: Row(
+            children: <Widget>[
+              AppTextAction(
+                label: l10n.syncRetryOne,
+                icon: Icons.refresh_rounded,
+                onPressed: () => owner.retryQuarantined(entry.id),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              AppTextAction(
+                label: l10n.syncDiscardOne,
+                icon: Icons.delete_outline_rounded,
+                onPressed: () => _confirmDiscard(context, owner),
+              ),
+            ],
+          ),
+        ),
       ],
+    );
+  }
+
+  Future<void> _confirmDiscard(BuildContext context, SyncCubit owner) async {
+    final l10n = AppL10n.of(context);
+
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: l10n.syncDiscardOneConfirm,
+      message: l10n.syncDiscardOneBody(entry.subjectName),
+      confirmLabel: l10n.syncDiscardOne,
+      isDestructive: true,
+    );
+
+    if (confirmed) await owner.discardQuarantined(entry.id);
+  }
+
+  /// Odoo's reason, in the user's language.
+  ///
+  /// The stored value is a [FailureKind] name — the same vocabulary the error
+  /// screens use — so it resolves through the presenter rather than being
+  /// shown as the raw enum a technician has no way to read.
+  static String _reason(AppL10n l10n, OutboxEntry entry) {
+    final kind = FailureKind.values
+        .where((k) => k.name == entry.lastError)
+        .firstOrNull;
+    if (kind == null) return l10n.syncBlocked;
+
+    return l10n.syncFailedReason(
+      FailurePresenter.shortMessage(l10n, Failure(kind: kind)),
     );
   }
 

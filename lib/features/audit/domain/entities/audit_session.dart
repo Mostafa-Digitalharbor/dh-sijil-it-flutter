@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../assets/domain/entities/asset.dart';
 
 /// What a scan turned out to be.
@@ -116,6 +117,51 @@ class AuditSession extends Equatable {
     for (final entry in expected.entries)
       if (!results.containsKey(entry.key)) entry.value,
   ];
+
+  /// The expected asset a scanned code belongs to, without asking Odoo.
+  ///
+  /// ## Why a walk cannot afford a round trip per sticker
+  ///
+  /// Every scan used to be a network lookup — `asset://<id>` by id, anything
+  /// else by serial — and while one was in flight the camera's detections were
+  /// dropped on the floor. On a warehouse connection that turned a count of
+  /// fifty into fifty pauses: scan, wait for the beep, scan. The whole point of
+  /// reading the expected set once at the start is that the answer for
+  /// anything in scope is already on the device.
+  ///
+  /// So the fast path is local and exact, and the network is left for the one
+  /// case that genuinely needs it: a code that is *not* in scope, which is
+  /// either an asset from another department or a sticker from another system
+  /// — and which the audit has to name rather than count.
+  ///
+  /// Matching is case-insensitive on serial and tag because a code read off a
+  /// barcode arrives upper-cased on some scanners and not others, and an audit
+  /// that misses an asset over a letter case is worse than no audit.
+  Asset? matchLocally(String code) {
+    final trimmed = code.trim();
+    if (trimmed.isEmpty) return null;
+
+    final id = assetIdFromQrPayload(trimmed);
+    if (id != null) return expected[id];
+
+    final needle = trimmed.toLowerCase();
+    for (final asset in expected.values) {
+      if (asset.serialNumber?.toLowerCase() == needle) return asset;
+      if (asset.assetTag?.toLowerCase() == needle) return asset;
+    }
+    return null;
+  }
+
+  /// The record id inside an `asset://<id>` payload this app printed.
+  ///
+  /// Public and here rather than private in the repository because the audit
+  /// now reads the same payload, and two parsers for one format is how one of
+  /// them stops understanding a code the other prints.
+  static int? assetIdFromQrPayload(String code) {
+    const prefix = '${AppConstants.qrScheme}://';
+    if (!code.toLowerCase().startsWith(prefix)) return null;
+    return int.tryParse(code.substring(prefix.length).trim());
+  }
 
   AuditSession record(Asset asset, DateTime at) {
     return copyWith(

@@ -60,13 +60,13 @@ class AppL10nEn extends AppL10n {
   String get actionOpen => 'Open';
 
   @override
+  String get actionOpenSettings => 'Open settings';
+
+  @override
   String get actionRefresh => 'Refresh';
 
   @override
   String get actionRemove => 'Remove';
-
-  @override
-  String get actionOpenSettings => 'Open settings';
 
   @override
   String get actionRetry => 'Try again';
@@ -97,6 +97,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get appTagline => 'IT Asset Management';
+
+  @override
+  String get assetActionHistory => 'History';
 
   @override
   String get assetActionsTitle => 'Asset actions';
@@ -171,6 +174,16 @@ class AppL10nEn extends AppL10n {
   String get assignConfirm => 'Confirm assignment';
 
   @override
+  String get assignDueClear => 'Remove the date';
+
+  @override
+  String get assignDueHint =>
+      'Leave this empty unless the asset is a loan somebody has to bring back.';
+
+  @override
+  String get assignDueNotSet => 'No return date';
+
+  @override
   String get assignNotesHint => 'Handed over with charger and USB-C hub…';
 
   @override
@@ -178,6 +191,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get assignStepDate => 'Assignment date';
+
+  @override
+  String get assignStepDue => 'Expected return date';
 
   @override
   String get assignStepEmployee => 'Select employee';
@@ -194,10 +210,155 @@ class AppL10nEn extends AppL10n {
   String get assignTitle => 'Assign asset';
 
   @override
+  String get auditBegin => 'Start counting';
+
+  @override
+  String get auditCounting => 'Counting';
+
+  @override
+  String get auditDiscardBody =>
+      'The scans so far are on this phone only. Leaving loses them.';
+
+  @override
+  String get auditDiscardConfirm => 'Leave';
+
+  @override
+  String get auditDiscardTitle => 'Leave the count?';
+
+  @override
+  String get auditFinish => 'Finish';
+
+  @override
+  String get auditFound => 'Found';
+
+  @override
+  String get auditJustScanned => 'Just scanned';
+
+  @override
+  String get auditKeepScanning => 'Keep scanning — no need to stop';
+
+  @override
+  String get auditMissing => 'Not found';
+
+  @override
+  String get auditNothingMissing => 'Everything in scope was found.';
+
+  @override
+  String auditOf(int done, int total) {
+    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String doneString = doneNumberFormat.format(done);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$doneString of $totalString';
+  }
+
+  @override
+  String get auditOutOfScope => 'Here, but recorded elsewhere';
+
+  @override
+  String get auditPickCategory => 'Pick a category';
+
+  @override
+  String get auditPickDepartment => 'Pick a department';
+
+  @override
+  String get auditReportExpected => 'Expected';
+
+  @override
+  String get auditReportFound => 'Counted';
+
+  @override
+  String get auditReportMissing => 'Not found';
+
+  @override
+  String get auditReportScope => 'Scope';
+
+  @override
+  String get auditReportShare => 'Share report';
+
+  @override
+  String get auditReportTitle => 'Stock count';
+
+  @override
+  String get auditReportUnexpected => 'Found out of scope';
+
+  @override
+  String get auditResume => 'Keep counting';
+
+  @override
+  String get auditSaveToOdoo => 'Save findings to Odoo';
+
+  @override
+  String get auditSaved => 'Findings saved to Odoo';
+
+  @override
+  String get auditSavedNone => 'Nothing to record — no findings.';
+
+  @override
+  String get auditScopeAll => 'Everything';
+
+  @override
+  String get auditScopeCategory => 'One category';
+
+  @override
+  String get auditScopeDepartment => 'One department';
+
+  @override
+  String get auditStartBody =>
+      'A narrow scope gets counted. Everything at once does not.';
+
+  @override
+  String get auditStartTitle => 'What are you counting?';
+
+  @override
+  String get auditTitle => 'Audit';
+
+  @override
+  String get auditUnexpected => 'Not in scope';
+
+  @override
+  String get auditUnknownCode => 'That code matches no asset';
+
+  @override
+  String get auditWhereExpected => 'Where expected';
+
+  @override
   String get authModeApiKey => 'API key';
 
   @override
   String get authModePassword => 'Password';
+
+  @override
+  String get bulkMoveDepartment => 'Move to department';
+
+  @override
+  String bulkMoveDone(int count, String department) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets moved to $department',
+      one: '1 asset moved to $department',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkMoveNoDepartments =>
+      'This Odoo has no departments to move assets to.';
+
+  @override
+  String get bulkMoveTitle => 'Which department?';
+
+  @override
+  String get bulkPrintLabels => 'Label sheet';
 
   @override
   String get capabilityActivityLog => 'Activity log';
@@ -252,6 +413,9 @@ class AppL10nEn extends AppL10n {
       'Stored in your device keychain, never as plain text';
 
   @override
+  String get dashboardAssetsUnit => 'ASSETS';
+
+  @override
   String get dashboardByCategory => 'Assets by category';
 
   @override
@@ -267,10 +431,16 @@ class AppL10nEn extends AppL10n {
   String get dashboardOpenMaintenance => 'Open maintenance';
 
   @override
+  String get dashboardRareStatuses => 'Reserved, damaged or lost';
+
+  @override
   String get dashboardRecentActivity => 'Recent activity';
 
   @override
   String get dashboardTitle => 'Dashboard';
+
+  @override
+  String get dashboardTrendTitle => 'In service, last 12 months';
 
   @override
   String get dashboardWarrantyDue => 'Warranty ends <30 days';
@@ -308,17 +478,17 @@ class AppL10nEn extends AppL10n {
   String get diagnosticsCopy => 'Copy';
 
   @override
-  String get diagnosticsCrashReporting => 'Crash reporting';
-
-  @override
-  String get diagnosticsCrashOn => 'On — anonymous crash reports are sent';
+  String get diagnosticsCrashDetail =>
+      'Reports never include your password, API key or name.';
 
   @override
   String get diagnosticsCrashOff => 'Off — nothing leaves this device';
 
   @override
-  String get diagnosticsCrashDetail =>
-      'Reports never include your password, API key or name.';
+  String get diagnosticsCrashOn => 'On — anonymous crash reports are sent';
+
+  @override
+  String get diagnosticsCrashReporting => 'Crash reporting';
 
   @override
   String get diagnosticsEmpty => 'No problems recorded';
@@ -326,6 +496,45 @@ class AppL10nEn extends AppL10n {
   @override
   String get diagnosticsEmptyBody =>
       'Technical details appear here when something fails.';
+
+  @override
+  String get dueChipOverdue => 'Overdue';
+
+  @override
+  String get dueChipSoon => 'Due soon';
+
+  @override
+  String dueInDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Due back in $daysString days',
+      one: 'Due back tomorrow',
+      zero: 'Due back today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dueOverdueBy(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days overdue',
+      one: '1 day overdue',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get employeeAssetsHeld => 'Assets held';
@@ -460,10 +669,34 @@ class AppL10nEn extends AppL10n {
   String get errorDatabaseUnavailableTitle => 'Database not found';
 
   @override
-  String get errorHowToFix => 'What to do';
+  String get errorFieldUnavailableBody =>
+      'This screen asked Odoo for a field your instance does not have. Nothing was changed.';
 
   @override
-  String get errorInsecureConnectionTitle => 'This address is not encrypted';
+  String errorFieldUnavailableBodyDetailed(String field) {
+    return 'This screen asked Odoo for the field “$field”, which your instance does not have. Nothing was changed.';
+  }
+
+  @override
+  String get errorFieldUnavailableFix =>
+      'Retrying will not help — the field has to exist first. Sign out and back in if it was just added; otherwise ask your Odoo administrator.';
+
+  @override
+  String get errorFieldUnavailableTitle => 'A field is missing on your Odoo';
+
+  @override
+  String get errorFileUnavailableBody =>
+      'The phone released the file before it finished uploading. This usually happens when the camera app is closed by the system while another app is in the foreground.';
+
+  @override
+  String get errorFileUnavailableFix =>
+      'Take the photo again and stay in the app until the upload finishes.';
+
+  @override
+  String get errorFileUnavailableTitle => 'Photo could not be read';
+
+  @override
+  String get errorHowToFix => 'What to do';
 
   @override
   String get errorInsecureConnectionBody =>
@@ -472,6 +705,9 @@ class AppL10nEn extends AppL10n {
   @override
   String get errorInsecureConnectionFix =>
       'Change the address to https://. If your Odoo has no certificate yet, your administrator can add one — a self-hosted instance on the office network needs it too.';
+
+  @override
+  String get errorInsecureConnectionTitle => 'This address is not encrypted';
 
   @override
   String get errorInvalidCredentialsBody =>
@@ -521,6 +757,32 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get errorNotAnOdooServerTitle => 'That doesn\'t look like Odoo';
+
+  @override
+  String get errorRateLimitedBody =>
+      'The Odoo server is limiting how often this app may ask for data. Nothing is wrong with your connection or your account.';
+
+  @override
+  String get errorRateLimitedFix =>
+      'Wait a moment and try again. If it keeps happening, ask your Odoo administrator to raise the rate limit for this app.';
+
+  @override
+  String errorRateLimitedFixSeconds(int seconds) {
+    final intl.NumberFormat secondsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String secondsString = secondsNumberFormat.format(seconds);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Wait $secondsString seconds and try again.',
+      one: 'Wait 1 second and try again.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorRateLimitedTitle => 'Too many requests';
 
   @override
   String get errorRecordNotFoundBody =>
@@ -600,6 +862,74 @@ class AppL10nEn extends AppL10n {
   String get errorValidationTitle => 'Check what you entered';
 
   @override
+  String exportAssetsSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets',
+      one: '1 asset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get exportAssetsTitle => 'Asset list';
+
+  @override
+  String get exportColumnAssignedOn => 'Assigned on';
+
+  @override
+  String get exportColumnCategory => 'Category';
+
+  @override
+  String get exportColumnDepartment => 'Department';
+
+  @override
+  String get exportColumnDueBack => 'Due back';
+
+  @override
+  String get exportColumnHolder => 'Assigned to';
+
+  @override
+  String get exportColumnManufacturer => 'Manufacturer';
+
+  @override
+  String get exportColumnModel => 'Model';
+
+  @override
+  String get exportColumnName => 'Name';
+
+  @override
+  String get exportColumnSerial => 'Serial number';
+
+  @override
+  String get exportColumnStatus => 'Status';
+
+  @override
+  String get exportColumnTag => 'Tag';
+
+  @override
+  String get exportColumnWarrantyEnd => 'Warranty ends';
+
+  @override
+  String get exportFailed => 'The file could not be prepared.';
+
+  @override
+  String exportGeneratedOn(String date) {
+    return 'Generated $date';
+  }
+
+  @override
+  String get exportNothingToShare => 'There is nothing to export yet.';
+
+  @override
+  String get exportShare => 'Share';
+
+  @override
   String get fieldApiKeyHint => 'Your Odoo API key';
 
   @override
@@ -642,10 +972,16 @@ class AppL10nEn extends AppL10n {
   String get filterManufacturer => 'Manufacturer';
 
   @override
+  String get filterOverdue => 'Overdue only';
+
+  @override
   String get filterStatus => 'Status';
 
   @override
   String get filterWarranty => 'Warranty';
+
+  @override
+  String get filtersLabel => 'Filters';
 
   @override
   String filtersLabelActive(int count) {
@@ -657,10 +993,184 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get filtersLabel => 'Filters';
+  String get filtersTitle => 'Filter assets';
 
   @override
-  String get filtersTitle => 'Filter assets';
+  String get greetingAfternoon => 'Good afternoon';
+
+  @override
+  String get greetingEvening => 'Good evening';
+
+  @override
+  String get greetingMorning => 'Good morning';
+
+  @override
+  String get handoverAddAssets => 'Add assets';
+
+  @override
+  String handoverAddCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Add $countString';
+  }
+
+  @override
+  String get handoverBundleEmpty => 'Nothing added yet.';
+
+  @override
+  String handoverBundleFull(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return '$maxString is the most one handover can carry';
+  }
+
+  @override
+  String get handoverConfirm => 'Confirm handover';
+
+  @override
+  String handoverDone(String employee) {
+    return 'Handed over to $employee';
+  }
+
+  @override
+  String get handoverNeedsAssets => 'Add at least one asset';
+
+  @override
+  String get handoverNeedsRecipient => 'Choose who is receiving';
+
+  @override
+  String get handoverNeedsSignature => 'The recipient has to sign';
+
+  @override
+  String get handoverNoAssignableAssets =>
+      'Nothing available to hand over right now.';
+
+  @override
+  String get handoverNotesHint =>
+      'Onboarding kit, replacement for a failed laptop…';
+
+  @override
+  String get handoverNothingRecorded => 'Nothing was recorded';
+
+  @override
+  String get handoverNothingRecordedBody =>
+      'Odoo accepted none of the bundle, so no asset changed hands.';
+
+  @override
+  String handoverPartial(int done, int total) {
+    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String doneString = doneNumberFormat.format(done);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$doneString of $totalString recorded';
+  }
+
+  @override
+  String get handoverPickAssets => 'Add to the handover';
+
+  @override
+  String get handoverPickAssetsBody =>
+      'Only assets nobody is holding are shown.';
+
+  @override
+  String get handoverProofSaved => 'The signature is on every asset in Odoo.';
+
+  @override
+  String get handoverRecorded => 'Recorded';
+
+  @override
+  String get handoverRefused => 'Odoo refused these';
+
+  @override
+  String handoverRemoveFromBundle(String asset) {
+    return 'Remove $asset';
+  }
+
+  @override
+  String get handoverRetryRefused => 'Try these again';
+
+  @override
+  String get handoverSearchAssets => 'Search assets';
+
+  @override
+  String get handoverSearchPeople => 'Search people';
+
+  @override
+  String get handoverSignHint => 'Sign above';
+
+  @override
+  String get handoverSignatureIncomplete =>
+      'Recorded, but the signature did not reach every asset.';
+
+  @override
+  String get handoverSignatureRequired => 'Sign to confirm receipt';
+
+  @override
+  String get handoverStepBundle => 'What they are receiving';
+
+  @override
+  String get handoverStepDate => 'Handover date';
+
+  @override
+  String get handoverStepNotes => 'Note';
+
+  @override
+  String get handoverStepRecipient => 'Who is receiving';
+
+  @override
+  String get handoverStepSignature => 'Recipient\'s signature';
+
+  @override
+  String get handoverSubtitle => 'Several assets, one signature';
+
+  @override
+  String get handoverTitle => 'Handover';
+
+  @override
+  String get historyEmptyBody =>
+      'Assignments, returns and repairs appear here as they happen.';
+
+  @override
+  String get historyEmptyTitle => 'Nothing recorded yet';
+
+  @override
+  String historyHolders(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString holders',
+      one: '1 holder',
+      zero: 'No holders yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historyLoadOlder => 'Show older';
+
+  @override
+  String get historyRegistered => 'Registered';
+
+  @override
+  String historySince(String date) {
+    return 'In service since $date';
+  }
+
+  @override
+  String get historyTitle => 'History';
 
   @override
   String get labelAll => 'All';
@@ -678,10 +1188,7 @@ class AppL10nEn extends AppL10n {
   String get labelCategory => 'Category';
 
   @override
-  String get launchNoMailApp => 'No email app is set up on this device.';
-
-  @override
-  String get launchNoPhoneApp => 'This device cannot place calls.';
+  String get labelDueBack => 'Due back';
 
   @override
   String labelHeldDays(int days) {
@@ -730,6 +1237,24 @@ class AppL10nEn extends AppL10n {
   String get labelServer => 'Server';
 
   @override
+  String labelSheetSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString labels',
+      one: '1 label',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get labelSheetTitle => 'Asset labels';
+
+  @override
   String get labelSignedInAs => 'Signed in as';
 
   @override
@@ -751,7 +1276,108 @@ class AppL10nEn extends AppL10n {
   String get languageSystem => 'System';
 
   @override
+  String get launchNoMailApp => 'No email app is set up on this device.';
+
+  @override
+  String get launchNoPhoneApp => 'This device cannot place calls.';
+
+  @override
+  String lifecycleAge(int months) {
+    final intl.NumberFormat monthsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String monthsString = monthsNumberFormat.format(months);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: 'In service $monthsString months',
+      one: 'In service 1 month',
+      zero: 'In service less than a month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lifecycleAgeing => 'Due for replacement';
+
+  @override
+  String get lifecycleCostPerYear => 'Cost per year so far';
+
+  @override
+  String get lifecycleOverdue => 'Past its expected life';
+
+  @override
+  String lifecycleOverdueBy(int months) {
+    final intl.NumberFormat monthsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String monthsString = monthsNumberFormat.format(months);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$monthsString months past its expected life',
+      one: '1 month past its expected life',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lifecycleRemaining(int months) {
+    final intl.NumberFormat monthsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String monthsString = monthsNumberFormat.format(months);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$monthsString months left of its expected life',
+      one: '1 month left of its expected life',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lifecycleReplaceLabel => 'Replace';
+
+  @override
+  String get lifecycleTitle => 'Service life';
+
+  @override
+  String get lifecycleUnknown => 'No purchase date recorded';
+
+  @override
+  String get lifecycleUnknownHint =>
+      'Add a purchase date to see how much life this asset has left and what it has cost per year.';
+
+  @override
   String get loadingLabel => 'Loading…';
+
+  @override
+  String get lockBody =>
+      'Anyone holding an unlocked phone could reassign company equipment. Unlock to carry on.';
+
+  @override
+  String get lockFailed => 'That did not unlock. Try again.';
+
+  @override
+  String get lockReason => 'Unlock Sijil IT';
+
+  @override
+  String get lockSettingsSubtitle =>
+      'Ask for this device’s fingerprint, face or passcode before Sijil IT opens.';
+
+  @override
+  String get lockSettingsTitle => 'Require unlock';
+
+  @override
+  String get lockTitle => 'Sijil IT is locked';
+
+  @override
+  String get lockUnavailable =>
+      'This device has no screen lock set up, so there is nothing to ask for.';
+
+  @override
+  String get lockUnlock => 'Unlock';
 
   @override
   String get loginAclNotice =>
@@ -848,6 +1474,12 @@ class AppL10nEn extends AppL10n {
   String get maintenanceTypePreventive => 'Preventive';
 
   @override
+  String get moreAuditSubtitle => 'Count what is really there';
+
+  @override
+  String get moreHandoverSubtitle => 'Hand several assets to one person';
+
+  @override
   String get moreMaintenanceSubtitle => 'Requests and history for your assets';
 
   @override
@@ -856,6 +1488,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get moreTitle => 'More';
+
+  @override
+  String get moreToolsLabel => 'Tools';
 
   @override
   String get navAssets => 'Assets';
@@ -873,6 +1508,46 @@ class AppL10nEn extends AppL10n {
   String get navScan => 'Scan';
 
   @override
+  String get operationCreate => 'create';
+
+  @override
+  String get operationDelete => 'delete';
+
+  @override
+  String get operationRead => 'view';
+
+  @override
+  String get operationWrite => 'change';
+
+  @override
+  String overdueCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString assets are late',
+      one: '1 asset is late',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overdueEmptyBody =>
+      'Every asset with a return date is still within it. Set a date when you hand something over and it will be watched here.';
+
+  @override
+  String get overdueEmptyTitle => 'Nothing is late';
+
+  @override
+  String get overdueSubtitle => 'Assets past the date they were promised back';
+
+  @override
+  String get overdueTitle => 'Overdue returns';
+
+  @override
   String photoCount(int used, int max) {
     final intl.NumberFormat usedNumberFormat = intl.NumberFormat.decimalPattern(
       localeName,
@@ -887,11 +1562,169 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
+  String get photosAdd => 'Add';
+
+  @override
+  String get photosAdded => 'Photo saved';
+
+  @override
+  String get photosCamera => 'Camera';
+
+  @override
+  String get photosEmpty => 'No photos yet';
+
+  @override
+  String get photosEmptyHint =>
+      'Photograph the fault before you start, and the repair when you finish.';
+
+  @override
+  String get photosGallery => 'Gallery';
+
+  @override
+  String photosPosition(int current, int total) {
+    final intl.NumberFormat currentNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String currentString = currentNumberFormat.format(current);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$currentString of $totalString';
+  }
+
+  @override
+  String get photosRemoveAction => 'Remove';
+
+  @override
+  String get photosRemoveBody => 'It will be deleted from Odoo for everyone.';
+
+  @override
+  String get photosRemoveTitle => 'Remove this photo?';
+
+  @override
+  String get photosRemoved => 'Photo removed';
+
+  @override
+  String get photosSavedToOdoo => 'Saved to Odoo';
+
+  @override
+  String get photosTitle => 'Photos';
+
+  @override
   String get qrHint =>
       'Print this and stick it on the device. It carries only the asset id.';
 
   @override
   String get qrTitle => 'Asset QR code';
+
+  @override
+  String get receiptAssets => 'Assets';
+
+  @override
+  String get receiptDate => 'Handed over on';
+
+  @override
+  String get receiptNotes => 'Notes';
+
+  @override
+  String get receiptRecipient => 'Received by';
+
+  @override
+  String get receiptShare => 'Share receipt';
+
+  @override
+  String get receiptSignature => 'Signature';
+
+  @override
+  String get receiptTitle => 'Handover receipt';
+
+  @override
+  String reminderMaintenanceDue(String request) {
+    return '$request is scheduled for today.';
+  }
+
+  @override
+  String reminderMaintenanceOverdue(String request, int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$request is $daysString days overdue.',
+      one: '$request is 1 day overdue.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderMaintenanceTitle => 'Maintenance due';
+
+  @override
+  String reminderNotificationBody(String asset, int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days left',
+      one: '1 day left',
+    );
+    return '$asset — $_temp0';
+  }
+
+  @override
+  String get reminderNotificationTitle => 'A warranty is running out';
+
+  @override
+  String get remindersDenied =>
+      'Notifications are switched off for Sijil IT in your device settings.';
+
+  @override
+  String remindersLeadDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days before',
+      one: '1 day before',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get remindersLeadLabel => 'Warn me';
+
+  @override
+  String remindersScheduled(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString reminders scheduled',
+      one: '1 reminder scheduled',
+      zero: 'Nothing scheduled',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get remindersSubtitle => 'Be told before a warranty runs out';
+
+  @override
+  String get remindersTitle => 'Warranty reminders';
 
   @override
   String get returnCondition => 'Condition on return';
@@ -941,7 +1774,31 @@ class AppL10nEn extends AppL10n {
   String get scanAgain => 'Scan again';
 
   @override
+  String get scanCameraErrorBody =>
+      'Another app may be using the camera, or this device did not hand it over.';
+
+  @override
+  String get scanCameraErrorFix =>
+      'Close any other app using the camera, then reopen this screen. Restarting the device clears it if that does not.';
+
+  @override
+  String get scanCameraErrorTitle => 'The camera could not start';
+
+  @override
   String get scanCreateAsset => 'Create asset';
+
+  @override
+  String get scanEnterCode => 'Type a code';
+
+  @override
+  String get scanEnterCodeBody =>
+      'For a label the camera cannot read — scratched, in the dark, or behind a desk.';
+
+  @override
+  String get scanEnterCodeHint => 'Serial number or asset tag';
+
+  @override
+  String get scanEnterCodeTitle => 'Type the asset code';
 
   @override
   String get scanInstruction => 'Point at an asset code';
@@ -978,17 +1835,6 @@ class AppL10nEn extends AppL10n {
       'Turn on camera access for Sijil IT in your device settings.';
 
   @override
-  String get scanCameraErrorTitle => 'The camera could not start';
-
-  @override
-  String get scanCameraErrorBody =>
-      'Another app may be using the camera, or this device did not hand it over.';
-
-  @override
-  String get scanCameraErrorFix =>
-      'Close any other app using the camera, then reopen this screen. Restarting the device clears it if that does not.';
-
-  @override
   String get scanPermissionTitle => 'Camera access is off';
 
   @override
@@ -1014,6 +1860,80 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get sectionWarranty => 'Warranty';
+
+  @override
+  String get selectionAll => 'Select all loaded';
+
+  @override
+  String get selectionCancel => 'Leave selection';
+
+  @override
+  String selectionCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString selected',
+      one: '1 selected',
+      zero: 'Nothing selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectionLimitReached(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'You can act on $countString assets at a time.';
+  }
+
+  @override
+  String get selectionNone => 'Clear selection';
+
+  @override
+  String get selectionStart => 'Select assets';
+
+  @override
+  String sessionExpiresOn(String date) {
+    return 'Signs out on $date unless the app is opened.';
+  }
+
+  @override
+  String get sessionExplain =>
+      'The window counts from the last time you opened the app, so daily use never signs you out. A device left unused is signed out and the saved credential is deleted.';
+
+  @override
+  String sessionMaxAgeDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days',
+      one: '1 day',
+      zero: 'No limit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sessionNeverExpiresNote =>
+      'The saved sign-in never expires on this device.';
+
+  @override
+  String get sessionSubtitle =>
+      'How long this device may reuse your Odoo sign-in without you typing it again.';
+
+  @override
+  String get sessionTitle => 'Saved sign-in';
 
   @override
   String get settingsAppearance => 'Appearance';
@@ -1112,6 +2032,9 @@ class AppL10nEn extends AppL10n {
   String get statusDamaged => 'Damaged';
 
   @override
+  String get statusKeptInLog => 'Recorded in the log';
+
+  @override
   String get statusLost => 'Lost';
 
   @override
@@ -1124,7 +2047,175 @@ class AppL10nEn extends AppL10n {
   String get statusRetired => 'Retired';
 
   @override
-  String get statusKeptInLog => 'Recorded in the log';
+  String syncAttempts(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString attempts',
+      one: '1 attempt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncBlocked => 'Odoo refused this. It will not be retried.';
+
+  @override
+  String get syncDiscard => 'Discard queue';
+
+  @override
+  String get syncDiscardBody =>
+      'These were never sent to Odoo. Discarding them cannot be undone.';
+
+  @override
+  String get syncDiscardConfirm => 'Discard the waiting changes?';
+
+  @override
+  String get syncDiscardFailedAll => 'Discard all';
+
+  @override
+  String get syncDiscardFailedAllBody =>
+      'These changes will be forgotten. Odoo never received them, so they cannot be recovered. Anything still waiting to send is left alone.';
+
+  @override
+  String get syncDiscardFailedAllConfirm => 'Discard everything that failed?';
+
+  @override
+  String get syncDiscardOne => 'Discard';
+
+  @override
+  String syncDiscardOneBody(String subject) {
+    return '$subject will be forgotten. Odoo never received it, so it cannot be recovered.';
+  }
+
+  @override
+  String get syncDiscardOneConfirm => 'Discard this change?';
+
+  @override
+  String syncFailedBanner(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes could not be sent — tap to review',
+      one: '1 change could not be sent — tap to review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncFailedBody =>
+      'Odoo refused these. They are still saved here, so nothing you did is lost — but they will not send on their own.';
+
+  @override
+  String syncFailedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes could not be sent',
+      one: '1 change could not be sent',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncFailedReason(String reason) {
+    return 'Odoo said: $reason';
+  }
+
+  @override
+  String get syncFailedSection => 'Could not be sent';
+
+  @override
+  String get syncNow => 'Send now';
+
+  @override
+  String get syncOfflineBanner => 'Offline';
+
+  @override
+  String syncPendingBanner(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes waiting to send',
+      one: '1 change waiting to send',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncPendingChip => 'Not sent yet';
+
+  @override
+  String get syncQueueEmptyBody =>
+      'Changes you make without a connection wait here until there is one.';
+
+  @override
+  String get syncQueueEmptyTitle => 'Everything is on Odoo';
+
+  @override
+  String syncQueuedAssign(String employee) {
+    return 'Hand over to $employee';
+  }
+
+  @override
+  String get syncQueuedNotice =>
+      'Saved on this device. It will go to Odoo when there is a connection.';
+
+  @override
+  String get syncQueuedReturn => 'Take back';
+
+  @override
+  String syncQueuedStatus(String status) {
+    return 'Mark as $status';
+  }
+
+  @override
+  String get syncRetryOne => 'Try again';
+
+  @override
+  String get syncSending => 'Sending…';
+
+  @override
+  String syncSentCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString changes sent',
+      one: '1 change sent',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncStaleBanner(String time) {
+    return 'Showing the copy from $time';
+  }
+
+  @override
+  String get syncSubtitle => 'Writes waiting for a connection';
+
+  @override
+  String get syncTitle => 'Sync';
 
   @override
   String get themeDark => 'Dark';
@@ -1198,6 +2289,19 @@ class AppL10nEn extends AppL10n {
       'That doesn\'t look like a valid server address.';
 
   @override
+  String get voiceHeardNothing =>
+      'Nothing was heard. Try again, closer to the phone.';
+
+  @override
+  String get voiceListening => 'Listening…';
+
+  @override
+  String get voiceSearchStart => 'Search by voice';
+
+  @override
+  String get voiceSearchStop => 'Stop listening';
+
+  @override
   String warrantyEnds(String date) {
     return 'Ends $date';
   }
@@ -1256,874 +2360,4 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get warrantyValid => 'Warranty valid';
-
-  @override
-  String get errorFileUnavailableTitle => 'Photo could not be read';
-
-  @override
-  String get errorFileUnavailableBody =>
-      'The phone released the file before it finished uploading. This usually happens when the camera app is closed by the system while another app is in the foreground.';
-
-  @override
-  String get errorFileUnavailableFix =>
-      'Take the photo again and stay in the app until the upload finishes.';
-
-  @override
-  String get photosTitle => 'Photos';
-
-  @override
-  String get photosAdd => 'Add';
-
-  @override
-  String get photosCamera => 'Camera';
-
-  @override
-  String get photosGallery => 'Gallery';
-
-  @override
-  String get photosSavedToOdoo => 'Saved to Odoo';
-
-  @override
-  String get photosEmpty => 'No photos yet';
-
-  @override
-  String get photosEmptyHint =>
-      'Photograph the fault before you start, and the repair when you finish.';
-
-  @override
-  String get photosRemoveTitle => 'Remove this photo?';
-
-  @override
-  String get photosRemoveBody => 'It will be deleted from Odoo for everyone.';
-
-  @override
-  String get photosRemoveAction => 'Remove';
-
-  @override
-  String get photosRemoved => 'Photo removed';
-
-  @override
-  String get photosAdded => 'Photo saved';
-
-  @override
-  String photosPosition(int current, int total) {
-    final intl.NumberFormat currentNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String currentString = currentNumberFormat.format(current);
-    final intl.NumberFormat totalNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String totalString = totalNumberFormat.format(total);
-
-    return '$currentString of $totalString';
-  }
-
-  @override
-  String get greetingMorning => 'Good morning';
-
-  @override
-  String get greetingAfternoon => 'Good afternoon';
-
-  @override
-  String get greetingEvening => 'Good evening';
-
-  @override
-  String get dashboardTrendTitle => 'In service, last 12 months';
-
-  @override
-  String get dashboardAssetsUnit => 'ASSETS';
-
-  @override
-  String get dashboardRareStatuses => 'Reserved, damaged or lost';
-
-  @override
-  String get historyTitle => 'History';
-
-  @override
-  String get historyEmptyTitle => 'Nothing recorded yet';
-
-  @override
-  String get historyEmptyBody =>
-      'Assignments, returns and repairs appear here as they happen.';
-
-  @override
-  String get historyLoadOlder => 'Show older';
-
-  @override
-  String get historyRegistered => 'Registered';
-
-  @override
-  String historySince(String date) {
-    return 'In service since $date';
-  }
-
-  @override
-  String historyHolders(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString holders',
-      one: '1 holder',
-      zero: 'No holders yet',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get assetActionHistory => 'History';
-
-  @override
-  String get auditTitle => 'Audit';
-
-  @override
-  String get auditStartTitle => 'What are you counting?';
-
-  @override
-  String get auditStartBody =>
-      'A narrow scope gets counted. Everything at once does not.';
-
-  @override
-  String get auditScopeAll => 'Everything';
-
-  @override
-  String get auditScopeCategory => 'One category';
-
-  @override
-  String get auditScopeDepartment => 'One department';
-
-  @override
-  String get auditPickCategory => 'Pick a category';
-
-  @override
-  String get auditPickDepartment => 'Pick a department';
-
-  @override
-  String get auditBegin => 'Start counting';
-
-  @override
-  String get auditCounting => 'Counting';
-
-  @override
-  String get auditFound => 'Found';
-
-  @override
-  String get auditUnexpected => 'Not in scope';
-
-  @override
-  String get auditMissing => 'Not found';
-
-  @override
-  String get auditKeepScanning => 'Keep scanning — no need to stop';
-
-  @override
-  String get auditJustScanned => 'Just scanned';
-
-  @override
-  String get auditWhereExpected => 'Where expected';
-
-  @override
-  String get auditOutOfScope => 'Here, but recorded elsewhere';
-
-  @override
-  String get auditUnknownCode => 'That code matches no asset';
-
-  @override
-  String get auditFinish => 'Finish';
-
-  @override
-  String get auditResume => 'Keep counting';
-
-  @override
-  String get auditReportTitle => 'Stock count';
-
-  @override
-  String get auditNothingMissing => 'Everything in scope was found.';
-
-  @override
-  String get auditSaveToOdoo => 'Save findings to Odoo';
-
-  @override
-  String get auditSaved => 'Findings saved to Odoo';
-
-  @override
-  String get auditSavedNone => 'Nothing to record — no findings.';
-
-  @override
-  String get auditDiscardTitle => 'Leave the count?';
-
-  @override
-  String get auditDiscardBody =>
-      'The scans so far are on this phone only. Leaving loses them.';
-
-  @override
-  String get auditDiscardConfirm => 'Leave';
-
-  @override
-  String auditOf(int done, int total) {
-    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String doneString = doneNumberFormat.format(done);
-    final intl.NumberFormat totalNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String totalString = totalNumberFormat.format(total);
-
-    return '$doneString of $totalString';
-  }
-
-  @override
-  String get moreAuditSubtitle => 'Count what is really there';
-
-  @override
-  String get moreToolsLabel => 'Tools';
-
-  @override
-  String get handoverTitle => 'Handover';
-
-  @override
-  String get handoverSubtitle => 'Several assets, one signature';
-
-  @override
-  String get handoverConfirm => 'Confirm handover';
-
-  @override
-  String get handoverStepRecipient => 'Who is receiving';
-
-  @override
-  String get handoverStepBundle => 'What they are receiving';
-
-  @override
-  String get handoverStepDate => 'Handover date';
-
-  @override
-  String get handoverStepSignature => 'Recipient\'s signature';
-
-  @override
-  String get handoverStepNotes => 'Note';
-
-  @override
-  String get handoverNotesHint =>
-      'Onboarding kit, replacement for a failed laptop…';
-
-  @override
-  String get handoverSearchPeople => 'Search people';
-
-  @override
-  String get handoverBundleEmpty => 'Nothing added yet.';
-
-  @override
-  String get handoverAddAssets => 'Add assets';
-
-  @override
-  String handoverBundleFull(int max) {
-    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String maxString = maxNumberFormat.format(max);
-
-    return '$maxString is the most one handover can carry';
-  }
-
-  @override
-  String handoverRemoveFromBundle(String asset) {
-    return 'Remove $asset';
-  }
-
-  @override
-  String get handoverSignHint => 'Sign above';
-
-  @override
-  String get handoverSignatureRequired => 'Sign to confirm receipt';
-
-  @override
-  String get handoverNeedsRecipient => 'Choose who is receiving';
-
-  @override
-  String get handoverNeedsAssets => 'Add at least one asset';
-
-  @override
-  String get handoverNeedsSignature => 'The recipient has to sign';
-
-  @override
-  String get handoverPickAssets => 'Add to the handover';
-
-  @override
-  String get handoverPickAssetsBody =>
-      'Only assets nobody is holding are shown.';
-
-  @override
-  String get handoverSearchAssets => 'Search assets';
-
-  @override
-  String handoverAddCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return 'Add $countString';
-  }
-
-  @override
-  String get handoverNoAssignableAssets =>
-      'Nothing available to hand over right now.';
-
-  @override
-  String handoverDone(String employee) {
-    return 'Handed over to $employee';
-  }
-
-  @override
-  String handoverPartial(int done, int total) {
-    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String doneString = doneNumberFormat.format(done);
-    final intl.NumberFormat totalNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String totalString = totalNumberFormat.format(total);
-
-    return '$doneString of $totalString recorded';
-  }
-
-  @override
-  String get handoverProofSaved => 'The signature is on every asset in Odoo.';
-
-  @override
-  String get handoverSignatureIncomplete =>
-      'Recorded, but the signature did not reach every asset.';
-
-  @override
-  String get handoverRecorded => 'Recorded';
-
-  @override
-  String get handoverRefused => 'Odoo refused these';
-
-  @override
-  String get handoverRetryRefused => 'Try these again';
-
-  @override
-  String get handoverNothingRecorded => 'Nothing was recorded';
-
-  @override
-  String get handoverNothingRecordedBody =>
-      'Odoo accepted none of the bundle, so no asset changed hands.';
-
-  @override
-  String get moreHandoverSubtitle => 'Hand several assets to one person';
-
-  @override
-  String get errorFieldUnavailableTitle => 'A field is missing on your Odoo';
-
-  @override
-  String get errorFieldUnavailableBody =>
-      'This screen asked Odoo for a field your instance does not have. Nothing was changed.';
-
-  @override
-  String errorFieldUnavailableBodyDetailed(String field) {
-    return 'This screen asked Odoo for the field “$field”, which your instance does not have. Nothing was changed.';
-  }
-
-  @override
-  String get errorFieldUnavailableFix =>
-      'Retrying will not help — the field has to exist first. Sign out and back in if it was just added; otherwise ask your Odoo administrator.';
-
-  @override
-  String get operationRead => 'view';
-
-  @override
-  String get operationCreate => 'create';
-
-  @override
-  String get operationWrite => 'change';
-
-  @override
-  String get operationDelete => 'delete';
-
-  @override
-  String get syncTitle => 'Sync';
-
-  @override
-  String get syncSubtitle => 'Writes waiting for a connection';
-
-  @override
-  String get syncOfflineBanner => 'Offline';
-
-  @override
-  String syncStaleBanner(String time) {
-    return 'Showing the copy from $time';
-  }
-
-  @override
-  String syncPendingBanner(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString changes waiting to send',
-      one: '1 change waiting to send',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get syncPendingChip => 'Not sent yet';
-
-  @override
-  String get syncNow => 'Send now';
-
-  @override
-  String get syncSending => 'Sending…';
-
-  @override
-  String get syncQueueEmptyTitle => 'Everything is on Odoo';
-
-  @override
-  String get syncQueueEmptyBody =>
-      'Changes you make without a connection wait here until there is one.';
-
-  @override
-  String syncSentCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString changes sent',
-      one: '1 change sent',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get syncBlocked => 'Odoo refused this. It will not be retried.';
-
-  @override
-  String syncAttempts(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString attempts',
-      one: '1 attempt',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String syncQueuedAssign(String employee) {
-    return 'Hand over to $employee';
-  }
-
-  @override
-  String get syncQueuedReturn => 'Take back';
-
-  @override
-  String syncQueuedStatus(String status) {
-    return 'Mark as $status';
-  }
-
-  @override
-  String get syncDiscard => 'Discard queue';
-
-  @override
-  String get syncDiscardConfirm => 'Discard the waiting changes?';
-
-  @override
-  String get syncDiscardBody =>
-      'These were never sent to Odoo. Discarding them cannot be undone.';
-
-  @override
-  String get syncQueuedNotice =>
-      'Saved on this device. It will go to Odoo when there is a connection.';
-
-  @override
-  String get remindersTitle => 'Warranty reminders';
-
-  @override
-  String get remindersSubtitle => 'Be told before a warranty runs out';
-
-  @override
-  String get remindersLeadLabel => 'Warn me';
-
-  @override
-  String remindersLeadDays(int days) {
-    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String daysString = daysNumberFormat.format(days);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$daysString days before',
-      one: '1 day before',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String remindersScheduled(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString reminders scheduled',
-      one: '1 reminder scheduled',
-      zero: 'Nothing scheduled',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get remindersDenied =>
-      'Notifications are switched off for Sijil IT in your device settings.';
-
-  @override
-  String get reminderNotificationTitle => 'A warranty is running out';
-
-  @override
-  String reminderNotificationBody(String asset, int days) {
-    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String daysString = daysNumberFormat.format(days);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$daysString days left',
-      one: '1 day left',
-    );
-    return '$asset — $_temp0';
-  }
-
-  @override
-  String get exportShare => 'Share';
-
-  @override
-  String get exportAssetsTitle => 'Asset list';
-
-  @override
-  String exportAssetsSubtitle(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString assets',
-      one: '1 asset',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String exportGeneratedOn(String date) {
-    return 'Generated $date';
-  }
-
-  @override
-  String get exportFailed => 'The file could not be prepared.';
-
-  @override
-  String get exportNothingToShare => 'There is nothing to export yet.';
-
-  @override
-  String get exportColumnTag => 'Tag';
-
-  @override
-  String get exportColumnName => 'Name';
-
-  @override
-  String get exportColumnCategory => 'Category';
-
-  @override
-  String get exportColumnManufacturer => 'Manufacturer';
-
-  @override
-  String get exportColumnModel => 'Model';
-
-  @override
-  String get exportColumnSerial => 'Serial number';
-
-  @override
-  String get exportColumnStatus => 'Status';
-
-  @override
-  String get exportColumnHolder => 'Assigned to';
-
-  @override
-  String get exportColumnDepartment => 'Department';
-
-  @override
-  String get exportColumnAssignedOn => 'Assigned on';
-
-  @override
-  String get exportColumnWarrantyEnd => 'Warranty ends';
-
-  @override
-  String get receiptTitle => 'Handover receipt';
-
-  @override
-  String get receiptShare => 'Share receipt';
-
-  @override
-  String get receiptRecipient => 'Received by';
-
-  @override
-  String get receiptDate => 'Handed over on';
-
-  @override
-  String get receiptAssets => 'Assets';
-
-  @override
-  String get receiptNotes => 'Notes';
-
-  @override
-  String get receiptSignature => 'Signature';
-
-  @override
-  String get auditReportShare => 'Share report';
-
-  @override
-  String get auditReportScope => 'Scope';
-
-  @override
-  String get auditReportExpected => 'Expected';
-
-  @override
-  String get auditReportFound => 'Counted';
-
-  @override
-  String get auditReportMissing => 'Not found';
-
-  @override
-  String get auditReportUnexpected => 'Found out of scope';
-
-  @override
-  String get assignStepDue => 'Expected return date';
-
-  @override
-  String get assignDueHint =>
-      'Leave this empty unless the asset is a loan somebody has to bring back.';
-
-  @override
-  String get assignDueNotSet => 'No return date';
-
-  @override
-  String get assignDueClear => 'Remove the date';
-
-  @override
-  String get labelDueBack => 'Due back';
-
-  @override
-  String get dueChipOverdue => 'Overdue';
-
-  @override
-  String get dueChipSoon => 'Due soon';
-
-  @override
-  String dueOverdueBy(int days) {
-    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String daysString = daysNumberFormat.format(days);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$daysString days overdue',
-      one: '1 day overdue',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String dueInDays(int days) {
-    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
-      localeName,
-    );
-    final String daysString = daysNumberFormat.format(days);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: 'Due back in $daysString days',
-      one: 'Due back tomorrow',
-      zero: 'Due back today',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get overdueTitle => 'Overdue returns';
-
-  @override
-  String get overdueSubtitle => 'Assets past the date they were promised back';
-
-  @override
-  String get overdueEmptyTitle => 'Nothing is late';
-
-  @override
-  String get overdueEmptyBody =>
-      'Every asset with a return date is still within it. Set a date when you hand something over and it will be watched here.';
-
-  @override
-  String overdueCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString assets are late',
-      one: '1 asset is late',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get filterOverdue => 'Overdue only';
-
-  @override
-  String get exportColumnDueBack => 'Due back';
-
-  @override
-  String get selectionStart => 'Select assets';
-
-  @override
-  String get selectionCancel => 'Leave selection';
-
-  @override
-  String selectionCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString selected',
-      one: '1 selected',
-      zero: 'Nothing selected',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get selectionAll => 'Select all loaded';
-
-  @override
-  String get selectionNone => 'Clear selection';
-
-  @override
-  String selectionLimitReached(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return 'You can act on $countString assets at a time.';
-  }
-
-  @override
-  String get bulkMoveDepartment => 'Move to department';
-
-  @override
-  String get bulkMoveTitle => 'Which department?';
-
-  @override
-  String bulkMoveDone(int count, String department) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString assets moved to $department',
-      one: '1 asset moved to $department',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get bulkMoveNoDepartments =>
-      'This Odoo has no departments to move assets to.';
-
-  @override
-  String get bulkPrintLabels => 'Label sheet';
-
-  @override
-  String get labelSheetTitle => 'Asset labels';
-
-  @override
-  String labelSheetSubtitle(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString labels',
-      one: '1 label',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get scanEnterCode => 'Type a code';
-
-  @override
-  String get scanEnterCodeTitle => 'Type the asset code';
-
-  @override
-  String get scanEnterCodeBody =>
-      'For a label the camera cannot read — scratched, in the dark, or behind a desk.';
-
-  @override
-  String get scanEnterCodeHint => 'Serial number or asset tag';
-
-  @override
-  String get lockSettingsTitle => 'Require unlock';
-
-  @override
-  String get lockSettingsSubtitle =>
-      'Ask for this device’s fingerprint, face or passcode before Sijil IT opens.';
-
-  @override
-  String get lockUnavailable =>
-      'This device has no screen lock set up, so there is nothing to ask for.';
-
-  @override
-  String get lockTitle => 'Sijil IT is locked';
-
-  @override
-  String get lockBody =>
-      'Anyone holding an unlocked phone could reassign company equipment. Unlock to carry on.';
-
-  @override
-  String get lockUnlock => 'Unlock';
-
-  @override
-  String get lockReason => 'Unlock Sijil IT';
-
-  @override
-  String get lockFailed => 'That did not unlock. Try again.';
 }

@@ -24,6 +24,7 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/export_action.dart';
 import '../../../../shared/widgets/paginated_list_view.dart';
 import '../../../../shared/widgets/state_views.dart';
+import '../../../../shared/widgets/voice_search_button.dart';
 import '../../domain/entities/asset.dart';
 import '../../domain/entities/asset_query.dart';
 import '../cubit/asset_list_cubit.dart';
@@ -428,12 +429,27 @@ class _SearchAndFilters extends StatelessWidget {
             hint: l10n.assetsSearchHint,
             onChanged: onSearch,
             onClear: () => onSearch(''),
-            trailing: AppIconButton(
-              icon: Icons.qr_code_scanner_rounded,
-              tooltip: l10n.scanTitle,
-              bordered: false,
-              size: AppDimens.appBarActionSize,
-              onPressed: () => context.go(AppRoutes.scan),
+            // Both hands-free ways in, beside each other: the camera for an
+            // asset you are standing in front of, the microphone for one you
+            // are looking for. The microphone is absent on a device that
+            // cannot dictate, so this is one button on most tablets.
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                VoiceSearchButton(
+                  onTranscript: (text) {
+                    controller.text = text;
+                    onSearch(text);
+                  },
+                ),
+                AppIconButton(
+                  icon: Icons.qr_code_scanner_rounded,
+                  tooltip: l10n.scanTitle,
+                  bordered: false,
+                  size: AppDimens.appBarActionSize,
+                  onPressed: () => context.go(AppRoutes.scan),
+                ),
+              ],
             ),
           ),
         ),

@@ -15,6 +15,7 @@ class SyncViewState extends Equatable {
     this.isOffline = false,
     this.servingFrom,
     this.pending = const <OutboxEntry>[],
+    this.quarantined = const <OutboxEntry>[],
     this.isSyncing = false,
     this.lastReport,
   });
@@ -26,31 +27,43 @@ class SyncViewState extends Equatable {
   /// When the data on screen was last read from Odoo, or null when it is live.
   final DateTime? servingFrom;
 
+  /// Writes still on their way to Odoo.
   final List<OutboxEntry> pending;
+
+  /// Writes the app has stopped trying to send, newest failure first.
+  ///
+  /// Separate from [pending] because they need a different sentence and a
+  /// different control: nothing will happen to these on its own, and the user
+  /// has to either fix what Odoo objected to and retry, or discard them.
+  final List<OutboxEntry> quarantined;
+
   final bool isSyncing;
   final SyncReport? lastReport;
 
   bool get hasPending => pending.isNotEmpty;
 
-  int get blockedCount => pending.where((e) => e.isBlocked).length;
+  bool get hasQuarantined => quarantined.isNotEmpty;
 
   /// Whether there is anything worth interrupting the user about.
   ///
   /// Being offline with nothing queued and a live-enough screen is not news —
   /// a banner that is always there is a banner nobody reads.
-  bool get shouldWarn => isOffline || servingFrom != null || hasPending;
+  bool get shouldWarn =>
+      isOffline || servingFrom != null || hasPending || hasQuarantined;
 
   SyncViewState copyWith({
     bool? isOffline,
     DateTime? servingFrom,
     bool clearServingFrom = false,
     List<OutboxEntry>? pending,
+    List<OutboxEntry>? quarantined,
     bool? isSyncing,
     SyncReport? lastReport,
   }) => SyncViewState(
     isOffline: isOffline ?? this.isOffline,
     servingFrom: clearServingFrom ? null : (servingFrom ?? this.servingFrom),
     pending: pending ?? this.pending,
+    quarantined: quarantined ?? this.quarantined,
     isSyncing: isSyncing ?? this.isSyncing,
     lastReport: lastReport ?? this.lastReport,
   );
@@ -60,6 +73,7 @@ class SyncViewState extends Equatable {
     isOffline,
     servingFrom,
     pending,
+    quarantined,
     isSyncing,
     lastReport?.sent,
     lastReport?.remaining,
@@ -146,10 +160,35 @@ class SyncCubit extends Cubit<SyncViewState> {
     await _refreshQueue();
   }
 
+  /// Puts one given-up write back in the queue and sends it.
+  ///
+  /// The reason these fail is usually outside the app — a permission, a record
+  /// rule, a required field — so the retry is offered per entry: an
+  /// administrator grants one thing, and the user sends the one write that was
+  /// waiting on it without disturbing the rest.
+  Future<void> retryQuarantined(String id) async {
+    await _outbox.retry(id);
+    await _refreshQueue();
+    await syncNow();
+  }
+
+  /// Discards one given-up write, leaving everything else alone.
+  Future<void> discardQuarantined(String id) async {
+    await _outbox.remove(id);
+    await _refreshQueue();
+  }
+
+  /// Discards every given-up write, leaving the live queue alone.
+  Future<void> discardAllQuarantined() async {
+    await _outbox.clearQuarantined();
+    await _refreshQueue();
+  }
+
   Future<void> _refreshQueue() async {
     final pending = await _outbox.pending();
+    final quarantined = await _outbox.quarantined();
     if (isClosed) return;
-    emit(state.copyWith(pending: pending));
+    emit(state.copyWith(pending: pending, quarantined: quarantined));
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:io' show HttpDate;
+
 import 'package:dio/dio.dart';
 
 import '../../constants/app_constants.dart';
@@ -67,7 +69,7 @@ class DioXmlRpcClient implements XmlRpcClient {
     try {
       final response = await _dio.postUri<String>(endpoint, data: body);
 
-      _throwForStatus(response.statusCode ?? 0);
+      _throwForStatus(response.statusCode ?? 0, response.headers);
 
       final payload = response.data;
       if (payload == null || payload.isEmpty) {
@@ -91,8 +93,25 @@ class DioXmlRpcClient implements XmlRpcClient {
   /// Turns an HTTP status into the exception that produces the right advice.
   ///
   /// Ordered by what the user has to do about it, not by numeric range.
-  static void _throwForStatus(int status) {
+  static void _throwForStatus(int status, Headers headers) {
     if (status < 400) return;
+
+    // Throttling, before the 5xx branch: a proxy that is shedding load
+    // answers 429, but some answer 503 with a Retry-After instead, and both
+    // mean "you are asking too fast" rather than "the server is broken".
+    //
+    // Checked first because the advice is the one thing the user can act on,
+    // and because routing it to the connection screen — which is where every
+    // other 4xx goes — would send them to change a URL that is correct.
+    final retryAfter = _retryAfter(headers);
+    if (status == _statusTooManyRequests ||
+        (status == _statusServiceUnavailable && retryAfter != null)) {
+      throw app.RateLimitedException(
+        'The server is rate-limiting this client.',
+        retryAfter: retryAfter,
+        technicalDetails: 'HTTP $status',
+      );
+    }
 
     // The instance is up and broke while answering. The address is right, so
     // sending the user to the connection screen would be sending them to fix
@@ -123,6 +142,47 @@ class DioXmlRpcClient implements XmlRpcClient {
       technicalDetails: 'HTTP $status',
     );
   }
+
+  /// Odoo Online and most proxies in front of a self-hosted instance answer
+  /// a throttled client with one of these.
+  static const int _statusTooManyRequests = 429;
+  static const int _statusServiceUnavailable = 503;
+
+  /// `Retry-After`, in the two forms RFC 9110 allows.
+  ///
+  /// Delta-seconds is what every proxy in practice sends; the HTTP-date form
+  /// is in the spec and costs three lines to support. A malformed value is
+  /// treated as absent rather than as zero — "try again now" against a server
+  /// that just refused is the one answer guaranteed to be wrong.
+  static Duration? _retryAfter(Headers headers) {
+    final raw = headers.value(_retryAfterHeader)?.trim();
+    if (raw == null || raw.isEmpty) return null;
+
+    final seconds = int.tryParse(raw);
+    if (seconds != null) {
+      if (seconds <= 0) return null;
+      final wait = Duration(seconds: seconds);
+      return wait > AppConstants.maxQuotedRetryWait ? null : wait;
+    }
+
+    // `HttpDate.parse` throws on anything it does not recognise — and throws
+    // `HttpException`, not the `FormatException` its name suggests. Caught
+    // broadly on purpose: a proxy sending a malformed date must degrade to
+    // "no wait quoted", never take the whole request down with it.
+    final DateTime date;
+    try {
+      date = HttpDate.parse(raw);
+    } on Object {
+      return null;
+    }
+    final wait = date.difference(DateTime.now());
+    if (wait <= Duration.zero || wait > AppConstants.maxQuotedRetryWait) {
+      return null;
+    }
+    return wait;
+  }
+
+  static const String _retryAfterHeader = 'retry-after';
 
   /// Whether the OS refused the request because it was not encrypted.
   static bool _isCleartextBlock(DioException e) {
@@ -155,6 +215,13 @@ class DioXmlRpcClient implements XmlRpcClient {
       // validateStatus lets every status through, so this is reachable only
       // from a Dio path that bypasses it. Classified the same way regardless,
       // so the two routes cannot disagree about what a 503 means.
+      DioExceptionType.badResponse
+          when e.response?.statusCode == _statusTooManyRequests =>
+        app.RateLimitedException(
+          'The server is rate-limiting this client.',
+          retryAfter: _retryAfter(e.response!.headers),
+          technicalDetails: 'HTTP ${e.response?.statusCode}',
+        ),
       DioExceptionType.badResponse when (e.response?.statusCode ?? 0) >= 500 =>
         app.ServerException(
           'The Odoo server failed while handling the request.',

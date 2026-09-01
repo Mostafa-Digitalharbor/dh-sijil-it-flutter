@@ -153,6 +153,16 @@ abstract final class FailurePresenter {
         l10n.errorFileUnavailableBody,
         l10n.errorFileUnavailableFix,
       ),
+      // Names the wait when the server quoted one, because "try again later"
+      // and "try again in 30 seconds" lead to very different behaviour: the
+      // first gets tapped immediately and fails again.
+      FailureKind.rateLimited => (
+        l10n.errorRateLimitedTitle,
+        l10n.errorRateLimitedBody,
+        failure.retryAfter != null
+            ? l10n.errorRateLimitedFixSeconds(failure.retryAfter!.inSeconds)
+            : l10n.errorRateLimitedFix,
+      ),
       FailureKind.server => (
         l10n.errorServerTitle,
         l10n.errorServerBody,
@@ -211,6 +221,7 @@ abstract final class FailurePresenter {
     FailureKind.businessRule => Icons.rule_rounded,
     FailureKind.recordNotFound => Icons.search_off_rounded,
     FailureKind.fileUnavailable => Icons.broken_image_outlined,
+    FailureKind.rateLimited => Icons.speed_rounded,
     FailureKind.server => Icons.dns_rounded,
     FailureKind.cache => Icons.sd_card_alert_rounded,
     FailureKind.validation => Icons.edit_note_rounded,

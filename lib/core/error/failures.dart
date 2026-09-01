@@ -64,6 +64,12 @@ enum FailureKind {
   /// A photo the OS handed the app could not be read back.
   fileUnavailable,
 
+  /// The server, or a proxy in front of it, is throttling this client.
+  ///
+  /// Separate from [server] because the fix is different in kind: nothing is
+  /// broken and nothing needs configuring, the app simply has to slow down.
+  rateLimited,
+
   /// Odoo returned a 5xx or an unclassifiable fault.
   server,
 
@@ -104,6 +110,7 @@ class Failure extends Equatable {
     this.serverMessage,
     this.model,
     this.operation,
+    this.retryAfter,
   });
 
   const Failure.noInternet({String? technicalDetails})
@@ -127,12 +134,18 @@ class Failure extends Equatable {
   /// What was refused, when Odoo said. Translated by the presenter.
   final OdooOperation? operation;
 
+  /// How long the server asked the client to wait, for
+  /// [FailureKind.rateLimited]. Null for every other kind, and null when the
+  /// server throttled without saying for how long.
+  final Duration? retryAfter;
+
   /// Whether offering "Try again" makes sense for this kind.
   bool get isRetryable => switch (kind) {
     FailureKind.noInternet ||
     FailureKind.serverUnreachable ||
     FailureKind.timeout ||
     FailureKind.server ||
+    FailureKind.rateLimited ||
     FailureKind.unknown => true,
     _ => false,
   };
@@ -142,6 +155,9 @@ class Failure extends Equatable {
     FailureKind.noInternet ||
     FailureKind.timeout ||
     FailureKind.server ||
+    // Waiting is the fix, and the button is how the user finds out the wait
+    // is over without backing out of the screen and coming in again.
+    FailureKind.rateLimited ||
     FailureKind.unknown ||
     // Retake-and-retry is exactly the fix, and the button is the shortest way
     // back to it.
@@ -178,6 +194,7 @@ class Failure extends Equatable {
     serverMessage: serverMessage,
     model: model ?? this.model,
     operation: operation ?? this.operation,
+    retryAfter: retryAfter,
   );
 
   @override
@@ -187,6 +204,7 @@ class Failure extends Equatable {
     serverMessage,
     model,
     operation,
+    retryAfter,
   ];
 
   @override

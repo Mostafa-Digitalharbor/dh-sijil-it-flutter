@@ -157,6 +157,13 @@ void main() {
     // Members of AppL10n itself rather than message keys.
     called.removeAll(<String>{'localeName', 'lookup', 'delegate', 'of'});
 
+    // And whatever the app has added to it. `l10n.reminderCopy` reads exactly
+    // like a message key at the call site and is an extension getter that
+    // assembles several of them — so it has to come off the list, and reading
+    // the extensions rather than naming them keeps the next one from failing
+    // this test on the day it is written.
+    called.removeAll(_appL10nExtensionMembers());
+
     expect(
       called.difference(en.keys.toSet()),
       isEmpty,
@@ -217,4 +224,39 @@ void main() {
       reason: 'move these into the ARB files:\n${offenders.join('\n')}',
     );
   });
+}
+
+/// Everything the app has bolted onto `AppL10n` with an extension.
+///
+/// These are reached as `l10n.something` and are not message keys, so the
+/// "every key the code calls exists" check has to know about them. Read from
+/// the source rather than listed by hand: a list would be correct until the
+/// next extension is written, and the failure it produced would point at the
+/// ARB files rather than at this test.
+Set<String> _appL10nExtensionMembers() {
+  final members = <String>{};
+  final block = RegExp(
+    r'extension\s+\w+\s+on\s+AppL10n\s*\{([\s\S]*?)\n\}',
+    multiLine: true,
+  );
+  // `Type name =>` or `Type name {` — the two shapes a getter or method takes.
+  final member = RegExp(
+    r'^\s*(?:\w[\w<>,\s?]*\s+)?(\w+)\s*(?:=>|\()',
+    multiLine: true,
+  );
+
+  for (final file
+      in Directory('lib')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .where((f) => !f.path.contains('generated'))) {
+    for (final match in block.allMatches(file.readAsStringSync())) {
+      for (final declared in member.allMatches(match.group(1)!)) {
+        members.add(declared.group(1)!);
+      }
+    }
+  }
+
+  return members;
 }

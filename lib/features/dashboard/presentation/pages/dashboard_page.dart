@@ -15,6 +15,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/cubit/view_state.dart';
 import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/utils/app_number.dart';
+import '../../../../shared/utils/reminder_copy_l10n.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_data_views.dart';
@@ -64,14 +65,7 @@ class _DashboardView extends StatelessWidget {
           current.status == ViewStatus.success,
       listener: (context, _) {
         final l10n = AppL10n.of(context);
-        unawaited(
-          sl<ReminderScheduler>().refresh(
-            ReminderCopy(
-              title: l10n.reminderNotificationTitle,
-              body: l10n.reminderNotificationBody,
-            ),
-          ),
-        );
+        unawaited(sl<ReminderScheduler>().refresh(l10n.reminderCopy));
       },
       builder: (context, state) {
         final cubit = context.read<DashboardCubit>();

@@ -21,6 +21,7 @@ import '../cubit/app_settings_cubit.dart';
 import '../cubit/settings_cubit.dart';
 import '../widgets/app_lock_card.dart';
 import '../widgets/reminders_card.dart';
+import '../widgets/session_card.dart';
 
 /// Connection, account, appearance and cache (spec §23).
 class SettingsPage extends StatelessWidget {
@@ -112,6 +113,11 @@ class _SettingsView extends StatelessWidget {
               // the last setting that changes how the app behaves, and the
               // ones below it are about what the app is holding.
               const AppLockCard(),
+              // Directly under the lock, because the two are the same
+              // question asked at different ranges: the lock guards the app on
+              // a device somebody is holding, this guards the credential on a
+              // device nobody is.
+              const SessionCard(),
               _DataCard(
                 state: state,
                 onClearCache: () => _confirmClearCache(context),

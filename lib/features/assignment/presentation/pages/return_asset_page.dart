@@ -98,7 +98,11 @@ class _ReturnAssetViewState extends State<_ReturnAssetView> {
 
         final returned = state.returned;
         if (returned != null) {
-          AppSnack.success(context, l10n.returnSuccess(returned.name));
+          AppSnack.written(
+            context,
+            l10n.returnSuccess(returned.name),
+            queued: returned.hasPendingSync,
+          );
           _close();
         }
       },

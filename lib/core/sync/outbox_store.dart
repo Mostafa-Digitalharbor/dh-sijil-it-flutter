@@ -51,8 +51,8 @@ class OutboxStore {
     return entry;
   }
 
-  /// Everything waiting, oldest first.
-  Future<List<OutboxEntry>> pending() async {
+  /// Every row on disk, live and quarantined, oldest first.
+  Future<List<OutboxEntry>> all() async {
     final keys = await _cache.keys(CacheBoxes.outbox);
     final entries = <OutboxEntry>[];
 
@@ -74,12 +74,64 @@ class OutboxStore {
     return entries;
   }
 
-  /// How many writes are waiting, including ones that have stopped retrying.
+  /// Everything still waiting to go, oldest first.
+  ///
+  /// Excludes quarantined rows, and every caller depends on that: the banner
+  /// stops warning, [depth] can reach zero, and [subjectIds] stops naming an
+  /// asset whose write Odoo has refused — which is what lets the detail screen
+  /// go back to showing the record Odoo actually holds.
+  Future<List<OutboxEntry>> pending() async =>
+      (await all()).where((e) => !e.isQuarantined).toList();
+
+  /// Writes the app has given up sending, newest failure first.
+  ///
+  /// Kept rather than deleted: they are still the only copy of work somebody
+  /// did, and the reason they failed is often something an administrator can
+  /// fix — after which [retry] puts them back in the queue.
+  Future<List<OutboxEntry>> quarantined() async {
+    final entries = (await all()).where((e) => e.isQuarantined).toList()
+      ..sort((a, b) => b.quarantinedAt!.compareTo(a.quarantinedAt!));
+    return entries;
+  }
+
+  /// How many writes are still waiting to go.
   Future<int> depth() async => (await pending()).length;
 
-  /// The assets the queue is holding a change for, so their rows can say so.
+  /// The assets the queue is holding a *live* change for, so their rows can
+  /// say so. A quarantined write is not pending and must not be overlaid.
   Future<Set<int>> subjectIds() async =>
       (await pending()).map((e) => e.subjectId).toSet();
+
+  /// Stops trying to send [entry], keeping it and the reason it failed.
+  Future<void> quarantine(OutboxEntry entry, {required String reason}) async {
+    await save(
+      entry.copyWith(lastError: reason, quarantinedAt: DateTime.now()),
+    );
+    AppLogger.warn(
+      'Quarantined ${entry.kind.name} for ${entry.subjectId}: '
+      '$reason',
+    );
+  }
+
+  /// Puts a quarantined write back in the queue, with its attempt count reset.
+  ///
+  /// The count is reset because the thing that was failing is usually outside
+  /// the app — a permission, a record rule, a required field somebody has now
+  /// filled in — and carrying five spent attempts forward would send it
+  /// straight back to quarantine on the first hiccup.
+  Future<void> retry(String id) async {
+    final entry = (await all()).where((e) => e.id == id).firstOrNull;
+    if (entry == null) return;
+    await save(entry.copyWith(attempts: 0, clearQuarantine: true));
+  }
+
+  /// Discards only the writes that were given up on.
+  Future<void> clearQuarantined() async {
+    for (final entry in await quarantined()) {
+      await _cache.delete(CacheBoxes.outbox, entry.id);
+    }
+    await _announce();
+  }
 
   Future<void> remove(String id) async {
     await _cache.delete(CacheBoxes.outbox, id);

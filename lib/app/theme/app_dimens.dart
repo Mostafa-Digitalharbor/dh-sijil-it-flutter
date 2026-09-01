@@ -226,6 +226,20 @@ abstract final class AppDurations {
   /// to read as "still looking" rather than as a progress bar that is stuck.
   static const Duration scannerSweep = Duration(seconds: 2);
 
+  /// How long the microphone stays open for one dictated search.
+  ///
+  /// Long enough to say "MacBook Pro belonging to Ahmed", short enough that a
+  /// microphone opened by accident in a pocket gives up on its own rather than
+  /// recording a corridor.
+  static const Duration voiceListen = Duration(seconds: 12);
+
+  /// The silence that ends a dictation early.
+  ///
+  /// Three seconds rather than one: a technician reading a serial off a
+  /// sticker pauses in the middle of it, and cutting them off at the pause is
+  /// how half a serial ends up in the search box.
+  static const Duration voicePause = Duration(seconds: 3);
+
   const AppDurations._();
 }
 

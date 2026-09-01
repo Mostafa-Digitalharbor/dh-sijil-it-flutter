@@ -12,6 +12,14 @@ abstract final class AppConstants {
   static const Duration receiveTimeout = Duration(seconds: 45);
   static const Duration sendTimeout = Duration(seconds: 30);
 
+  /// The longest `Retry-After` the app will quote back to a user.
+  ///
+  /// A proxy shedding load sometimes asks for an hour, which is true and
+  /// useless on a screen somebody is standing in front of. Past this the
+  /// message drops the number and says "wait a moment" instead — the same
+  /// advice without the false precision of a countdown nobody will sit out.
+  static const Duration maxQuotedRetryWait = Duration(minutes: 10);
+
   /// How long capability metadata (`ir.model` / `fields_get`) stays cached
   /// before a background refresh. Settings offers a manual refresh too.
   static const Duration metadataTtl = Duration(hours: 12);
@@ -105,6 +113,23 @@ abstract final class AppConstants {
 
   /// How many category bars the dashboard draws before it stops being a chart.
   static const int categoryChartLimit = 6;
+
+  /// How long an IT asset is assumed to earn its keep, in months.
+  ///
+  /// Five years. Not a fact about any particular laptop — it is the figure
+  /// finance departments actually depreciate IT equipment over, and it is what
+  /// makes "this machine is four and a half years old" mean something to
+  /// somebody deciding a budget.
+  ///
+  /// Deliberately one number rather than a table per category. A per-category
+  /// figure would be more accurate and would also be wrong on every instance
+  /// that categorises differently from ours — and the screen it feeds is a
+  /// prompt to think, not a depreciation schedule.
+  static const int assetServiceLifeMonths = 60;
+
+  /// How close to the end of that life an asset has to be before the app says
+  /// so. Six months: long enough to get a purchase through an approval cycle.
+  static const int assetReplacementNoticeMonths = 6;
 
   /// One employee's holdings fit in a single page; paging four rows would be
   /// ceremony for nothing.

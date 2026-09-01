@@ -24,6 +24,42 @@ abstract final class AppSnack {
     tone: AppColors.success,
   );
 
+  /// Confirms a write, saying plainly whether Odoo has it yet.
+  ///
+  /// ## Why this is not [success]
+  ///
+  /// A write made with no signal is parked in the outbox and the repository
+  /// returns the record as it *will* read once the queue drains — which is the
+  /// right answer for the screen and the wrong one for the sentence under it.
+  /// Every one of these actions used to end in a green tick and "Assigned to
+  /// Ahmed", whether Odoo had accepted the handover or whether it was sitting
+  /// on a phone in a basement.
+  ///
+  /// That is the one lie worth going out of the way to prevent: a technician
+  /// who has been told the handover is recorded has no reason to keep the app
+  /// open, and the queue is the only copy. So a queued write gets the upload
+  /// icon and the sentence that says where it actually is, rather than a tick
+  /// that means something it does not.
+  static void written(
+    BuildContext context,
+    String message, {
+    required bool queued,
+  }) {
+    if (!queued) return success(context, message);
+
+    final l10n = AppL10n.of(context);
+    _show(
+      context,
+      '$message\n${l10n.syncQueuedNotice}',
+      icon: Icons.cloud_upload_outlined,
+      tone: AppColors.warning,
+      // Two sentences rather than one, and the second is the one that matters.
+      // At the text ceiling in Arabic the pair runs past the usual three lines,
+      // and the line that would have been dropped is "not in Odoo yet".
+      maxLines: _queuedMaxLines,
+    );
+  }
+
   /// Reports a failure that does not take over the screen.
   ///
   /// Uses the failure's short form: a snackbar has room for what happened, not
@@ -46,11 +82,18 @@ abstract final class AppSnack {
     tone: AppColors.info,
   );
 
+  /// Lines a one-sentence confirmation gets.
+  static const int _defaultMaxLines = 3;
+
+  /// Lines the queued form gets. See [written].
+  static const int _queuedMaxLines = 5;
+
   static void _show(
     BuildContext context,
     String message, {
     required IconData icon,
     required Color tone,
+    int maxLines = _defaultMaxLines,
   }) {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
@@ -81,7 +124,7 @@ abstract final class AppSnack {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onInverseSurface,
                   ),
-                  maxLines: 3,
+                  maxLines: maxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

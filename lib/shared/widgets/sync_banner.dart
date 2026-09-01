@@ -103,6 +103,17 @@ class SyncBanner extends StatelessWidget {
     AppL10n l10n,
     SyncViewState state,
   ) {
+    // Ahead of a queued write, because it is the only one of the four states
+    // that will not resolve itself. A queue drains when signal comes back; a
+    // rejected write waits for a person to decide something.
+    if (state.hasQuarantined) {
+      return (
+        l10n.syncFailedBanner(state.quarantined.length),
+        AppColors.danger,
+        Icons.error_outline_rounded,
+      );
+    }
+
     if (state.hasPending) {
       return (
         l10n.syncPendingBanner(state.pending.length),

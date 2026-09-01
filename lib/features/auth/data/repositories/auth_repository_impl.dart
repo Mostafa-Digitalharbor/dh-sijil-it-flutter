@@ -115,6 +115,22 @@ class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
 
       if (!await _vault.hasSecret()) return null;
 
+      // The credential is a working Odoo login and it lives on the device. If
+      // nobody has used it inside the window, throw it away rather than go on
+      // holding a key to the asset register for a handset that may not be in
+      // the owner's hands any more.
+      //
+      // Thrown rather than returned as `null`: both end at the login screen,
+      // but only the failure carries the sentence explaining why the app is
+      // asking for a password it already had.
+      if (_preferences.isSessionExpired()) {
+        AppLogger.info('Session expired; the stored credential was cleared.');
+        await _sessionManager.end();
+        await _preferences.setUserId(null);
+        await _preferences.setLastAuthenticated(null);
+        throw const SessionExpiredException();
+      }
+
       // Trust the stored uid optimistically and let the first real call prove
       // it. Re-authenticating on every cold start would cost a round trip and
       // would fail offline, where the cache could still serve the user.
@@ -126,7 +142,12 @@ class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
       _sessionManager.start(session);
 
       try {
-        return await _loadProfile(session);
+        final user = await _loadProfile(session);
+        // The window is idle time, so a successful restore renews it. Written
+        // only after the profile read succeeds: a restore that could not reach
+        // Odoo has proved nothing and must not extend the credential's life.
+        await _preferences.setLastAuthenticated(DateTime.now());
+        return user;
       } on AppException catch (e) {
         AppLogger.warn('Session restore failed: ${e.message}');
         await _sessionManager.end(forgetCredential: false);
@@ -140,7 +161,10 @@ class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
     return guard(() async {
       await _sessionManager.end(forgetCredential: forgetCredential);
       await _capabilityService.invalidate();
-      if (forgetCredential) await _preferences.setUserId(null);
+      if (forgetCredential) {
+        await _preferences.setUserId(null);
+        await _preferences.setLastAuthenticated(null);
+      }
     });
   }
 
@@ -201,6 +225,9 @@ class AuthRepositoryImpl with RepositoryGuard implements AuthRepository {
     await _preferences.setUserId(session.userId);
     await _preferences.setServerVersion(session.serverVersion);
     await _preferences.setLastMetadataSync(DateTime.now());
+    // Starts the session window. Everything else here is bookkeeping; this is
+    // the clock that decides when the credential stops being usable.
+    await _preferences.setLastAuthenticated(DateTime.now());
   }
 
   /// Fails fast when the device is offline, so the user gets "you're offline"

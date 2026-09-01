@@ -74,9 +74,10 @@ class _AssignAssetViewState extends State<_AssignAssetView> {
 
         final assigned = state.assigned;
         if (assigned != null) {
-          AppSnack.success(
+          AppSnack.written(
             context,
             l10n.assignSuccess(assigned.name, state.selected?.name ?? ''),
+            queued: assigned.hasPendingSync,
           );
           _close();
         }

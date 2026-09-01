@@ -247,8 +247,56 @@ class AuditCubit extends Cubit<AuditState> {
     if (session == null || session.isFinished) return;
 
     final trimmed = code.trim();
-    if (trimmed.isEmpty || state.isResolving) return;
+    if (trimmed.isEmpty) return;
     if (trimmed == state.lastCode) return;
+
+    // The fast path, and the one almost every scan in a walk takes: the
+    // expected set was read once at the start, so an asset in scope is already
+    // on the device and needs no round trip at all. Recording it synchronously
+    // is what lets somebody walk a shelf at the speed they can point a camera,
+    // and it keeps working in a stock room with no signal.
+    final known = session.matchLocally(trimmed);
+    if (known != null) {
+      final updated = session.record(known, DateTime.now());
+      emit(
+        state.copyWith(
+          status: ViewStatus.success,
+          session: updated,
+          lastCode: trimmed,
+          lastScan: updated.results[known.id],
+          clearFailure: true,
+        ),
+      );
+      return;
+    }
+
+    // Not in scope. That is a finding rather than a count, and the only case
+    // worth a lookup: it is either an asset from another department or a
+    // sticker from another system, and the audit has to name which.
+    //
+    // Queued rather than dropped while another lookup is in flight. Dropping
+    // was the old behaviour and it lost scans silently — the technician saw no
+    // beep, assumed a bad read, and scanned again.
+    if (state.isResolving) {
+      // Deduplicated: a camera reports the same sticker many times a second,
+      // and a queue that took every repeat would turn one out-of-scope asset
+      // into thirty round trips.
+      if (!_pendingCodes.contains(trimmed)) _pendingCodes.add(trimmed);
+      return;
+    }
+
+    await _resolveRemote(trimmed);
+    await _drainPending();
+  }
+
+  /// Codes detected while a lookup was in flight, oldest first.
+  final List<String> _pendingCodes = <String>[];
+
+  /// Looks one out-of-scope code up, then drains anything that arrived while
+  /// it was running.
+  Future<void> _resolveRemote(String trimmed) async {
+    final session = state.session;
+    if (session == null || session.isFinished) return;
 
     emit(
       state.copyWith(
@@ -283,6 +331,28 @@ class AuditCubit extends Cubit<AuditState> {
         },
       ),
     );
+  }
+
+  /// Works through the codes that arrived while a lookup was running.
+  ///
+  /// One at a time and in order, because each is a round trip and firing them
+  /// together would be the same load the old code avoided by dropping them.
+  /// The difference is that none is lost.
+  ///
+  /// Flat rather than recursive: [_resolveRemote] deliberately does not call
+  /// this, so a walk that queues forty codes runs forty sequential lookups
+  /// rather than forty nested ones.
+  Future<void> _drainPending() async {
+    while (_pendingCodes.isNotEmpty && !isClosed) {
+      final next = _pendingCodes.removeAt(0);
+      final session = state.session;
+      if (session == null || session.isFinished) {
+        _pendingCodes.clear();
+        return;
+      }
+
+      await _resolveRemote(next);
+    }
   }
 
   /// Lets the next detection through again once the code has left the frame.

@@ -76,6 +76,45 @@ flutter {
     source = "../.."
 }
 
+// CameraX, raised past what `mobile_scanner` asks for.
+//
+// ## Why
+//
+// Android 15 moved devices to 16 KB memory pages, and from 1 November 2025
+// Google Play refuses an update that targets Android 15+ unless every shared
+// library in it is aligned to that page size. One library in this app was not:
+//
+//     lib/arm64-v8a/libimage_processing_util_jni.so   p_align = 4096
+//
+// It arrives through `mobile_scanner`, which asks for `androidx.camera:*:1.3.3`
+// — a version that predates the requirement. Nothing else in the build is
+// affected: the Flutter engine, Sentry, `libdartjni` and `datastore` are all
+// already at 16 KB or better, which is what makes this a one-line fix rather
+// than a toolchain upgrade.
+//
+// A `strictly` constraint rather than `force`: it states the floor as a
+// resolution rule, so a future `mobile_scanner` that asks for something newer
+// still wins, and a future one that asks for something *older* fails the build
+// loudly instead of silently reintroducing the misalignment.
+//
+// ## How to check this is still true
+//
+//     flutter build apk --debug
+//     python tool/check_elf_alignment.py build/app/outputs/flutter-apk/app-debug.apk
+//
+// 1.4.2 is the first release in the 1.4 line carrying 16 KB-aligned binaries
+// for every ABI the app ships.
+val cameraXVersion = "1.4.2"
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    constraints {
+        listOf("camera-core", "camera-camera2", "camera-lifecycle").forEach {
+            implementation("androidx.camera:$it") {
+                version { strictly(cameraXVersion) }
+                because("16 KB page alignment — Play requirement from Nov 2025")
+            }
+        }
+    }
 }

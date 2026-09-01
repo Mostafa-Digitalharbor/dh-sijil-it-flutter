@@ -19,6 +19,19 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- Dictating a search instead of typing it. A technician holding a laptop
+         in one hand has no second hand for a keyboard, and the search field is
+         the way into every screen in the product.
+
+         Asked for by `speech_to_text` at the moment the microphone button is
+         pressed, the same way the camera is asked for by the scanner — which
+         is what keeps the prompt attached to the action that needs it.
+
+         `required="false"` on the feature: an emulator or a tablet without a
+         microphone must still install and run, with the button simply absent.
+    -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
     <!-- enableOnBackInvokedCallback: Android 13+ predictive back. Without it
          the platform logs "OnBackInvokedCallback is not enabled for the
          application" on every launch and falls back to the legacy
@@ -93,6 +106,13 @@
         <intent>
             <action android:name="android.intent.action.DIAL"/>
             <data android:scheme="tel"/>
+        </intent>
+        <!-- Voice search. Android 11+ hides other packages by default, and
+             `speech_to_text` binds to whichever app provides the recogniser —
+             so without this it reports "speech recognition unavailable" on
+             every device, including ones that have it. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
         </intent>
     </queries>
 </manifest>

@@ -10,6 +10,7 @@ import 'package:sijil_it/core/network/odoo/odoo_connection.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
 import 'package:sijil_it/core/security/app_lock.dart';
 import 'package:sijil_it/core/security/credential_vault.dart';
+import 'package:sijil_it/core/services/voice_input.dart';
 import 'package:sijil_it/core/storage/cache/cache_store.dart';
 import 'package:sijil_it/core/storage/preferences/app_preferences.dart';
 import 'package:sijil_it/features/auth/presentation/cubit/auth_cubit.dart';
@@ -31,6 +32,7 @@ import 'test_doubles.dart';
 Future<InProcessOdooClient> configureTestDependencies({
   FakeOdooData? data,
   FakeNetworkInfo? network,
+  FakeVoiceInput? voice,
   Map<String, Object> preferences = const {},
 }) async {
   await sl.reset();
@@ -46,6 +48,10 @@ Future<InProcessOdooClient> configureTestDependencies({
   sl.registerLazySingleton<CacheStore>(InMemoryCache.new);
   sl.registerSingleton<AppPreferences>(await AppPreferences.create());
   sl.registerLazySingleton<NetworkInfo>(() => network ?? FakeNetworkInfo());
+  // The fifth platform-bound piece. Defaults to "this device cannot dictate",
+  // which is the truth about a host VM and keeps the microphone button off
+  // every screen that is not testing it.
+  sl.registerSingleton<VoiceInput>(voice ?? FakeVoiceInput());
 
   final client = InProcessOdooClient(data ?? FakeOdooData.seeded());
   sl.registerSingleton<XmlRpcClient>(client);

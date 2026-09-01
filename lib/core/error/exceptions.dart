@@ -53,6 +53,19 @@ class AuthenticationException extends AppException {
   const AuthenticationException(super.message, {super.technicalDetails});
 }
 
+/// The stored credential went unused for longer than the session window, so
+/// the app threw it away rather than go on holding a working Odoo login.
+///
+/// Its own type rather than an [AuthenticationException]: nothing is wrong
+/// with the password, and the login screen says something different when the
+/// user is being asked for a credential the app deliberately discarded than
+/// when Odoo rejected one.
+class SessionExpiredException extends AppException {
+  const SessionExpiredException([
+    super.message = 'The saved sign-in expired and was cleared.',
+  ]);
+}
+
 /// Odoo raised `odoo.exceptions.AccessError` / `AccessDenied` — the user's
 /// ACLs or record rules forbid the operation.
 class AccessDeniedException extends AppException {
@@ -119,6 +132,31 @@ class ServerException extends AppException {
 
   /// The HTTP status, when the failure came in over HTTP.
   final int? statusCode;
+}
+
+/// The server refused the request because too many arrived too quickly.
+///
+/// Odoo Online sits behind a rate limiter, and so does every reverse proxy a
+/// self-hosted instance is likely to be put behind. The app is a plausible
+/// trigger: a page of assets fans out into a chatter scan, and an audit walks
+/// a fleet a page at a time.
+///
+/// Its own type because the advice is the opposite of every other 4xx. The
+/// URL is right, the credentials are right, and the one thing that fixes it
+/// is waiting — so it must not be routed to the connection screen.
+class RateLimitedException extends AppException {
+  const RateLimitedException(
+    super.message, {
+    this.retryAfter,
+    super.technicalDetails,
+  });
+
+  /// How long the server asked the client to wait, when it said.
+  ///
+  /// Read from the `Retry-After` header. Null when the server sent no header
+  /// or sent a form the app could not parse, in which case the user is told
+  /// to wait "a moment" rather than a number the app guessed.
+  final Duration? retryAfter;
 }
 
 /// The XML-RPC payload could not be parsed into the expected shape.

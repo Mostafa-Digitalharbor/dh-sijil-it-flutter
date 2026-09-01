@@ -4,9 +4,96 @@ import 'package:sijil_it/core/error/exceptions.dart' as app;
 import 'package:sijil_it/core/network/connectivity/network_info.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
 import 'package:sijil_it/core/security/credential_vault.dart';
+import 'package:sijil_it/core/services/voice_input.dart';
 import 'package:sijil_it/core/storage/cache/cache_store.dart';
 
 import 'fake_odoo_data.dart';
+
+/// A [VoiceInput] that reports what a host VM actually has: no microphone.
+///
+/// [available] is settable so a test can put the button on screen and drive
+/// it. [speak] plays a transcript back through the callback the button
+/// registered, which is the whole contract the UI depends on — everything
+/// between a microphone and that callback belongs to the plugin.
+class FakeVoiceInput implements VoiceInput {
+  FakeVoiceInput({this.available = false, bool? offered}) : _offered = offered;
+
+  /// What initialising the recogniser would answer — and, on a real device,
+  /// the call that raises the microphone prompt.
+  bool available;
+
+  bool? _offered;
+
+  /// What [canOffer] answers. Defaults to [available] so a test that only
+  /// cares whether the button appears does not have to set both.
+  ///
+  /// Set independently to model the state the real plugin is in before the
+  /// user has ever been asked: nothing is known yet, so the button is offered
+  /// and the press is what asks.
+  bool get offered => _offered ?? available;
+
+  set offered(bool value) => _offered = value;
+
+  /// Whether [listen] should refuse, as it does when the permission prompt is
+  /// answered with "Don't allow".
+  bool refuseToStart = false;
+
+  String? lastLocaleId;
+  int stopCount = 0;
+
+  /// How often each question was asked.
+  ///
+  /// [isAvailableCount] is the one that matters: it counts the calls that
+  /// prompt on a real device, and a build that increments it is the bug this
+  /// double exists to catch.
+  int canOfferCount = 0;
+  int isAvailableCount = 0;
+
+  void Function(VoiceResult)? _onResult;
+
+  @override
+  bool get isListening => _onResult != null;
+
+  @override
+  Future<bool> canOffer() async {
+    canOfferCount++;
+    return offered;
+  }
+
+  @override
+  Future<bool> isAvailable() async {
+    isAvailableCount++;
+    return available;
+  }
+
+  @override
+  Future<bool> listen({
+    required void Function(VoiceResult result) onResult,
+    required String localeId,
+  }) async {
+    lastLocaleId = localeId;
+    // Through [isAvailable], as the real one does: `PlatformVoiceInput.listen`
+    // initialises the recogniser first, and that is the call which raises the
+    // microphone prompt. Short-circuiting on `available` here would have made
+    // the double unable to show *where* the prompt happens, which is the only
+    // interesting thing about it.
+    if (!await isAvailable() || refuseToStart) return false;
+    _onResult = onResult;
+    return true;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCount++;
+    _onResult = null;
+  }
+
+  /// Feeds a transcript back, the way the recogniser does.
+  void speak(String text, {bool isFinal = true}) {
+    _onResult?.call(VoiceResult(text: text, isFinal: isFinal));
+    if (isFinal) _onResult = null;
+  }
+}
 
 /// In-memory [CredentialVault] with the same contract as the real one.
 ///

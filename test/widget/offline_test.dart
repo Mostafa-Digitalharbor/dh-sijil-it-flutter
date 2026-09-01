@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sijil_it/app/di/injector.dart';
+import 'package:sijil_it/core/error/failures.dart';
 import 'package:sijil_it/core/sync/outbox_entry.dart';
 import 'package:sijil_it/core/sync/outbox_store.dart';
 import 'package:sijil_it/core/sync/sync_service.dart';
@@ -419,7 +420,10 @@ void main() {
       );
     });
 
-    test('a write Odoo keeps refusing stops retrying', () async {
+    test('a write Odoo refuses outright leaves the queue at once', () async {
+      // Not after five attempts. An `AccessError` says the answer will be the
+      // same every time, and the four extra round trips only keep the asset
+      // wrongly overlaid for longer.
       final id = await anAvailableAsset();
       goOffline();
 
@@ -438,17 +442,156 @@ void main() {
         message: 'AccessError: you may not modify this record',
       );
 
-      for (var attempt = 0; attempt < OutboxEntry.maxAttempts + 1; attempt++) {
-        await sl<SyncService>().drain();
-      }
+      await sl<SyncService>().drain();
 
-      final entry = (await sl<OutboxStore>().pending()).single;
+      final outbox = sl<OutboxStore>();
       expect(
-        entry.isBlocked,
-        isTrue,
+        await outbox.pending(),
+        isEmpty,
         reason: 'a badge that never clears stops meaning anything',
       );
+
+      final given = (await outbox.quarantined()).single;
+      expect(given.isQuarantined, isTrue);
+      expect(
+        given.attempts,
+        1,
+        reason: 'one attempt was enough to learn the answer',
+      );
+      expect(
+        given.lastError,
+        FailureKind.accessDenied.name,
+        reason: 'the screen shows why, so the user can ask for the right thing',
+      );
     });
+
+    test('and stops overlaying the asset it could not change', () async {
+      // The reason quarantine exists. While the entry was pending, the overlay
+      // kept rewriting the asset to the state the failed write intended — so
+      // the detail screen showed a handover Odoo had rejected and would never
+      // accept, for ever, with no way back short of discarding every other
+      // queued write with it.
+      final id = await anAvailableAsset();
+      goOffline();
+
+      await sl<AssetRepository>().assign(
+        AssignmentRequest(
+          assetId: id,
+          employeeId: 11,
+          employeeName: 'Ahmed',
+          assignedOn: DateTime(2026, 8, 29),
+        ),
+      );
+
+      final outbox = sl<OutboxStore>();
+      expect(await outbox.subjectIds(), contains(id));
+
+      comeBack();
+      client.faults['maintenance.equipment.write'] = (
+        code: 1,
+        message: 'AccessError: you may not modify this record',
+      );
+      await sl<SyncService>().drain();
+
+      expect(
+        await outbox.subjectIds(),
+        isNot(contains(id)),
+        reason: 'the record on screen goes back to what Odoo actually holds',
+      );
+    });
+
+    test(
+      'a retryable failure still spends its attempts before giving up',
+      () async {
+        // The other route into quarantine, and it must not be the fast one: a
+        // server that is briefly unwell should be retried, not written off.
+        final id = await anAvailableAsset();
+        goOffline();
+
+        await sl<AssetRepository>().assign(
+          AssignmentRequest(
+            assetId: id,
+            employeeId: 11,
+            employeeName: 'Ahmed',
+            assignedOn: DateTime(2026, 8, 29),
+          ),
+        );
+
+        comeBack();
+        client.faults['maintenance.equipment.write'] = (
+          code: 1,
+          message: 'Internal Server Error',
+        );
+
+        final outbox = sl<OutboxStore>();
+        for (
+          var attempt = 0;
+          attempt < OutboxEntry.maxAttempts - 1;
+          attempt++
+        ) {
+          await sl<SyncService>().drain();
+          expect(
+            await outbox.pending(),
+            hasLength(1),
+            reason: 'still worth retrying after ${attempt + 1} attempts',
+          );
+        }
+
+        await sl<SyncService>().drain();
+        expect(await outbox.pending(), isEmpty);
+        expect(await outbox.quarantined(), hasLength(1));
+      },
+    );
+
+    test(
+      'a quarantined write can be sent once the refusal is lifted',
+      () async {
+        final id = await anAvailableAsset();
+        goOffline();
+
+        await sl<AssetRepository>().assign(
+          AssignmentRequest(
+            assetId: id,
+            employeeId: 11,
+            employeeName: 'Ahmed',
+            assignedOn: DateTime(2026, 8, 29),
+          ),
+        );
+
+        comeBack();
+        client.faults['maintenance.equipment.write'] = (
+          code: 1,
+          message: 'AccessError: you may not modify this record',
+        );
+        await sl<SyncService>().drain();
+
+        final outbox = sl<OutboxStore>();
+        final given = (await outbox.quarantined()).single;
+
+        // The administrator grants the permission.
+        client.faults.remove('maintenance.equipment.write');
+        await outbox.retry(given.id);
+
+        expect(
+          (await outbox.pending()).single.attempts,
+          0,
+          reason: 'carrying spent attempts forward sends it straight back',
+        );
+
+        await sl<SyncService>().drain();
+
+        expect(await outbox.pending(), isEmpty);
+        expect(await outbox.quarantined(), isEmpty);
+        final row = data
+            .tableOf('maintenance.equipment')
+            .firstWhere((r) => r['id'] == id);
+        expect(
+          row['employee_id'],
+          isNot(false),
+          reason: 'the work the technician did finally reached Odoo',
+        );
+      },
+    );
   });
 
   group('what the user is told', () {

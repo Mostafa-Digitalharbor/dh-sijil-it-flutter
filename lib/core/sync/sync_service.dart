@@ -12,11 +12,20 @@ import 'write_queue.dart';
 
 /// The result of one attempt to empty the queue.
 class SyncReport {
-  const SyncReport({this.sent = 0, this.failed = 0, this.remaining = 0});
+  const SyncReport({
+    this.sent = 0,
+    this.failed = 0,
+    this.remaining = 0,
+    this.quarantined = 0,
+  });
 
   final int sent;
   final int failed;
   final int remaining;
+
+  /// How many writes this drain gave up on. They are kept and shown with the
+  /// reason rather than deleted — see [OutboxEntry.quarantinedAt].
+  final int quarantined;
 
   bool get isClean => failed == 0 && remaining == 0;
 }
@@ -94,14 +103,10 @@ class SyncService {
 
     var sent = 0;
     var failed = 0;
+    var quarantined = 0;
 
     try {
       for (final entry in await _outbox.pending()) {
-        if (entry.isBlocked) {
-          failed++;
-          continue;
-        }
-
         final failure = await _replay(entry);
         if (failure == null) {
           await _outbox.remove(entry.id);
@@ -110,17 +115,42 @@ class SyncService {
         }
 
         failed++;
-        await _outbox.save(
-          entry.copyWith(
-            attempts: entry.attempts + 1,
-            lastError: failure.kind.name,
-          ),
+
+        // Counted whether or not it is retried again: the request was sent and
+        // Odoo answered, and a queue screen that shows nought attempts beside
+        // a failure is describing something that did not happen.
+        final attempted = entry.copyWith(
+          attempts: entry.attempts + 1,
+          lastError: failure.kind.name,
         );
+
+        // Odoo has refused this for a reason retrying cannot fix — an ACL, a
+        // record rule, a constraint on the value. Quarantined on the first
+        // rejection rather than after five: the four extra attempts change
+        // nothing, and every one of them is a round trip that keeps the asset
+        // wrongly overlaid for longer.
+        if (!failure.isRetryable) {
+          await _outbox.quarantine(attempted, reason: failure.kind.name);
+          quarantined++;
+          continue;
+        }
+
+        // Retryable, but it has now failed as often as retrying is worth. The
+        // count only moves when a replay was actually attempted — which needs
+        // a connection — so reaching it means the request keeps being refused
+        // while the network is fine.
+        if (attempted.isBlocked) {
+          await _outbox.quarantine(attempted, reason: failure.kind.name);
+          quarantined++;
+          continue;
+        }
+
+        await _outbox.save(attempted);
 
         // A connectivity failure means the window closed again; everything
         // after this entry would fail the same way, and trying anyway would
         // burn an attempt off each one for nothing.
-        if (failure.isRetryable) break;
+        break;
       }
     } finally {
       _queue.endDrain();
@@ -128,10 +158,18 @@ class SyncService {
     }
 
     final left = await _outbox.depth();
-    final report = SyncReport(sent: sent, failed: failed, remaining: left);
+    final report = SyncReport(
+      sent: sent,
+      failed: failed,
+      remaining: left,
+      quarantined: quarantined,
+    );
 
     if (!_reports.isClosed) _reports.add(report);
-    AppLogger.info('Sync: $sent sent, $failed failed, $left waiting');
+    AppLogger.info(
+      'Sync: $sent sent, $failed failed, $quarantined given up, '
+      '$left waiting',
+    );
     return report;
   }
 

@@ -182,9 +182,13 @@ void main() {
     // separator around it ('+$extra', '1/$n') was invisible; and the vocabulary
     // did not list `step` or `extra`.
     final interpolated = RegExp(r'\$\{?([A-Za-z_][\w.]*(?:\(\))?)\}?');
+    // Whole words, not substrings. Without the boundaries `count` matched
+    // inside `country` — `'${locale.languageCode}_$country'` is a locale id
+    // handed to a speech recogniser, contains no number, and is not something
+    // a user reads.
     final numeric = RegExp(
-      'count|total|length|number|days|remaining|size|index|step|extra|'
-      'quantity|amount|position|page|hours|minutes|months|years',
+      r'\b(?:count|total|length|number|days|remaining|size|index|step|extra|'
+      r'quantity|amount|position|page|hours|minutes|months|years)\b',
       caseSensitive: false,
     );
     final offenders = <String>[];

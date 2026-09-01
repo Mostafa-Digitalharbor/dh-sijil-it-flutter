@@ -211,7 +211,15 @@ class SectionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (trailing != null) trailing!,
+              // Flexible, not bare. A trailing widget laid out at its
+              // intrinsic width takes what it wants and the `Expanded` title
+              // gets whatever is left — which is a negative number once the
+              // trailing is a chip carrying an Arabic label at the text
+              // ceiling, and the row paints a yellow bar across the card.
+              //
+              // Loose fit so it still shrinks to its content when there is
+              // room, which is every other caller and every other size.
+              if (trailing != null) Flexible(child: trailing!),
             ],
           ),
           const SizedBox(height: AppSpacing.md),

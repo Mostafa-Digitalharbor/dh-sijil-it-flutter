@@ -8,6 +8,10 @@
 	<string>Sijil IT asks for Face ID before it opens, so company assets cannot be reassigned from an unlocked phone.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sijil IT attaches photos to asset return records.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Sijil IT lets you dictate a search instead of typing it, so you can look an asset up with one hand.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Sijil IT turns what you say into a search for an asset or an employee.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

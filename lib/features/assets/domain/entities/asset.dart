@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/odoo/odoo_object_service.dart';
+import 'asset_lifecycle.dart';
 import 'asset_status.dart';
 import 'return_due.dart';
 import 'warranty.dart';
@@ -97,6 +98,22 @@ class Asset extends Equatable {
 
   /// Past its expected return date and still with somebody.
   bool get isOverdue => dueBack.isOverdue;
+
+  /// How far through its working life this asset is, and what it has cost per
+  /// year of it.
+  ///
+  /// Derived rather than stored, like [subtitle] and unlike [warranty]: it is
+  /// a pure function of two fields already on the record, and computing it
+  /// here means a row, a detail screen and an export cannot disagree about
+  /// what "due for replacement" means.
+  ///
+  /// Reads the clock, so it is a getter rather than a field — a screen left
+  /// open across midnight on the last day of a month should not go on saying
+  /// the asset has a month left.
+  AssetLifecycle get lifecycle => AssetLifecycle.evaluate(
+    purchaseDate: purchaseDate,
+    purchaseValue: purchaseValue,
+  );
 
   /// Payload encoded into the asset's QR code (spec §12).
   ///

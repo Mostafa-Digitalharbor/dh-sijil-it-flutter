@@ -35,6 +35,15 @@ abstract final class PrefKeys {
   /// secret.
   static const String appLockEnabled = 'app_lock_enabled';
 
+  /// When the stored credential last proved itself against Odoo, and how long
+  /// it may go on doing so unattended.
+  ///
+  /// Not secrets: they are a timestamp and a number of days. What they guard
+  /// *is* a secret, and it is in the keychain — these decide when the app
+  /// throws it away.
+  static const String lastAuthenticated = 'last_authenticated_at';
+  static const String sessionMaxAgeDays = 'session_max_age_days';
+
   const PrefKeys._();
 }
 
