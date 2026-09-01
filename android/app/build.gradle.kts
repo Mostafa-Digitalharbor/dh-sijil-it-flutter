@@ -107,7 +107,7 @@ flutter {
 val cameraXVersion = "1.4.2"
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     constraints {
         listOf("camera-core", "camera-camera2", "camera-lifecycle").forEach {
