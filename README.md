@@ -99,7 +99,12 @@ Features whose backing model is missing are hidden, never broken.
   never in an app state object.
 - Every log line passes through `LogSanitizer`; passwords, API keys, tokens
   and basic-auth URLs are redacted, with tests to prove it.
-- The local cache is AES-encrypted with a per-install key.
+- The local cache is encrypted at rest by the platform — iOS Data Protection
+  on every file in the container, Android file-based encryption plus
+  `allowBackup="false"` so the boxes cannot be pulled off with `adb backup`.
+  The app ships no cipher of its own, which is what keeps it exempt from US
+  export-compliance filing; see the note in `hive_cache_store.dart` before
+  adding one.
 - HTTPS is the default and cleartext traffic is disabled on Android.
   Certificate validation is never disabled.
 - Odoo ACLs are always respected — the app never works around a permission
@@ -118,6 +123,28 @@ Features whose backing model is missing are hidden, never broken.
 Release signing needs four repository secrets:
 `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+
+### Crash reporting
+
+`CrashReporter` reads its DSN from `String.fromEnvironment('SENTRY_DSN')`, so a
+build that is not given one never initialises the SDK — not initialised and
+silent, but absent. That is deliberate: it makes "this build reports nowhere" a
+property of the binary rather than a setting someone could flip.
+
+CI takes it from the `SENTRY_DSN` repository secret. Locally, put it in `.env`
+(git-ignored) and pass the file:
+
+    SENTRY_DSN=https://<key>@<org>.ingest.<region>.sentry.io/<project>
+    SENTRY_ENVIRONMENT=production
+
+    flutter build appbundle --release --dart-define-from-file=.env
+
+Leave the file off and the same build reports nothing, which is the shape a
+customer who does not want telemetry should get.
+
+Whether the DSN is compiled in changes the **Data safety** declaration on the
+Play listing: a build with one collects crash logs, diagnostics and a device
+identifier, and all three have to be declared. See `store-assets/DATA-SAFETY.md`.
 
 ---
 

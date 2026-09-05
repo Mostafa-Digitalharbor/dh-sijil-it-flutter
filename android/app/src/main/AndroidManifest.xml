@@ -9,6 +9,13 @@
          because "some time that morning" is the right precision for a
          warranty that expires in a month. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Android drops every scheduled alarm on reboot, so without this the
+         warranty reminders quietly stop existing until the app is next opened.
+         A reminder for a warranty expiring in three weeks is precisely the one
+         nobody is opening the app to check, which is what makes this the
+         difference between the feature working and only appearing to. Paired
+         with the plugin's ScheduledNotificationBootReceiver below. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- Settings -> Require unlock. USE_BIOMETRIC is a normal permission, so
          it is granted at install and never prompts; without it AndroidX's
          BiometricPrompt refuses to show. The prompt also accepts the device
@@ -39,10 +46,21 @@
          screen, and every form that asks before discarding — get neither the
          back preview nor the system animation the rest of the OS uses.
          Flutter routes its `PopScope` through the new API from 3.24 on. -->
+    <!-- allowBackup: off, deliberately, and it is the one setting that has to
+         stay off. The Hive boxes hold cached employees, asset assignments and
+         the outbox, protected on disk by Android's own file-based encryption.
+         Left at its default of true, `adb backup` and Auto Backup would copy
+         those files off the device and out from behind that protection — the
+         one real extraction path on Android, and the gap the app's own AES
+         cipher used to paper over before it was removed for export-compliance
+         reasons (see ios/Runner/Info.plist). Nothing here is worth backing up
+         anyway: every box is rebuilt from Odoo on the next refresh, and the
+         credentials live in EncryptedSharedPreferences, not here. -->
     <application
         android:label="Sijil IT"
         android:name="${applicationName}"
         android:usesCleartextTraffic="false"
+        android:allowBackup="false"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -80,6 +98,21 @@
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="barcode" />
+        <!-- Re-arms the reminders the plugin had scheduled before the device
+             restarted or the app was replaced by an update. `exported="false"`:
+             only the system broadcasts these actions, so nothing else needs to
+             reach it. QUICKBOOT_POWERON covers HTC and a number of Chinese
+             ROMs that send their own action instead of BOOT_COMPLETED. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
