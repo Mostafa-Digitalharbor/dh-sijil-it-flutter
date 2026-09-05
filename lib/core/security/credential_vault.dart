@@ -58,15 +58,7 @@ class CredentialVault {
 
   Future<void> clearSecret() => _clearAllSecretKeys();
 
-  /// Random key used to encrypt the Hive cache at rest, generated once per
-  /// installation and stored in the keystore alongside the credential.
-  Future<String?> readHiveKey() =>
-      _storage.read(key: SecureKeys.hiveEncryptionKey);
-
-  Future<void> writeHiveKey(String base64Key) =>
-      _storage.write(key: SecureKeys.hiveEncryptionKey, value: base64Key);
-
-  /// Wipes everything, including the cache key. Used by "Sign out" and by
+  /// Wipes every stored secret. Used by "Sign out" and by
   /// Settings → Clear data.
   Future<void> wipe() => _storage.deleteAll();
 

@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../core/export/file_share.dart';
 import '../../core/network/connectivity/network_info.dart';
+import '../../core/network/jsonrpc/json_rpc_client.dart';
 import '../../core/network/odoo/odoo_attachment_service.dart';
 import '../../core/network/odoo/odoo_auth_service.dart';
 import '../../core/network/odoo/odoo_capability_service.dart';
@@ -97,7 +98,7 @@ Future<void> configureDependencies() async {
 /// widget test exercises the same objects `bootstrap()` does.
 ///
 /// Requires [CredentialVault], [CacheStore], [AppPreferences], [NetworkInfo]
-/// and [XmlRpcClient] to be registered already.
+/// and [XmlRpcClient] / [JsonRpcClient] to be registered already.
 void registerAppGraph() {
   _registerOdooServices();
   _registerSync();
@@ -111,7 +112,7 @@ Future<void> _registerPlatform() async {
   sl.registerLazySingleton<CredentialVault>(CredentialVault.createDefault);
   sl.registerLazySingleton<AppLock>(AppLock.new);
 
-  final cacheStore = HiveCacheStore(sl<CredentialVault>());
+  final cacheStore = HiveCacheStore();
   await cacheStore.init();
   sl.registerSingleton<CacheStore>(cacheStore);
 
@@ -131,6 +132,8 @@ Future<void> _registerPlatform() async {
 // ── Layer 1: transport ─────────────────────────────────────────────────────
 void _registerTransport() {
   sl.registerLazySingleton<XmlRpcClient>(DioXmlRpcClient.createDefault);
+  // Second transport, one call. See `OdooAuthService.listDatabases`.
+  sl.registerLazySingleton<JsonRpcClient>(DioJsonRpcClient.createDefault);
 }
 
 // ── Layer 2: Odoo services ─────────────────────────────────────────────────
@@ -139,7 +142,7 @@ void _registerOdooServices() {
     () => OdooSessionManager(sl<CredentialVault>()),
   );
   sl.registerLazySingleton<OdooAuthService>(
-    () => OdooAuthService(sl<XmlRpcClient>()),
+    () => OdooAuthService(sl<XmlRpcClient>(), sl<JsonRpcClient>()),
   );
   sl.registerLazySingleton<OdooObjectService>(
     () => OdooObjectService(sl<XmlRpcClient>(), sl<OdooSessionManager>()),

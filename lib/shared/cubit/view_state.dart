@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../core/error/failures.dart';
+import '../../core/pagination/paginated_result.dart';
 
 /// The four phases every screen in the app can be in.
 ///
@@ -42,6 +43,49 @@ abstract class ViewState extends Equatable {
 
   @override
   List<Object?> get props => [status, failure];
+}
+
+/// Base state for a screen that pages through a list.
+///
+/// ## Why this is a type and not a convention
+///
+/// Assets, employees and maintenance requests are the same screen with
+/// different rows, and all three states already carried the same two fields —
+/// a [PaginatedResult] and an `isLoadingMore` flag — plus the same two getters
+/// derived from them. Nothing said so, so each screen re-wired the eight
+/// arguments [PaginatedListView] needs by hand, and each was free to derive
+/// `hasMore` from something slightly different.
+///
+/// Declaring it lets `PaginatedListView.fromState` take the state itself, so
+/// the wiring is written once and a new list screen cannot get it subtly wrong
+/// — it either satisfies this contract or it does not compile.
+abstract class PaginatedViewState<T> extends ViewState {
+  const PaginatedViewState({
+    super.status,
+    super.failure,
+    this.page = const PaginatedResult.empty(),
+    this.isLoadingMore = false,
+  });
+
+  /// The rows read so far, merged across every page.
+  final PaginatedResult<T> page;
+
+  /// A next-page request is in flight.
+  ///
+  /// Distinct from [ViewStatus.refreshing], which replaces the list rather
+  /// than extending it: one shows a footer spinner under rows the user is
+  /// still reading, the other shows an indicator at the top.
+  final bool isLoadingMore;
+
+  /// The rows themselves. Subclasses add a domain-named alias — `assets`,
+  /// `employees` — because that is what reads well at a call site.
+  List<T> get items => page.items;
+
+  /// True while the server still has rows beyond the ones read so far.
+  bool get hasMore => page.hasMore;
+
+  @override
+  List<Object?> get props => [...super.props, page, isLoadingMore];
 }
 
 /// Ready-made state for screens that just load one value.

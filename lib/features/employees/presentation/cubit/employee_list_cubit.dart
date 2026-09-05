@@ -11,26 +11,22 @@ import '../../domain/entities/employee.dart';
 import '../../domain/usecases/employee_usecases.dart';
 
 /// What the employee directory renders (spec §9).
-class EmployeeListState extends ViewState {
+class EmployeeListState extends PaginatedViewState<Employee> {
   const EmployeeListState({
     super.status,
     super.failure,
-    this.page = const PaginatedResult<Employee>.empty(),
+    super.page,
+    super.isLoadingMore,
     this.query = const EmployeeQuery(),
     this.departments = const <OdooNameRef>[],
-    this.isLoadingMore = false,
   });
 
-  final PaginatedResult<Employee> page;
   final EmployeeQuery query;
   final List<OdooNameRef> departments;
-  final bool isLoadingMore;
 
-  List<Employee> get employees => page.items;
+  List<Employee> get employees => items;
 
   EmployeeFilters get filters => query.filters;
-
-  bool get hasMore => page.hasMore;
 
   bool get isFilteredEmpty => employees.isEmpty && filters.isNotEmpty;
 
@@ -52,13 +48,7 @@ class EmployeeListState extends ViewState {
   );
 
   @override
-  List<Object?> get props => [
-    ...super.props,
-    page,
-    query,
-    departments,
-    isLoadingMore,
-  ];
+  List<Object?> get props => [...super.props, query, departments];
 }
 
 /// The employee directory's ViewModel.

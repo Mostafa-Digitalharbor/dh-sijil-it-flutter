@@ -16,6 +16,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_chip.dart';
 import '../../../../shared/widgets/app_data_views.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/async_data_view.dart';
@@ -211,45 +212,37 @@ class _ProfileCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(
+          AppMediaRow(
+            gap: AppSpacing.lg,
+            leading: AppAvatar(
+              name: employee.name,
+              size: AppDimens.avatarXl,
+              emphasised: true,
+            ),
             children: <Widget>[
-              AppAvatar(
-                name: employee.name,
-                size: AppDimens.avatarXl,
-                emphasised: true,
+              Text(
+                employee.name,
+                style: theme.textTheme.headlineSmall,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      employee.name,
-                      style: theme.textTheme.headlineSmall,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (employee.role != null) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(
-                        employee.role!,
-                        style: theme.textTheme.bodySmall,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                    if (employee.department != null) ...<Widget>[
-                      const SizedBox(height: AppSpacing.sm),
-                      AppChip.neutral(
-                        label: employee.department!.name,
-                        icon: Icons.apartment_rounded,
-                        dense: true,
-                      ),
-                    ],
-                  ],
+              if (employee.role != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  employee.role!,
+                  style: theme.textTheme.bodySmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+              ],
+              if (employee.department != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.sm),
+                AppChip.neutral(
+                  label: employee.department!.name,
+                  icon: Icons.apartment_rounded,
+                  dense: true,
+                ),
+              ],
             ],
           ),
           if (employee.hasEmail || employee.hasPhone) ...<Widget>[
@@ -333,30 +326,18 @@ class _NothingAssigned extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AppCard(
-      child: Row(
+      child: AppMediaRow(
+        leading: Icon(
+          Icons.inbox_rounded,
+          size: AppDimens.iconXl,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
         children: <Widget>[
-          Icon(
-            Icons.inbox_rounded,
-            size: AppDimens.iconXl,
-            color: theme.colorScheme.onSurfaceVariant,
+          Text(
+            l10n.emptyEmployeeAssetsTitle,
+            style: theme.textTheme.titleSmall,
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  l10n.emptyEmployeeAssetsTitle,
-                  style: theme.textTheme.titleSmall,
-                ),
-                Text(
-                  l10n.emptyEmployeeAssetsBody,
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
+          Text(l10n.emptyEmployeeAssetsBody, style: theme.textTheme.bodySmall),
         ],
       ),
     );

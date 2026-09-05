@@ -109,22 +109,18 @@ class MaintenanceQuery extends Equatable {
 }
 
 /// What the maintenance list renders.
-class MaintenanceListState extends ViewState {
+class MaintenanceListState extends PaginatedViewState<MaintenanceRequest> {
   const MaintenanceListState({
     super.status,
     super.failure,
-    this.page = const PaginatedResult<MaintenanceRequest>.empty(),
+    super.page,
+    super.isLoadingMore,
     this.query = const MaintenanceQuery(),
-    this.isLoadingMore = false,
   });
 
-  final PaginatedResult<MaintenanceRequest> page;
   final MaintenanceQuery query;
-  final bool isLoadingMore;
 
-  List<MaintenanceRequest> get requests => page.items;
-
-  bool get hasMore => page.hasMore;
+  List<MaintenanceRequest> get requests => items;
 
   bool get onlyOpen => query.filters.onlyOpen;
 
@@ -144,7 +140,7 @@ class MaintenanceListState extends ViewState {
   );
 
   @override
-  List<Object?> get props => [...super.props, page, query, isLoadingMore];
+  List<Object?> get props => [...super.props, query];
 }
 
 /// The maintenance list's ViewModel.

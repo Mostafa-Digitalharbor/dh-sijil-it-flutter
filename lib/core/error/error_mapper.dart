@@ -112,9 +112,35 @@ abstract final class ErrorMapper {
       );
     }
 
+    // Credentials refused, which is not the same thing as permission refused
+    // and must not be reported as one.
+    //
+    // Odoo raises `AccessDenied` when it will not accept *who you are* and
+    // `AccessError` when it will not let that person do *this*. The app
+    // replays a stored secret on every call, so `AccessDenied` mid-session
+    // means the credential stopped working — the password was changed, the API
+    // key revoked, the user deactivated. The answer is to sign in again, which
+    // is what [FailureKind.sessionExpired] says and offers a button for.
+    //
+    // Matched on the spaced form as well, because that is what Odoo 19
+    // actually puts on the wire: `execute_kw` with a stale secret answers the
+    // bare string `Access Denied` (XML-RPC fault 3), with no exception class
+    // and no traceback. Only the unspaced `AccessDenied` was matched, so the
+    // real message fell through every branch to "Odoo reported an error — try
+    // again", which sent the user to retry a call that could never succeed.
+    //
+    // Below the database check, deliberately: a wrong database name answers
+    // with a message that contains `AccessDenied` too, and it is a typo in a
+    // field rather than anything to do with the credential.
+    if (text.contains('accessdenied') || text.contains('access denied')) {
+      return Failure(
+        kind: FailureKind.sessionExpired,
+        technicalDetails: fault.message,
+      );
+    }
+
     // Permission (spec section 21).
     if (text.contains('accesserror') ||
-        text.contains('accessdenied') ||
         text.contains('not allowed to') ||
         text.contains('you are not allowed') ||
         text.contains('sorry, you are not allowed')) {

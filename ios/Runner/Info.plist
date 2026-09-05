@@ -12,6 +12,39 @@
 	<string>Sijil IT lets you dictate a search instead of typing it, so you can look an asset up with one hand.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Sijil IT turns what you say into a search for an asset or an employee.</string>
+	<!--
+	  Export compliance, answered here once instead of by hand on every upload.
+
+	  App Store Connect asks whether the app uses non-exempt encryption every
+	  time a build is processed, and holds the build until somebody answers.
+	  This key is that answer, in the repository, where it can be reviewed
+	  against the code rather than remembered.
+
+	  "false" is accurate only because the app carries no encryption of its
+	  own. What it has:
+
+	    - HTTPS to the Odoo server, via the OS network stack — exempt.
+	    - Credentials in the Keychain, via flutter_secure_storage — the
+	      operating system's own encryption, exempt.
+	    - Face ID / passcode through LocalAuthentication — the OS again.
+	    - The Hive cache, encrypted at rest by iOS Data Protection because
+	      every file in the container is, with no cipher of ours on top.
+
+	  That last line is a decision, not an accident. The cache used to be
+	  wrapped in HiveAesCipher — an AES implementation shipped inside the app
+	  rather than taken from iOS, which is exactly the "standard encryption
+	  algorithms in addition to the encryption within Apple's operating
+	  system" case that makes an app non-exempt and drags every release into
+	  an export filing. It was removed for that reason; the reasoning in full
+	  is in lib/core/storage/cache/hive_cache_store.dart.
+
+	  So: if anyone ever adds a cipher, a key-derivation function, or a crypto
+	  package to this app, this key has to change to true and the compliance
+	  paperwork starts. Do not flip it back to false to make a build go
+	  through.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

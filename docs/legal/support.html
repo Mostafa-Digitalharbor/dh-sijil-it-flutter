@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — Sijil IT</title>
+<meta name="description" content="Help and contact for the Sijil IT mobile app by Digital Harbor.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1d21;
+    --muted: #5b6470;
+    --rule: #e3e7ec;
+    --accent: #0b5cab;
+    --card: #f6f8fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --fg: #e8ebee;
+      --muted: #9aa4b0;
+      --rule: #2a2f35;
+      --accent: #6ba8e8;
+      --card: #1c2025;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 .35rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.15rem; margin: 2.5rem 0 .75rem; }
+  h3 { font-size: 1rem; margin: 1.75rem 0 .4rem; }
+  .meta { color: var(--muted); font-size: .9rem; margin: 0; }
+  a { color: var(--accent); }
+  ul, ol { padding-inline-start: 1.25rem; }
+  li { margin: .4rem 0; }
+  .contact {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .contact p { margin: .4rem 0; }
+  .fix { color: var(--muted); }
+  .fix strong { color: var(--fg); }
+  .switch { display: inline-flex; gap: .5rem; align-items: center; margin-top: 1rem; font-size: .9rem; }
+  .switch button {
+    font: inherit; color: var(--accent); background: none;
+    border: 1px solid var(--rule); border-radius: 6px;
+    padding: .35rem .7rem; cursor: pointer;
+  }
+  .switch button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  [dir="rtl"] { text-align: right; }
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Sijil IT — Support</h1>
+    <p class="meta">Digital Harbor</p>
+    <div class="switch">
+      <button id="btn-en" aria-pressed="true">English</button>
+      <button id="btn-ar" aria-pressed="false">العربية</button>
+    </div>
+  </header>
+
+  <!-- ─────────────────────────── ENGLISH ─────────────────────────── -->
+  <main id="en">
+
+    <div class="contact">
+      <p><strong>Email us:</strong>
+        <a href="mailto:support@digital-harbor.net">support@digital-harbor.net</a></p>
+      <p class="meta">We reply within one business day, Sunday to Thursday.</p>
+    </div>
+
+    <h2>What you need before you start</h2>
+    <p>Sijil IT is a client for Odoo. It has no database of its own, so it
+    needs a server you already run:</p>
+    <ul>
+      <li>Odoo 17, 18 or 19, reachable over HTTPS</li>
+      <li>The <strong>Maintenance</strong> app installed — this is what holds
+      the assets. Adding <strong>Employees</strong> unlocks assignment and the
+      staff directory; <strong>Inventory</strong> adds a second asset source.</li>
+      <li>A user account with read access to those models. The app never works
+      around an Odoo permission — if your account cannot see something, neither
+      can the app.</li>
+    </ul>
+
+    <h2>Signing in</h2>
+    <ol>
+      <li>Enter your server address, for example <code>https://company.odoo.com</code>.</li>
+      <li>Tap <strong>Detect databases</strong>. The app asks the server which
+      databases it hosts and fills in the name for you.</li>
+      <li>Tap <strong>Test connection</strong> to confirm the server answers and
+      to see which Odoo apps it has.</li>
+      <li>Continue, then sign in with your Odoo username and password — or,
+      better, an API key.</li>
+    </ol>
+    <p>To create an API key in Odoo: <em>Preferences → Account Security → New
+    API Key</em>. An API key can be revoked without changing your password.</p>
+
+    <h2>Common problems</h2>
+
+    <h3>"This server keeps its database list private"</h3>
+    <p class="fix">Not an error. Most production instances switch off database
+    listing on purpose. <strong>Type the database name into the Database field
+    by hand</strong> — your Odoo administrator can confirm the exact name, and
+    it is case-sensitive.</p>
+
+    <h3>"Database not found"</h3>
+    <p class="fix">The name is almost right but not exact. Database names are
+    <strong>case-sensitive</strong>, and a hosted Odoo database is often named
+    after the subdomain rather than the company.</p>
+
+    <h3>Sign-in is refused although the password is correct</h3>
+    <p class="fix">Check that you are on the right toggle — <strong>Password</strong>
+    versus <strong>API key</strong>. An API key entered as a password will be
+    rejected, and the other way round. If your Odoo enforces two-factor
+    authentication, you must use an API key.</p>
+
+    <h3>A screen or a button is missing</h3>
+    <p class="fix">That is deliberate. The app checks which Odoo apps you have
+    and hides what it cannot support rather than showing something broken. If
+    the maintenance screens are missing, the <strong>Maintenance</strong> app is
+    not installed; if assignment is missing, it is <strong>Employees</strong>.</p>
+
+    <h3>The scanner says camera access is off</h3>
+    <p class="fix">Open <em>iOS Settings → Sijil IT → Camera</em> and turn it
+    back on, or use the button on that screen, which takes you straight there.
+    You can always search for an asset instead of scanning it.</p>
+
+    <h3>Changes are not appearing in Odoo</h3>
+    <p class="fix">You were probably offline when you made them. Open
+    <strong>Sync</strong> to see exactly what is still queued and why. Nothing
+    is lost — the queue survives closing the app, and empties when the
+    connection returns.</p>
+
+    <h2>Reporting a bug</h2>
+    <p>Open <em>Settings → Diagnostics</em>, which holds a recent record of what
+    went wrong with passwords and keys already stripped out. Send us that,
+    along with:</p>
+    <ul>
+      <li>What you were doing when it happened</li>
+      <li>Your Odoo version, and the app version from <em>Settings → About</em></li>
+      <li>Your device and iOS or Android version</li>
+    </ul>
+    <p>Please do not send passwords or API keys. We never need them.</p>
+
+    <h2>Privacy</h2>
+    <p>Your data goes to your own Odoo server and never to us. Details in the
+    <a href="privacy-policy.html">privacy policy</a>.</p>
+
+  </main>
+
+  <!-- ─────────────────────────── العربية ─────────────────────────── -->
+  <main id="ar" dir="rtl" lang="ar" hidden>
+
+    <div class="contact">
+      <p><strong>راسلنا:</strong>
+        <a href="mailto:support@digital-harbor.net">support@digital-harbor.net</a></p>
+      <p class="meta">نرد خلال يوم عمل واحد، من الأحد إلى الخميس.</p>
+    </div>
+
+    <h2>ما تحتاجه قبل البدء</h2>
+    <p>«سجل IT» تطبيق يتصل بـ Odoo، وليست له قاعدة بيانات خاصة به، لذا يحتاج
+    خادمًا يعمل لديك بالفعل:</p>
+    <ul>
+      <li>Odoo 17 أو 18 أو 19، متاح عبر HTTPS</li>
+      <li>تطبيق <strong>الصيانة (Maintenance)</strong> مثبّتًا — فهو الذي يحمل
+      الأصول. وإضافة <strong>الموظفين (Employees)</strong> تفتح الإسناد ودليل
+      الموظفين، و<strong>المخزون (Inventory)</strong> يضيف مصدرًا ثانيًا
+      للأصول.</li>
+      <li>حساب له صلاحية الاطلاع على هذه النماذج. التطبيق لا يتجاوز صلاحيات
+      Odoo إطلاقًا — فما لا يراه حسابك لا يراه التطبيق.</li>
+    </ul>
+
+    <h2>تسجيل الدخول</h2>
+    <ol>
+      <li>أدخل عنوان الخادم، مثل <code>https://company.odoo.com</code>.</li>
+      <li>اضغط <strong>اكتشاف قواعد البيانات</strong>، ليسأل التطبيق الخادم عن
+      قواعد البيانات لديه ويملأ الاسم نيابة عنك.</li>
+      <li>اضغط <strong>اختبار الاتصال</strong> للتأكد من استجابة الخادم ومعرفة
+      تطبيقات Odoo المثبّتة عليه.</li>
+      <li>تابِع، ثم سجّل الدخول باسم المستخدم وكلمة المرور — أو بمفتاح API وهو
+      الأفضل.</li>
+    </ol>
+    <p>لإنشاء مفتاح API في Odoo: <em>التفضيلات ← أمان الحساب ← مفتاح API
+    جديد</em>. ويمكن إلغاء المفتاح دون تغيير كلمة المرور.</p>
+
+    <h2>مشكلات شائعة</h2>
+
+    <h3>«هذا الخادم يُبقي قائمة قواعد بياناته خاصة»</h3>
+    <p class="fix">ليست مشكلة. أغلب الخوادم الإنتاجية تعطّل عرض القائمة عن قصد.
+    <strong>اكتب اسم قاعدة البيانات يدويًا</strong> — يؤكده لك مسؤول Odoo لديك،
+    وهو حسّاس لحالة الأحرف.</p>
+
+    <h3>«قاعدة البيانات غير موجودة»</h3>
+    <p class="fix">الاسم قريب لكنه غير مطابق. الأسماء <strong>حسّاسة لحالة
+    الأحرف</strong>، وغالبًا ما تُسمّى قاعدة البيانات المستضافة باسم النطاق
+    الفرعي لا باسم الشركة.</p>
+
+    <h3>يُرفض الدخول رغم صحة كلمة المرور</h3>
+    <p class="fix">تأكد من المفتاح الصحيح: <strong>كلمة مرور</strong> أم
+    <strong>مفتاح API</strong>. فإدخال مفتاح API مكان كلمة المرور يُرفض والعكس
+    كذلك. وإن كان Odoo لديك يفرض التحقق بخطوتين، فمفتاح API إلزامي.</p>
+
+    <h3>شاشة أو زر غير ظاهر</h3>
+    <p class="fix">هذا مقصود. يفحص التطبيق تطبيقات Odoo المتاحة ويخفي ما لا
+    يستطيع دعمه بدل أن يعرض شيئًا معطّلًا. فغياب شاشات الصيانة يعني أن تطبيق
+    <strong>الصيانة</strong> غير مثبّت، وغياب الإسناد يعني
+    <strong>الموظفين</strong>.</p>
+
+    <h3>الماسح يقول إن إذن الكاميرا مغلق</h3>
+    <p class="fix">افتح <em>الإعدادات ← سجل IT ← الكاميرا</em> وفعّله، أو استخدم
+    الزر في تلك الشاشة الذي ينقلك إليها مباشرة. ويمكنك دائمًا البحث عن الأصل
+    بدل مسحه.</p>
+
+    <h3>التغييرات لا تظهر في Odoo</h3>
+    <p class="fix">غالبًا كنت دون اتصال وقت إجرائها. افتح
+    <strong>المزامنة</strong> لترى ما لا يزال في الانتظار وسببه. لا شيء يضيع —
+    فقائمة الانتظار تبقى بعد إغلاق التطبيق وتُفرَّغ عند عودة الاتصال.</p>
+
+    <h2>الإبلاغ عن خلل</h2>
+    <p>افتح <em>الإعدادات ← التشخيص</em>، وفيه سجل حديث لما حدث بعد إزالة كلمات
+    المرور والمفاتيح منه. أرسله لنا مع:</p>
+    <ul>
+      <li>ما كنت تفعله وقت حدوث المشكلة</li>
+      <li>إصدار Odoo، وإصدار التطبيق من <em>الإعدادات ← حول</em></li>
+      <li>طراز جهازك وإصدار نظامه</li>
+    </ul>
+    <p>من فضلك لا ترسل كلمات مرور أو مفاتيح API. نحن لا نحتاجها أبدًا.</p>
+
+    <h2>الخصوصية</h2>
+    <p>بياناتك تذهب إلى خادم Odoo الخاص بك ولا تصل إلينا. التفاصيل في
+    <a href="privacy-policy.html">سياسة الخصوصية</a>.</p>
+
+  </main>
+
+  <footer>
+    <p>© 2026 Digital Harbor. Sijil IT is not affiliated with or endorsed by
+    Odoo S.A. Odoo is a trademark of Odoo S.A.</p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var en = document.getElementById('en');
+    var ar = document.getElementById('ar');
+    var btnEn = document.getElementById('btn-en');
+    var btnAr = document.getElementById('btn-ar');
+
+    function show(lang) {
+      var arabic = lang === 'ar';
+      en.hidden = arabic;
+      ar.hidden = !arabic;
+      btnEn.setAttribute('aria-pressed', String(!arabic));
+      btnAr.setAttribute('aria-pressed', String(arabic));
+      document.documentElement.lang = arabic ? 'ar' : 'en';
+    }
+
+    btnEn.addEventListener('click', function () { show('en'); });
+    btnAr.addEventListener('click', function () { show('ar'); });
+
+    if ((navigator.language || '').slice(0, 2) === 'ar') show('ar');
+  })();
+</script>
+
+</body>
+</html>

@@ -71,12 +71,8 @@ class _MaintenanceListViewState extends State<_MaintenanceListView> {
             onToggleOpen: (value) => cubit.showOnlyOpen(value: value),
             onPickType: cubit.filterByType,
           ),
-          body: PaginatedListView<MaintenanceRequest>(
-            items: state.requests,
-            status: state.status,
-            failure: state.failure,
-            hasMore: state.hasMore,
-            isLoadingMore: state.isLoadingMore,
+          body: PaginatedListView<MaintenanceRequest>.fromState(
+            state: state,
             onRefresh: () => cubit.load(refresh: true),
             onLoadMore: cubit.loadMore,
             onRetry: cubit.load,

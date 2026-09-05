@@ -36,6 +36,14 @@ class OdooConnection extends Equatable {
   Uri get objectEndpoint => _endpoint(AppConstants.xmlRpcObjectPath);
   Uri get dbEndpoint => _endpoint(AppConstants.xmlRpcDbPath);
 
+  /// The web client's own database list, used only when [dbEndpoint] refuses.
+  ///
+  /// Not an XML-RPC endpoint and deliberately not named like one: it is the
+  /// JSON route the Odoo login page calls to fill its dropdown, and it is the
+  /// only way to read the list on a hosted instance, where `/xmlrpc/2/db` is
+  /// switched off.
+  Uri get databaseListEndpoint => _endpoint(AppConstants.webDatabaseListPath);
+
   bool get isSecure => baseUrl.scheme == 'https';
 
   Uri _endpoint(String path) {

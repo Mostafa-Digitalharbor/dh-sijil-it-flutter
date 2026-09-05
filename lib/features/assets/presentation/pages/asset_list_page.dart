@@ -115,6 +115,7 @@ class _AssetListViewState extends State<_AssetListView> {
       filename: FileShare.safeName(l10n.exportAssetsTitle, 'csv'),
       subject: '${l10n.exportAssetsTitle} — ${copy.subtitle}',
       mimeType: 'text/csv',
+      hasContent: assets.isNotEmpty,
       build: () async =>
           Uint8List.fromList(utf8.encode(AssetListExport.csv(assets, copy))),
     );
@@ -142,6 +143,7 @@ class _AssetListViewState extends State<_AssetListView> {
       filename: FileShare.safeName(l10n.labelSheetTitle, 'pdf'),
       subject: '${l10n.labelSheetTitle} — ${copy.subtitle}',
       mimeType: 'application/pdf',
+      hasContent: assets.isNotEmpty,
       build: () =>
           AssetLabelSheetExport.build(assets: assets, copy: copy, theme: theme),
     );
@@ -268,12 +270,8 @@ class _AssetListViewState extends State<_AssetListView> {
                   child: const Icon(Icons.add_rounded),
                 )
               : null,
-          body: PaginatedListView<Asset>(
-            items: state.assets,
-            status: state.status,
-            failure: state.failure,
-            hasMore: state.hasMore,
-            isLoadingMore: state.isLoadingMore,
+          body: PaginatedListView<Asset>.fromState(
+            state: state,
             onRefresh: () => cubit.load(refresh: true),
             onLoadMore: cubit.loadMore,
             onRetry: cubit.load,
@@ -336,6 +334,7 @@ class _SelectionScaffold extends StatelessWidget {
       title: l10n.selectionCount(state.selectedIds.length),
       compactTitle: true,
       leading: AppCloseButton(
+        tooltip: l10n.selectionCancel,
         onPressed: state.isBulkWorking ? null : cubit.endSelection,
       ),
       actions: <Widget>[
@@ -357,12 +356,8 @@ class _SelectionScaffold extends StatelessWidget {
         onMove: onMove,
         onLabels: onLabels,
       ),
-      body: PaginatedListView<Asset>(
-        items: state.assets,
-        status: state.status,
-        failure: state.failure,
-        hasMore: state.hasMore,
-        isLoadingMore: state.isLoadingMore,
+      body: PaginatedListView<Asset>.fromState(
+        state: state,
         onRefresh: () => cubit.load(refresh: true),
         onLoadMore: cubit.loadMore,
         onRetry: cubit.load,

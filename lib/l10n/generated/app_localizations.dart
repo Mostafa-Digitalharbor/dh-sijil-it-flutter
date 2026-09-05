@@ -2155,12 +2155,6 @@ abstract class AppL10n {
   /// **'{months,plural, =1{1 month left of its expected life} other{{months} months left of its expected life}}'**
   String lifecycleRemaining(int months);
 
-  /// No description provided for @lifecycleReplaceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Replace'**
-  String get lifecycleReplaceLabel;
-
   /// No description provided for @lifecycleTitle.
   ///
   /// In en, this message translates to:
@@ -3528,12 +3522,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Nothing was heard. Try again, closer to the phone.'**
   String get voiceHeardNothing;
-
-  /// No description provided for @voiceListening.
-  ///
-  /// In en, this message translates to:
-  /// **'Listening…'**
-  String get voiceListening;
 
   /// No description provided for @voiceSearchStart.
   ///

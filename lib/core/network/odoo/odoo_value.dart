@@ -50,12 +50,23 @@ extension OdooValueReader on OdooRecord {
           '\n',
         )
         .replaceAll(RegExp(r'<[^>]+>'), '')
+        // `&amp;` is decoded **last**, and the order is the whole point.
+        //
+        // Odoo escapes a note before it stores it, so an asset actually named
+        // `Dell &lt;Pro&gt;` arrives as `&amp;lt;Pro&amp;gt;`. Decoding
+        // `&amp;` first turns that into `&lt;Pro&gt;`, which the next pass
+        // then decodes again into `<Pro>` — and the tag stripper above has
+        // already run, so the app shows markup the record never contained.
+        // Decoding the character entities first and the ampersand after means
+        // one pass of unescaping, which is the one Odoo applied.
         .replaceAll('&nbsp;', ' ')
-        .replaceAll('&amp;', '&')
         .replaceAll('&lt;', '<')
         .replaceAll('&gt;', '>')
         .replaceAll('&quot;', '"')
+        .replaceAll('&#34;', '"')
         .replaceAll('&#39;', "'")
+        .replaceAll('&apos;', "'")
+        .replaceAll('&amp;', '&')
         .replaceAll(RegExp(r'\n{3,}'), '\n\n')
         .trim();
 

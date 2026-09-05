@@ -66,12 +66,8 @@ class _EmployeeListViewState extends State<_EmployeeListView> {
             onSearch: cubit.search,
             onPickDepartment: cubit.filterByDepartment,
           ),
-          body: PaginatedListView<Employee>(
-            items: state.employees,
-            status: state.status,
-            failure: state.failure,
-            hasMore: state.hasMore,
-            isLoadingMore: state.isLoadingMore,
+          body: PaginatedListView<Employee>.fromState(
+            state: state,
             skeletonHasChips: false,
             onRefresh: () => cubit.load(refresh: true),
             onLoadMore: cubit.loadMore,

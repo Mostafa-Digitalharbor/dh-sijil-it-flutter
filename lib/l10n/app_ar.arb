@@ -555,7 +555,6 @@
       }
     }
   },
-  "lifecycleReplaceLabel": "استبدال",
   "lifecycleTitle": "عمر التشغيل",
   "lifecycleUnknown": "لا يوجد تاريخ شراء مسجّل",
   "lifecycleUnknownHint": "أضف تاريخ الشراء لتعرف كم بقي من عمر هذا الأصل وكم كلّف سنويًا.",
@@ -1064,7 +1063,6 @@
   "validationHttpsRequired": "يجب أن يبدأ عنوان الخادم بـ https://",
   "validationInvalidUrl": "هذا لا يبدو عنوان خادم صالحًا.",
   "voiceHeardNothing": "لم يُسمع شيء. أعد المحاولة من مسافة أقرب للهاتف.",
-  "voiceListening": "يستمع…",
   "voiceSearchStart": "البحث بالصوت",
   "voiceSearchStop": "إيقاف الاستماع",
   "warrantyEnds": "ينتهي {date}",

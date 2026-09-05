@@ -7,9 +7,11 @@ import 'package:sijil_it/core/network/odoo/odoo_name_ref.dart';
 import 'package:sijil_it/features/assets/domain/entities/asset_query.dart';
 import 'package:sijil_it/features/assets/domain/entities/asset_status.dart';
 import 'package:sijil_it/features/assets/presentation/widgets/asset_filter_sheet.dart';
+import 'package:sijil_it/features/assets/presentation/widgets/asset_status_sheet.dart';
 import 'package:sijil_it/features/attachments/domain/entities/record_photo.dart';
 import 'package:sijil_it/features/attachments/domain/usecases/attachment_usecases.dart';
 import 'package:sijil_it/features/attachments/presentation/pages/photo_viewer_page.dart';
+import 'package:sijil_it/l10n/generated/app_localizations.dart';
 import 'package:sijil_it/shared/widgets/app_sheets.dart';
 import 'package:sijil_it/shared/widgets/state_views.dart';
 
@@ -237,6 +239,112 @@ void main() {
         ),
       ),
     );
+
+    for (final (sizeName, size) in TestSizes.all) {
+      testWidgets('fits a $sizeName', (tester) async {
+        await tester.pumpWidget(
+          TestApp(size: size, child: signedInScreen(host())),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expectNoOverflow(tester);
+      });
+    }
+
+    testWidgets('fits the worst case', (tester) async {
+      await pumpWorstCase(tester, host());
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expectNoOverflow(tester);
+    });
+  });
+
+  // The real status picker, which the generic option-sheet group above only
+  // imitates. Worth its own group because the thing most likely to go wrong
+  // with it is not layout: it is the menu offering a status the app cannot
+  // actually set.
+  group('asset status sheet', () {
+    late AssetStatus? picked;
+
+    Widget host() => Builder(
+      builder: (context) => Scaffold(
+        body: TextButton(
+          onPressed: () async {
+            picked = await AssetStatusSheet.show(
+              context,
+              current: AssetStatus.available,
+            );
+          },
+          child: const Text('open'),
+        ),
+      ),
+    );
+
+    setUp(() => picked = null);
+
+    testWidgets('offers only the states the app can actually set', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        TestApp(size: TestSizes.phone, child: signedInScreen(host())),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      final l10n = AppL10n.of(tester.element(find.byType(Scaffold).first));
+
+      // The three Odoo has no field for, plus the way back to Available.
+      for (final label in <String>[
+        l10n.assetMarkAvailable,
+        l10n.assetMarkReserved,
+        l10n.assetMarkDamaged,
+        l10n.assetMarkLost,
+      ]) {
+        expect(find.text(label), findsOneWidget, reason: label);
+      }
+
+      // Facts Odoo owns. Offering them would imply the app can write something
+      // it can only read.
+      for (final label in <String>[
+        l10n.statusAssigned,
+        l10n.statusMaintenance,
+        l10n.statusRetired,
+      ]) {
+        expect(find.text(label), findsNothing, reason: label);
+      }
+    });
+
+    testWidgets('returns the status the user chose', (tester) async {
+      await tester.pumpWidget(
+        TestApp(size: TestSizes.phone, child: signedInScreen(host())),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      final l10n = AppL10n.of(tester.element(find.byType(Scaffold).first));
+      await tester.tap(find.text(l10n.assetMarkDamaged));
+      await tester.pumpAndSettle();
+
+      expect(picked, AssetStatus.damaged);
+    });
+
+    testWidgets('dismissing it records no change', (tester) async {
+      await tester.pumpWidget(
+        TestApp(size: TestSizes.phone, child: signedInScreen(host())),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      // Tapping the scrim is how a user backs out of a decision.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(picked, isNull);
+    });
 
     for (final (sizeName, size) in TestSizes.all) {
       testWidgets('fits a $sizeName', (tester) async {

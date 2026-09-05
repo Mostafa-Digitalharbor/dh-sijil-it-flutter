@@ -6,7 +6,6 @@
 abstract final class SecureKeys {
   static const String odooPassword = 'odoo_password';
   static const String odooApiKey = 'odoo_api_key';
-  static const String hiveEncryptionKey = 'hive_cipher_key';
 
   const SecureKeys._();
 }

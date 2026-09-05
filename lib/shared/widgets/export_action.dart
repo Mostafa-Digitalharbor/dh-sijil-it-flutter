@@ -53,15 +53,29 @@ abstract final class ExportAction {
   /// An export is a side errand: the user is looking at a list they still
   /// want. Replacing it with a failure view because a share sheet did not
   /// open would cost them the thing they came for.
+  ///
+  /// [hasContent] is the caller's answer to "is there anything to put in the
+  /// file". False produces a sentence saying so and no file, which is the
+  /// difference between an honest refusal and handing somebody a PDF with a
+  /// header and no rows — the second reads as a broken export, and the user
+  /// has no way to tell it from one.
   static Future<void> share({
     required BuildContext context,
     required String filename,
     required String subject,
     required String mimeType,
     required Future<Uint8List> Function() build,
+    bool hasContent = true,
   }) async {
     final l10n = AppL10n.of(context);
     final messenger = ScaffoldMessenger.of(context);
+
+    if (!hasContent) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.exportNothingToShare)));
+      return;
+    }
 
     try {
       final bytes = await build();
@@ -73,6 +87,26 @@ abstract final class ExportAction {
       );
     } on FileAccessException catch (error) {
       AppLogger.warn('Export failed — ${error.message}');
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.exportFailed)));
+    } on Object catch (error, stackTrace) {
+      // Deliberately a catch-all, and the only one in the widget layer.
+      //
+      // Everything between the button and the OS share sheet is capable of
+      // throwing something that is not a `FileAccessException`: the PDF
+      // encoder on a row it cannot lay out, a font that failed to load, a
+      // platform channel on a device with no app willing to receive the file.
+      // None of those were caught, so they escaped an `onPressed` — which in
+      // release means the export silently does nothing and the user taps the
+      // button again.
+      //
+      // The wording stays [AppL10n.exportFailed] rather than being mapped
+      // through `FailurePresenter`: these are local, not server, failures, and
+      // "the file could not be prepared" is both true and the whole of what
+      // the user can act on. The detail goes to the log, which is what the
+      // diagnostics screen is for.
+      AppLogger.error('Export failed', error, stackTrace);
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(l10n.exportFailed)));

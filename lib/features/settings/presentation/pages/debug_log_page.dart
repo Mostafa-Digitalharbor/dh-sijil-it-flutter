@@ -13,6 +13,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/state_views.dart';
@@ -179,41 +180,32 @@ class _EntryCard extends StatelessWidget {
     final tone = isError ? AppColors.danger : AppColors.warning;
 
     return AppCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: AppMediaRow(
+        alignment: CrossAxisAlignment.start,
+        leading: Icon(
+          isError ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
+          size: AppDimens.iconLg,
+          color: tone,
+        ),
         children: <Widget>[
-          Icon(
-            isError ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
-            size: AppDimens.iconLg,
-            color: tone,
+          Text(
+            context.dates.dateAndTime(entry.at),
+            style: theme.textTheme.labelSmall,
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
+          const SizedBox(height: AppSpacing.xs),
+          // Technical text, so it keeps LTR reading order even in an
+          // Arabic UI — a reversed model name is not a diagnostic.
+          Directionality(
+            textDirection: TextDirection.ltr,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  context.dates.dateAndTime(entry.at),
-                  style: theme.textTheme.labelSmall,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                // Technical text, so it keeps LTR reading order even in an
-                // Arabic UI — a reversed model name is not a diagnostic.
-                Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(entry.message, style: theme.textTheme.bodyMedium),
-                      if (entry.detail != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(entry.detail!, style: theme.textTheme.bodySmall),
-                      ],
-                    ],
-                  ),
-                ),
+                Text(entry.message, style: theme.textTheme.bodyMedium),
+                if (entry.detail != null) ...<Widget>[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(entry.detail!, style: theme.textTheme.bodySmall),
+                ],
               ],
             ),
           ),

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_palette.dart';
-import '../../app/theme/app_spacing.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'app_media_row.dart';
 
 /// The signed-in person, at the top of the dashboard.
 ///
@@ -57,34 +57,25 @@ class GreetingHeader extends StatelessWidget {
     final palette = context.palette;
     final text = Theme.of(context).textTheme;
 
-    return Row(
+    return AppMediaRow(
+      leading: UserAvatar(name: name, photo: photo),
+      trailing: trailing,
       children: <Widget>[
-        UserAvatar(name: name, photo: photo),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                greetingFor(l10n, now ?? DateTime.now()),
-                style: text.headlineSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                name,
-                style: text.bodySmall?.copyWith(
-                  color: palette.dim,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+        Text(
+          greetingFor(l10n, now ?? DateTime.now()),
+          style: text.headlineSmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        if (trailing != null) trailing!,
+        Text(
+          name,
+          style: text.bodySmall?.copyWith(
+            color: palette.dim,
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }

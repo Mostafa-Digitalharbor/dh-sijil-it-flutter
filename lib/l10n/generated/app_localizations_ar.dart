@@ -1358,9 +1358,6 @@ class AppL10nAr extends AppL10n {
   }
 
   @override
-  String get lifecycleReplaceLabel => 'استبدال';
-
-  @override
   String get lifecycleTitle => 'عمر التشغيل';
 
   @override
@@ -2374,9 +2371,6 @@ class AppL10nAr extends AppL10n {
   @override
   String get voiceHeardNothing =>
       'لم يُسمع شيء. أعد المحاولة من مسافة أقرب للهاتف.';
-
-  @override
-  String get voiceListening => 'يستمع…';
 
   @override
   String get voiceSearchStart => 'البحث بالصوت';

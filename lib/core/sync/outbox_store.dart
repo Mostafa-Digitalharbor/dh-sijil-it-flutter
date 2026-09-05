@@ -7,9 +7,10 @@ import 'outbox_entry.dart';
 
 /// The queue of writes waiting for a connection.
 ///
-/// Backed by the same encrypted Hive store as the read cache, because the
-/// payloads name employees and assets — that is company data, and it sits on
-/// the device for as long as the technician is out of signal.
+/// Backed by the same Hive store as the read cache, which the platform
+/// encrypts at rest along with the rest of the app container — the payloads
+/// name employees and assets, that is company data, and it sits on the device
+/// for as long as the technician is out of signal.
 ///
 /// Ordering is by [OutboxEntry.queuedAt] and it is load-bearing: assigning an
 /// asset and then returning it must replay in that order, or the asset ends up

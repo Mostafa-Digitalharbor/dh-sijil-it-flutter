@@ -12,6 +12,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../assets/presentation/widgets/asset_icons.dart';
 import '../cubit/scanner_cubit.dart';
 
@@ -83,49 +84,40 @@ class _MatchFound extends StatelessWidget {
     final theme = Theme.of(context);
     final asset = state.match!;
 
-    return Row(
+    return AppMediaRow(
+      leading: AppLeadingTile(
+        icon: AssetIcons.forCategory(asset.category?.name),
+        tone: AppColors.statusAvailable,
+      ),
+      gap: AppSpacing.sm,
+      trailing: AppButton(
+        label: l10n.actionOpen,
+        expand: false,
+        isCompact: true,
+        onPressed: () {
+          context.read<ScannerCubit>().reset();
+          context.go(AppRoutes.assetDetailPath(asset.id));
+        },
+      ),
       children: <Widget>[
-        AppLeadingTile(
-          icon: AssetIcons.forCategory(asset.category?.name),
-          tone: AppColors.statusAvailable,
+        Text(
+          l10n.scanMatched(state.lastCode ?? ''),
+          style: theme.textTheme.labelSmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                l10n.scanMatched(state.lastCode ?? ''),
-                style: theme.textTheme.labelSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                asset.name,
-                style: theme.textTheme.titleSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                asset.subtitle ?? '',
-                style: theme.textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+        const SizedBox(height: AppSpacing.xxs),
+        Text(
+          asset.name,
+          style: theme.textTheme.titleSmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(width: AppSpacing.sm),
-        AppButton(
-          label: l10n.actionOpen,
-          expand: false,
-          isCompact: true,
-          onPressed: () {
-            context.read<ScannerCubit>().reset();
-            context.go(AppRoutes.assetDetailPath(asset.id));
-          },
+        Text(
+          asset.subtitle ?? '',
+          style: theme.textTheme.bodySmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -150,32 +142,23 @@ class _NoMatch extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Row(
+        AppMediaRow(
+          leading: const AppLeadingTile(
+            icon: Icons.search_off_rounded,
+            tone: AppColors.warning,
+          ),
           children: <Widget>[
-            const AppLeadingTile(
-              icon: Icons.search_off_rounded,
-              tone: AppColors.warning,
+            Text(
+              l10n.scanNoMatchTitle,
+              style: theme.textTheme.titleSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    l10n.scanNoMatchTitle,
-                    style: theme.textTheme.titleSmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    l10n.scanNoMatchBody(state.unmatchedCode ?? ''),
-                    style: theme.textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            Text(
+              l10n.scanNoMatchBody(state.unmatchedCode ?? ''),
+              style: theme.textTheme.bodySmall,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -223,29 +206,20 @@ class _LookupFailed extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Row(
+        AppMediaRow(
+          leading: AppLeadingTile(icon: presented.icon, tone: AppColors.danger),
           children: <Widget>[
-            AppLeadingTile(icon: presented.icon, tone: AppColors.danger),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    presented.title,
-                    style: theme.textTheme.titleSmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    presented.fix,
-                    style: theme.textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            Text(
+              presented.title,
+              style: theme.textTheme.titleSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              presented.fix,
+              style: theme.textTheme.bodySmall,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

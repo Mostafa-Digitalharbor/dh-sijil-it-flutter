@@ -7,6 +7,7 @@ import '../../core/responsive/responsive.dart';
 import '../utils/app_text.dart';
 import 'app_avatar.dart';
 import 'app_card.dart';
+import 'app_media_row.dart';
 
 /// The list row used across assets, employees and maintenance.
 ///
@@ -165,41 +166,32 @@ class AppSelectableTile extends StatelessWidget {
       onTap: onTap,
       selected: selected,
       semanticLabel: '$title, $subtitle',
-      child: Row(
+      child: AppMediaRow(
+        leading: AppAvatar(name: title, emphasised: selected),
+        gap: AppSpacing.sm,
+        trailing: _SelectionMark(selected: selected),
         children: [
-          AppAvatar(name: title, emphasised: selected),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (caption != null)
-                  Text(
-                    caption!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
+          Text(
+            title,
+            style: theme.textTheme.titleSmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: AppSpacing.sm),
-          _SelectionMark(selected: selected),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (caption != null)
+            Text(
+              caption!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
         ],
       ),
     );
@@ -293,34 +285,26 @@ class AppSettingTile extends StatelessWidget {
                   ),
                 )
               : null,
-          child: Row(
+          child: AppMediaRow(
+            leading: Icon(icon, size: AppDimens.iconXl, color: color),
+            trailing: onTap != null && showChevron
+                ? Icon(
+                    Icons.chevron_right_rounded,
+                    size: AppDimens.iconXl,
+                    color: theme.colorScheme.outlineVariant,
+                  )
+                : null,
             children: [
-              Icon(icon, size: AppDimens.iconXl, color: color),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(color: tone),
-                    ),
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.bodySmall,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(color: tone),
               ),
-              if (onTap != null && showChevron)
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: AppDimens.iconXl,
-                  color: theme.colorScheme.outlineVariant,
+              if (subtitle != null)
+                Text(
+                  subtitle!,
+                  style: theme.textTheme.bodySmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
             ],
           ),
@@ -364,25 +348,16 @@ class AppActivityTile extends StatelessWidget {
               ),
             )
           : null,
-      child: Row(
+      child: AppMediaRow(
+        leading: AppLeadingTile.small(icon: icon, tone: tone),
         children: [
-          AppLeadingTile.small(icon: icon, tone: tone),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(timestamp, style: theme.textTheme.bodySmall),
-              ],
-            ),
+          Text(
+            title,
+            style: theme.textTheme.titleSmall,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
+          Text(timestamp, style: theme.textTheme.bodySmall),
         ],
       ),
     );

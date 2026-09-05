@@ -318,16 +318,17 @@ void main() {
     });
   });
 
-  // ── 3. Outbox quarantine, through the encrypted store ──────────────────────
+  // ── 3. Outbox quarantine, through the on-disk store ────────────────────────
 
-  group('quarantine survives real encrypted storage', () {
+  group('quarantine survives real on-disk storage', () {
     late HiveCacheStore cache;
     late OutboxStore outbox;
 
     setUp(() async {
-      // The real store, keyed by a real keystore secret — not the harness's
-      // `InMemoryCache`. This is the whole point of the group.
-      cache = HiveCacheStore(CredentialVault.createDefault());
+      // The real store, writing real Hive files to the device's own app
+      // container — not the harness's `InMemoryCache`. This is the whole
+      // point of the group.
+      cache = HiveCacheStore();
       await cache.init();
       outbox = OutboxStore(cache);
       // The emulator carries whatever the app itself last queued.

@@ -56,12 +56,8 @@ class _EmployeeAssetsView extends StatelessWidget {
               : null,
           showBack: true,
           onBack: () => context.go(AppRoutes.employeeDetailPath(employeeId)),
-          body: PaginatedListView<Asset>(
-            items: state.assets,
-            status: state.status,
-            failure: state.failure,
-            hasMore: state.hasMore,
-            isLoadingMore: state.isLoadingMore,
+          body: PaginatedListView<Asset>.fromState(
+            state: state,
             onRefresh: () => cubit.load(refresh: true),
             onLoadMore: cubit.loadMore,
             onRetry: cubit.load,

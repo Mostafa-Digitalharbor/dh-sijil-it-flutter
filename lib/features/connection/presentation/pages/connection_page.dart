@@ -13,6 +13,7 @@ import '../../../../shared/utils/l10n_lookup.dart';
 import '../../../../shared/widgets/app_brand_header.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -306,32 +307,20 @@ class _DetectUnsupportedNotice extends StatelessWidget {
     return Padding(
       padding: const EdgeInsetsDirectional.only(top: AppSpacing.md),
       child: AppCard(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: AppMediaRow(
+          alignment: CrossAxisAlignment.start,
+          leading: Icon(
+            Icons.info_outline_rounded,
+            size: AppDimens.iconLg,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           children: [
-            Icon(
-              Icons.info_outline_rounded,
-              size: AppDimens.iconLg,
-              color: theme.colorScheme.onSurfaceVariant,
+            Text(
+              l10n.detectUnsupportedTitle,
+              style: theme.textTheme.titleSmall,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    l10n.detectUnsupportedTitle,
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    l10n.detectUnsupportedBody,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(l10n.detectUnsupportedBody, style: theme.textTheme.bodySmall),
           ],
         ),
       ),

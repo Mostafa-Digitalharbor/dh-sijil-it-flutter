@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sijil_it/app/di/injector.dart';
 import 'package:sijil_it/app/theme/app_theme.dart';
 import 'package:sijil_it/core/network/connectivity/network_info.dart';
+import 'package:sijil_it/core/network/jsonrpc/json_rpc_client.dart';
 import 'package:sijil_it/core/network/odoo/odoo_connection.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
 import 'package:sijil_it/core/security/app_lock.dart';
@@ -55,6 +56,9 @@ Future<InProcessOdooClient> configureTestDependencies({
 
   final client = InProcessOdooClient(data ?? FakeOdooData.seeded());
   sl.registerSingleton<XmlRpcClient>(client);
+  // The same object on both routes: one fake server, two transports, which is
+  // what a real Odoo host is.
+  sl.registerSingleton<JsonRpcClient>(client);
 
   // The real graph, on top of the doubles above. Nothing about repositories,
   // use cases or Cubits is re-declared here, so a widget test cannot drift from

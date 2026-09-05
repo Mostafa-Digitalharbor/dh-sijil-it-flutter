@@ -6,6 +6,7 @@ import 'package:sijil_it/core/error/error_mapper.dart';
 import 'package:sijil_it/core/error/exceptions.dart' as app;
 import 'package:sijil_it/core/error/failure_presenter.dart';
 import 'package:sijil_it/core/error/failures.dart';
+import 'package:sijil_it/core/network/jsonrpc/json_rpc_client.dart';
 import 'package:sijil_it/core/network/odoo/odoo_auth_service.dart';
 import 'package:sijil_it/core/network/odoo/odoo_capability_service.dart';
 import 'package:sijil_it/core/network/odoo/odoo_connection.dart';
@@ -54,7 +55,7 @@ void main() {
     vault = InMemoryVault();
     sessions = OdooSessionManager(vault);
     final client = DioXmlRpcClient.createDefault();
-    auth = OdooAuthService(client);
+    auth = OdooAuthService(client, DioJsonRpcClient.createDefault());
     object = OdooObjectService(client, sessions);
     capabilities = OdooCapabilityService(object, InMemoryCache());
 
@@ -145,6 +146,46 @@ void main() {
         expect(result, ['db1', 'db2']);
       },
     );
+
+    // The hosted-Odoo case, over a real socket. `/xmlrpc/2/db` is switched off
+    // — exactly as odoo.com ships it — and the web client's own JSON route
+    // answers, which is the only way to read the list on those instances.
+    test('listDatabases falls back to the web JSON route', () async {
+      await server.stop();
+      server = FakeOdooServer(
+        data: FakeOdooData(
+          serverVersion: '19.0',
+          database: 'acme-live-1',
+          login: 'a@b.c',
+          secret: 'k',
+          userId: 2,
+          installedModels: const {},
+          records: const {},
+          // Off, like a hosted instance.
+          allowDatabaseListing: false,
+          databases: const ['acme-live-1'],
+        ),
+      )..allowJsonDatabaseListing = true;
+      await server.start();
+
+      final result = await auth.listDatabases(
+        connection.copyWith(baseUrl: server.baseUrl, database: 'acme-live-1'),
+      );
+
+      expect(result, ['acme-live-1']);
+      // Asked the documented endpoint first, and only then the fallback.
+      expect(
+        server.calls.map((call) => call.path),
+        containsAllInOrder(<String>['/xmlrpc/2/db', '/web/database/list']),
+      );
+    });
+
+    test('listDatabases stays null when neither route answers', () async {
+      // Both off: a genuinely locked-down instance, where the free-text
+      // database field is the honest answer.
+      expect(server.allowJsonDatabaseListing, isFalse);
+      expect(await auth.listDatabases(connection), isNull);
+    });
   });
 
   // ── /xmlrpc/2/object — the nine required operations ───────────────────────
@@ -394,6 +435,42 @@ void main() {
           expect(failure.kind, FailureKind.accessDenied);
           expect(failure.model, 'maintenance.equipment');
           expect(failure.action, FailureAction.none);
+        }
+      },
+    );
+
+    // The other half of that pair, over the same socket. Odoo's two refusals
+    // look alike and are fixed in opposite places: an `AccessError` needs an
+    // administrator, a rejected credential needs the user to sign in again.
+    test(
+      'a stale credential ends the session rather than blaming the server',
+      () async {
+        // Exactly what Odoo 19 sends for `execute_kw` with a secret it no longer
+        // accepts: two words, fault code 3, nothing else to classify on.
+        sessions.start(
+          OdooSession(
+            connection: connection,
+            userId: server.data.userId,
+            serverVersion: '19.0',
+          ),
+        );
+        await vault.writeSecret('no-longer-valid', OdooAuthMode.apiKey);
+
+        try {
+          await object.searchRead(
+            model: OdooModels.maintenanceEquipment,
+            domain: const <List<Object?>>[],
+            fields: const <String>['id'],
+          );
+          fail('expected the server to refuse a stale secret');
+        } on Object catch (error) {
+          final failure = ErrorMapper.map(error);
+          expect(failure.kind, FailureKind.sessionExpired);
+          expect(
+            failure.action,
+            FailureAction.signIn,
+            reason: 'retrying cannot fix a credential the server rejects',
+          );
         }
       },
     );

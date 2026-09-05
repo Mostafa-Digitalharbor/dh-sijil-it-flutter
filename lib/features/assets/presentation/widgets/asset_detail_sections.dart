@@ -10,6 +10,7 @@ import '../../../../shared/utils/app_text.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_chip.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/key_value.dart';
 import '../../../../shared/widgets/state_views.dart';
 import '../../../../shared/widgets/status_chip.dart';
@@ -37,50 +38,37 @@ class AssetHeroCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          AppMediaRow(
+            alignment: CrossAxisAlignment.start,
+            leading: Container(
+              width: AppDimens.tileLg,
+              height: AppDimens.tileLg,
+              decoration: BoxDecoration(
+                color: primary.withValues(alpha: AppOpacities.overlay),
+                borderRadius: BorderRadius.circular(AppRadii.card),
+              ),
+              child: Icon(
+                AssetIcons.forCategory(asset.category?.name),
+                size: AppDimens.iconXxl,
+                color: AppColors.mint,
+              ),
+            ),
             children: <Widget>[
-              Container(
-                width: AppDimens.tileLg,
-                height: AppDimens.tileLg,
-                decoration: BoxDecoration(
-                  color: primary.withValues(alpha: AppOpacities.overlay),
-                  borderRadius: BorderRadius.circular(AppRadii.card),
-                ),
-                child: Icon(
-                  AssetIcons.forCategory(asset.category?.name),
-                  size: AppDimens.iconXxl,
-                  color: AppColors.mint,
-                ),
+              Text(
+                asset.name,
+                style: theme.textTheme.headlineSmall?.copyWith(color: primary),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      asset.name,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: primary,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (_descriptor.isNotEmpty) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        _descriptor,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: subdued,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
+              if (_descriptor.isNotEmpty) ...<Widget>[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  _descriptor,
+                  style: theme.textTheme.bodySmall?.copyWith(color: subdued),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -180,36 +168,28 @@ class AssetOwnershipSection extends StatelessWidget {
           else
             InkWell(
               onTap: onOpenEmployee,
-              child: Row(
+              child: AppMediaRow(
+                leading: AppAvatar(name: employee.name),
+                trailing: onOpenEmployee == null
+                    ? null
+                    : Icon(
+                        Icons.chevron_right_rounded,
+                        size: AppDimens.iconXl,
+                        color: theme.colorScheme.outlineVariant,
+                      ),
                 children: <Widget>[
-                  AppAvatar(name: employee.name),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          employee.name,
-                          style: theme.textTheme.titleSmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (asset.department != null)
-                          Text(
-                            asset.department!.name,
-                            style: theme.textTheme.bodySmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                      ],
-                    ),
+                  Text(
+                    employee.name,
+                    style: theme.textTheme.titleSmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (onOpenEmployee != null)
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: AppDimens.iconXl,
-                      color: theme.colorScheme.outlineVariant,
+                  if (asset.department != null)
+                    Text(
+                      asset.department!.name,
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                 ],
               ),
@@ -627,28 +607,20 @@ class AssetLocalStateNotice extends StatelessWidget {
     return AppCard(
       backgroundColor: tone.withValues(alpha: AppOpacities.overlay),
       borderColor: tone.withValues(alpha: AppOpacities.chipBorder),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: AppMediaRow(
+        alignment: CrossAxisAlignment.start,
+        leading: Icon(
+          Icons.history_rounded,
+          size: AppDimens.iconMd,
+          color: ink,
+        ),
         children: <Widget>[
-          Icon(Icons.history_rounded, size: AppDimens.iconMd, color: ink),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  l10n.statusKeptInLog,
-                  style: theme.textTheme.labelSmall?.copyWith(color: ink),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  l10n.assetLocalStateNote,
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
-            ),
+          Text(
+            l10n.statusKeptInLog,
+            style: theme.textTheme.labelSmall?.copyWith(color: ink),
           ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(l10n.assetLocalStateNote, style: theme.textTheme.bodySmall),
         ],
       ),
     );
@@ -713,39 +685,30 @@ class _RequestRow extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: AppDimens.minTapTarget),
         padding: const EdgeInsetsDirectional.symmetric(vertical: AppSpacing.sm),
-        child: Row(
+        child: AppMediaRow(
+          leading: AppLeadingTile.small(
+            icon: request.isDone
+                ? Icons.check_circle_outline_rounded
+                : Icons.build_rounded,
+            tone: tone,
+          ),
+          trailing: Icon(
+            Icons.chevron_right_rounded,
+            size: AppDimens.iconXl,
+            color: theme.colorScheme.outlineVariant,
+          ),
           children: <Widget>[
-            AppLeadingTile.small(
-              icon: request.isDone
-                  ? Icons.check_circle_outline_rounded
-                  : Icons.build_rounded,
-              tone: tone,
+            Text(
+              request.name,
+              style: theme.textTheme.titleSmall,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    request.name,
-                    style: theme.textTheme.titleSmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    _subtitle(context, l10n),
-                    style: theme.textTheme.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: AppDimens.iconXl,
-              color: theme.colorScheme.outlineVariant,
+            Text(
+              _subtitle(context, l10n),
+              style: theme.textTheme.bodySmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

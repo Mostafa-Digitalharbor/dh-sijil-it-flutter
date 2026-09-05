@@ -35,6 +35,29 @@ class PaginatedListView<T> extends StatefulWidget {
     super.key,
   });
 
+  /// The same list, wired from a [PaginatedViewState] instead of by hand.
+  ///
+  /// Every list screen in the app passed the same six values — items, status,
+  /// failure, hasMore, isLoadingMore — pulled out of a state object that
+  /// already held all of them together. This takes the state, which is both
+  /// shorter at the call site and impossible to get half right: there is no
+  /// longer a way to pass one screen's `items` beside another's `hasMore`.
+  PaginatedListView.fromState({
+    required PaginatedViewState<T> state,
+    required this.itemBuilder,
+    required this.onRefresh,
+    required this.onLoadMore,
+    required this.emptyView,
+    this.header,
+    this.onRetry,
+    this.skeletonHasChips = true,
+    super.key,
+  }) : items = state.items,
+       status = state.status,
+       failure = state.failure,
+       hasMore = state.hasMore,
+       isLoadingMore = state.isLoadingMore;
+
   final List<T> items;
   final ViewStatus status;
   final Failure? failure;

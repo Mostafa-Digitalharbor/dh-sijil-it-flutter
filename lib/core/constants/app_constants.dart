@@ -8,6 +8,14 @@ abstract final class AppConstants {
   static const String xmlRpcObjectPath = '/xmlrpc/2/object';
   static const String xmlRpcDbPath = '/xmlrpc/2/db';
 
+  /// The web client's database list.
+  ///
+  /// Not part of the XML-RPC surface above: it is the JSON route Odoo's own
+  /// login page calls, and the app uses it for one thing — reading the
+  /// database list on a hosted instance, where `/xmlrpc/2/db` is disabled and
+  /// answers `AccessDenied` to every caller.
+  static const String webDatabaseListPath = '/web/database/list';
+
   static const Duration connectTimeout = Duration(seconds: 20);
   static const Duration receiveTimeout = Duration(seconds: 45);
   static const Duration sendTimeout = Duration(seconds: 30);

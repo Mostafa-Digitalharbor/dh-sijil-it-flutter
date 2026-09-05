@@ -16,6 +16,7 @@ import '../../../../shared/utils/app_date_format.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_chip.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/async_data_view.dart';
 import '../../../../shared/widgets/key_value.dart';
@@ -227,32 +228,20 @@ class _RequestBody extends StatelessWidget {
           AppCard(
             onTap: () =>
                 context.go(AppRoutes.assetDetailPath(request.equipment!.id)),
-            child: Row(
+            child: AppMediaRow(
+              leading: const AppLeadingTile(icon: Icons.devices_other_rounded),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                size: AppDimens.iconXl,
+                color: theme.colorScheme.outlineVariant,
+              ),
               children: <Widget>[
-                const AppLeadingTile(icon: Icons.devices_other_rounded),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        l10n.assetDetailTitle,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                      Text(
-                        request.equipment!.name,
-                        style: theme.textTheme.titleSmall,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: AppDimens.iconXl,
-                  color: theme.colorScheme.outlineVariant,
+                Text(l10n.assetDetailTitle, style: theme.textTheme.bodySmall),
+                Text(
+                  request.equipment!.name,
+                  style: theme.textTheme.titleSmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

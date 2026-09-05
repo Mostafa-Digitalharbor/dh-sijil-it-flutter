@@ -582,6 +582,83 @@ void main() {
         reason: 'a button stuck spinning after a failure can never be retried',
       );
     });
+
+    // The failures that are not `FileAccessException`: the PDF encoder on a
+    // row it cannot lay out, a font that would not load, a share channel with
+    // nothing willing to receive the file. None of these were caught, so they
+    // escaped the `onPressed` and the export silently did nothing.
+    testWidgets('a build that throws anything is still explained', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        TestApp(
+          size: TestSizes.phone,
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => ExportButton(
+                label: 'Export',
+                onExport: () => ExportAction.share(
+                  context: context,
+                  filename: 'assets.pdf',
+                  subject: 'Assets',
+                  mimeType: 'application/pdf',
+                  build: () async => throw StateError('the encoder gave up'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(ExportButton));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text(en.exportFailed), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('nothing to export says so instead of sharing an empty file', (
+      tester,
+    ) async {
+      var built = false;
+
+      await tester.pumpWidget(
+        TestApp(
+          size: TestSizes.phone,
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => ExportButton(
+                label: 'Export',
+                onExport: () => ExportAction.share(
+                  context: context,
+                  filename: 'assets.csv',
+                  subject: 'Assets',
+                  mimeType: 'text/csv',
+                  hasContent: false,
+                  build: () async {
+                    built = true;
+                    return Uint8List(0);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(ExportButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text(en.exportNothingToShare), findsOneWidget);
+      expect(
+        built,
+        isFalse,
+        reason:
+            'a document with no rows should never be built, let alone '
+            'handed to the share sheet as if it were a result',
+      );
+    });
   });
 
   // ── SplashPage ───────────────────────────────────────────────────────────

@@ -136,6 +136,77 @@ void main() {
 
       expect(failure.kind, FailureKind.databaseUnavailable);
     });
+
+    // Recorded by calling `execute_kw` with a secret the server no longer
+    // accepts. The whole fault is these two words: no exception class, no
+    // traceback, XML-RPC fault code 3.
+    //
+    // The mapper matched only the unspaced `AccessDenied` that appears inside
+    // a traceback, so the real message fell through every branch to
+    // `FailureKind.server` — "Odoo reported an error, try again" — for a call
+    // that cannot succeed until the user signs in again.
+    test('a credential the server no longer accepts ends the session', () {
+      final failure = mapFault('Access Denied');
+
+      expect(failure.kind, FailureKind.sessionExpired);
+      expect(
+        failure.action,
+        FailureAction.signIn,
+        reason: 'the only thing that fixes a rejected credential',
+      );
+    });
+
+    test('a rejected credential is not reported as a permission problem', () {
+      // Odoo's two refusals mean different things and send the user to
+      // different places: `AccessDenied` is "we do not accept who you are"
+      // and is fixed by signing in; `AccessError` is "that person may not do
+      // this" and is fixed by an administrator. Telling somebody to go and ask
+      // for permissions they already have is a wasted trip.
+      expect(
+        mapFault('odoo.exceptions.AccessDenied').kind,
+        isNot(FailureKind.accessDenied),
+      );
+      expect(
+        mapFault(
+          'odoo.exceptions.AccessError: Sorry, you are not allowed to write '
+          'this kind of document (maintenance.equipment).',
+        ).kind,
+        FailureKind.accessDenied,
+      );
+    });
+
+    test('a relation pointing at a record that is gone', () {
+      // Recorded from `create` with a category id that does not exist.
+      final failure = mapFault(
+        'Record does not exist or has been deleted.\n'
+        '(Record: maintenance.equipment.category(99999999,), User: 2)',
+      );
+
+      expect(failure.kind, FailureKind.recordNotFound);
+    });
+
+    test('a field the instance does not have, named in the fault', () {
+      // Recorded from `search_read` asking for a field nobody added.
+      final failure = mapFault(
+        "ValueError: Invalid field 'x_nope_zz' on 'maintenance.equipment'",
+      );
+
+      expect(failure.kind, FailureKind.fieldUnavailable);
+      expect(failure.serverMessage, 'x_nope_zz');
+    });
+
+    test('a method Odoo 19 refuses to expose over RPC', () {
+      // `check_access` became private in 18, so the ACL probe hits this on
+      // every modern instance. It has to stay a plain server fault: the
+      // caller treats any failure as "unknown" and lets the real operation
+      // produce the real answer, rather than hiding a control the user has.
+      final failure = mapFault(
+        "Private methods (such as 'maintenance.equipment.check_access') "
+        'cannot be called remotely.',
+      );
+
+      expect(failure.kind, FailureKind.server);
+    });
   });
 
   group('what the user is actually shown', () {

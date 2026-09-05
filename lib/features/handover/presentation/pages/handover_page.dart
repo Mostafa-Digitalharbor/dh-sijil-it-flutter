@@ -19,6 +19,7 @@ import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_data_views.dart';
+import '../../../../shared/widgets/app_media_row.dart';
 import '../../../../shared/widgets/app_scaffold.dart';
 import '../../../../shared/widgets/app_sheets.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -722,31 +723,17 @@ class _Outcome extends StatelessWidget {
     return AppCard(
       backgroundColor: tone.withValues(alpha: AppOpacities.overlay),
       borderColor: tone.withValues(alpha: AppOpacities.chipBorder),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: AppMediaRow(
+        alignment: CrossAxisAlignment.start,
+        leading: Icon(
+          isComplete ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
+          size: AppDimens.iconMd,
+          color: ink,
+        ),
         children: <Widget>[
-          Icon(
-            isComplete
-                ? Icons.check_circle_rounded
-                : Icons.warning_amber_rounded,
-            size: AppDimens.iconMd,
-            color: ink,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(color: ink),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(message, style: theme.textTheme.bodySmall),
-              ],
-            ),
-          ),
+          Text(title, style: theme.textTheme.titleSmall?.copyWith(color: ink)),
+          const SizedBox(height: AppSpacing.xs),
+          Text(message, style: theme.textTheme.bodySmall),
         ],
       ),
     );

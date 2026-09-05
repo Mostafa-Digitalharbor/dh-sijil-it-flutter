@@ -338,15 +338,24 @@ class AppTextAction extends StatelessWidget {
 /// Deliberately *not* used by the scanner, whose close button is drawn white
 /// on a live camera feed and carries its own colours.
 class AppCloseButton extends StatelessWidget {
-  const AppCloseButton({required this.onPressed, super.key});
+  const AppCloseButton({required this.onPressed, this.tooltip, super.key});
 
   final VoidCallback? onPressed;
+
+  /// Overrides the default "Close".
+  ///
+  /// Exists because the same cross means two different things. On a sheet it
+  /// closes the screen; in a selection app bar it leaves selection mode and
+  /// leaves the list exactly where it was. A screen-reader user hearing
+  /// "Close" in the second case has every reason to expect the first, so the
+  /// caller that knows the difference says so.
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
     return AppIconButton(
       icon: Icons.close_rounded,
-      tooltip: AppL10n.of(context).actionClose,
+      tooltip: tooltip ?? AppL10n.of(context).actionClose,
       bordered: false,
       onPressed: onPressed,
     );

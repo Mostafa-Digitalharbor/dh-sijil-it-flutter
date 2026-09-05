@@ -1,5 +1,6 @@
 import '../../error/exceptions.dart';
 import '../../utils/logger.dart';
+import '../jsonrpc/json_rpc_client.dart';
 import '../xmlrpc/xml_rpc_client.dart';
 import 'odoo_connection.dart';
 
@@ -8,9 +9,13 @@ import 'odoo_connection.dart';
 /// Responsibilities: server reachability, version discovery and turning
 /// credentials into a `uid`. Nothing else in the app calls `authenticate`.
 class OdooAuthService {
-  const OdooAuthService(this._client);
+  const OdooAuthService(this._client, this._json);
 
   final XmlRpcClient _client;
+
+  /// Used for exactly one call — see [listDatabases]. Everything else the app
+  /// does goes over XML-RPC.
+  final JsonRpcClient _json;
 
   /// Reads the server's version banner. Also doubles as the reachability
   /// probe behind the "Test Connection" button, because it is the cheapest
@@ -79,25 +84,71 @@ class OdooAuthService {
     );
   }
 
-  /// Lists databases when the server allows it.
+  /// Lists databases when the server allows it, asking both ways it can be
+  /// asked.
   ///
-  /// Most production instances disable `db.list` (`list_db = False`), so a
-  /// failure here is expected and must not block the connection flow — the UI
-  /// falls back to a free-text database field.
+  /// Most on-premise instances disable `db.list` (`list_db = False`), so a
+  /// failure is expected and must not block the connection flow — the UI falls
+  /// back to a free-text database field.
+  ///
+  /// The second attempt is what makes this useful on Odoo Online. There the
+  /// `/xmlrpc/2/db` service is switched off and answers `AccessDenied`, while
+  /// `/web/database/list` — the endpoint the web client's own login page uses
+  /// to fill its dropdown — answers normally. Asking only the first told every
+  /// odoo.com customer their server does not publish its databases, which was
+  /// not true, and left them guessing a name of the shape
+  /// `<account>-<project>-live-<digits>`, which appears nowhere in the admin UI
+  /// they have access to.
+  ///
+  /// Null still means "this server will not say", and the free-text field is
+  /// still the answer for a genuinely locked-down instance.
   Future<List<String>?> listDatabases(OdooConnection connection) async {
+    return await _listOverXmlRpc(connection) ?? await _listOverJson(connection);
+  }
+
+  /// `/xmlrpc/2/db` → `list`. The documented interface, tried first.
+  Future<List<String>?> _listOverXmlRpc(OdooConnection connection) async {
     try {
       final result = await _client.call(
         endpoint: connection.dbEndpoint,
         methodName: 'list',
         params: const <Object?>[],
       );
-      if (result is List) {
-        return result.map((e) => '$e').toList(growable: false);
-      }
-      return null;
+      return _names(result);
     } on AppException {
       return null;
     }
+  }
+
+  /// `/web/database/list` — the web client's own call.
+  ///
+  /// Only reached when the documented one refused, so an instance that answers
+  /// the first is never asked twice.
+  Future<List<String>?> _listOverJson(OdooConnection connection) async {
+    try {
+      final result = await _json.invoke(
+        endpoint: connection.databaseListEndpoint,
+        method: 'list',
+      );
+      return _names(result);
+    } on AppException {
+      return null;
+    }
+  }
+
+  /// A database list out of either transport's answer.
+  ///
+  /// An *empty* list is normalised to null on purpose: both endpoints return
+  /// one when listing is switched off but the route still exists, and treating
+  /// that as "found nothing" would show the user an empty picker instead of
+  /// the field they can type into.
+  static List<String>? _names(Object? result) {
+    if (result is! List || result.isEmpty) return null;
+    final names = <String>[
+      for (final entry in result)
+        if ('$entry'.trim() case final String name when name.isNotEmpty) name,
+    ];
+    return names.isEmpty ? null : names;
   }
 }
 

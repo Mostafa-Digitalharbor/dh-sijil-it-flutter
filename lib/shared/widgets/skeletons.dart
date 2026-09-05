@@ -6,6 +6,7 @@ import '../../app/theme/app_dimens.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../core/responsive/responsive.dart';
 import 'app_card.dart';
+import 'app_media_row.dart';
 
 /// Placeholders shaped like the content they stand in for.
 ///
@@ -201,34 +202,25 @@ class SkeletonListRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard.row(
-      child: Row(
+      child: AppMediaRow(
+        leading: const SkeletonTile(),
         children: <Widget>[
-          const SkeletonTile(),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+          const SkeletonLine.title(),
+          const SizedBox(height: AppSpacing.sm),
+          const SkeletonLine.caption(),
+          if (showChips) ...<Widget>[
+            // No gap: this is the second line of one wrapped subtitle,
+            // not a second field.
+            const SkeletonLine.caption(widthFactor: 0.5),
+            const SizedBox(height: AppSpacing.sm),
+            const Row(
               children: <Widget>[
-                const SkeletonLine.title(),
-                const SizedBox(height: AppSpacing.sm),
-                const SkeletonLine.caption(),
-                if (showChips) ...<Widget>[
-                  // No gap: this is the second line of one wrapped subtitle,
-                  // not a second field.
-                  const SkeletonLine.caption(widthFactor: 0.5),
-                  const SizedBox(height: AppSpacing.sm),
-                  const Row(
-                    children: <Widget>[
-                      SkeletonChip(width: AppDimens.barLabelMinWidth),
-                      SizedBox(width: AppSpacing.snug),
-                      SkeletonChip(),
-                    ],
-                  ),
-                ],
+                SkeletonChip(width: AppDimens.barLabelMinWidth),
+                SizedBox(width: AppSpacing.snug),
+                SkeletonChip(),
               ],
             ),
-          ),
+          ],
         ],
       ),
     );

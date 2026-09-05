@@ -16,24 +16,23 @@ import '../../domain/repositories/asset_repository.dart';
 import '../../domain/usecases/asset_usecases.dart';
 
 /// What the assets screen renders (spec §11).
-class AssetListState extends ViewState {
+class AssetListState extends PaginatedViewState<Asset> {
   const AssetListState({
     super.status,
     super.failure,
-    this.page = const PaginatedResult<Asset>.empty(),
+    super.page,
+    super.isLoadingMore,
     this.query = const AssetQuery(),
     this.categories = const <OdooNameRef>[],
     this.manufacturers = const <String>[],
     this.departments = const <OdooNameRef>[],
     this.permissions = const AssetPermissions(),
-    this.isLoadingMore = false,
     this.isSelecting = false,
     this.selectedIds = const <int>{},
     this.isBulkWorking = false,
     this.bulkMoved,
   });
 
-  final PaginatedResult<Asset> page;
   final AssetQuery query;
 
   /// Filter-sheet options, loaded once alongside the first page.
@@ -44,10 +43,6 @@ class AssetListState extends ViewState {
   final List<OdooNameRef> departments;
 
   final AssetPermissions permissions;
-
-  /// A next-page request is in flight. Distinct from [ViewStatus.refreshing],
-  /// which replaces the list rather than extending it.
-  final bool isLoadingMore;
 
   /// Whether the list is in multi-select mode.
   ///
@@ -65,11 +60,9 @@ class AssetListState extends ViewState {
   /// The last completed bulk move, for the screen to confirm and acknowledge.
   final BulkMoveResult? bulkMoved;
 
-  List<Asset> get assets => page.items;
+  List<Asset> get assets => items;
 
   AssetFilters get filters => query.filters;
-
-  bool get hasMore => page.hasMore;
 
   /// True when the list is empty *because* of a search or filter, rather than
   /// because the instance has no assets. The two need different empty states:
@@ -125,7 +118,6 @@ class AssetListState extends ViewState {
   @override
   List<Object?> get props => [
     ...super.props,
-    page,
     query,
     categories,
     manufacturers,
@@ -133,7 +125,6 @@ class AssetListState extends ViewState {
     permissions.canCreate,
     permissions.canEdit,
     permissions.canDelete,
-    isLoadingMore,
     isSelecting,
     selectedIds,
     isBulkWorking,

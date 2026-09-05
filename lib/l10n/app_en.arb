@@ -681,7 +681,6 @@
       }
     }
   },
-  "lifecycleReplaceLabel": "Replace",
   "lifecycleTitle": "Service life",
   "lifecycleUnknown": "No purchase date recorded",
   "lifecycleUnknownHint": "Add a purchase date to see how much life this asset has left and what it has cost per year.",
@@ -1246,7 +1245,6 @@
   "validationHttpsRequired": "The server URL must start with https://",
   "validationInvalidUrl": "That doesn't look like a valid server address.",
   "voiceHeardNothing": "Nothing was heard. Try again, closer to the phone.",
-  "voiceListening": "Listening…",
   "voiceSearchStart": "Search by voice",
   "voiceSearchStop": "Stop listening",
   "warrantyEnds": "Ends {date}",

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:sijil_it/core/error/exceptions.dart' as app;
 import 'package:sijil_it/core/network/connectivity/network_info.dart';
+import 'package:sijil_it/core/network/jsonrpc/json_rpc_client.dart';
 import 'package:sijil_it/core/network/xmlrpc/xml_rpc_client.dart';
 import 'package:sijil_it/core/security/credential_vault.dart';
 import 'package:sijil_it/core/services/voice_input.dart';
@@ -101,7 +102,6 @@ class FakeVoiceInput implements VoiceInput {
 /// still honoured; every method that would touch the OS keystore is replaced.
 class InMemoryVault implements CredentialVault {
   String? _secret;
-  String? _hiveKey;
 
   /// Reads performed, so a test can prove the secret is fetched per call and
   /// never cached in a field.
@@ -125,15 +125,8 @@ class InMemoryVault implements CredentialVault {
   Future<void> clearSecret() async => _secret = null;
 
   @override
-  Future<String?> readHiveKey() async => _hiveKey;
-
-  @override
-  Future<void> writeHiveKey(String base64Key) async => _hiveKey = base64Key;
-
-  @override
   Future<void> wipe() async {
     _secret = null;
-    _hiveKey = null;
   }
 }
 
@@ -211,7 +204,7 @@ class FakeNetworkInfo implements NetworkInfo {
 /// exercise the real services, repositories and Cubits above it, while
 /// `test/integration/odoo_api_test.dart` proves the wire format over an actual
 /// socket in a plain Dart test.
-class InProcessOdooClient implements XmlRpcClient {
+class InProcessOdooClient implements XmlRpcClient, JsonRpcClient {
   InProcessOdooClient(this.data);
 
   final FakeOdooData data;
@@ -221,6 +214,13 @@ class InProcessOdooClient implements XmlRpcClient {
 
   /// Faults keyed by `model.method`, or by the bare method for `/common`.
   final Map<String, ({int code, String message})> faults = {};
+
+  /// Whether `/web/database/list` answers.
+  ///
+  /// Independent of [FakeOdooData.allowDatabaseListing] because on a hosted
+  /// Odoo the two genuinely disagree: `/xmlrpc/2/db` is switched off and the
+  /// web route still answers, which is the whole case the fallback exists for.
+  bool allowJsonDatabaseListing = false;
 
   /// Makes every call fail as if the host were unreachable.
   bool unreachable = false;
@@ -304,6 +304,42 @@ class InProcessOdooClient implements XmlRpcClient {
         technicalDetails: fault.message,
       );
     }
+  }
+
+  /// The JSON side of the same fake server — see [JsonRpcClient.invoke].
+  ///
+  /// Modelled as one host answering on two routes, because that is what a real
+  /// Odoo is: the fallback under test only means anything if the *same* server
+  /// can refuse over XML-RPC and answer over JSON, which is exactly what a
+  /// hosted instance does.
+  @override
+  Future<Object?> invoke({
+    required Uri endpoint,
+    required String method,
+    Map<String, Object?> params = const <String, Object?>{},
+  }) async {
+    calls.add((path: endpoint.path, method: method, params: <Object?>[params]));
+
+    if (delay > Duration.zero) await Future<void>.delayed(delay);
+
+    if (unreachable) {
+      throw const app.ConnectionException(
+        'Could not reach the Odoo server.',
+        technicalDetails: 'InProcessOdooClient.unreachable',
+      );
+    }
+
+    if (endpoint.path.endsWith('/web/database/list') && method == 'list') {
+      if (!allowJsonDatabaseListing) {
+        throw const app.OdooFaultException(
+          'AccessError: Database not found.',
+          technicalDetails: 'InProcessOdooClient.allowJsonDatabaseListing',
+        );
+      }
+      return data.databases;
+    }
+
+    throw app.OdooFaultException('Unknown JSON route: ${endpoint.path}');
   }
 
   Object? _common(String methodName, List<Object?> params) {

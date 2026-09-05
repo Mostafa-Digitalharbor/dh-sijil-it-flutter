@@ -1337,9 +1337,6 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get lifecycleReplaceLabel => 'Replace';
-
-  @override
   String get lifecycleTitle => 'Service life';
 
   @override
@@ -2291,9 +2288,6 @@ class AppL10nEn extends AppL10n {
   @override
   String get voiceHeardNothing =>
       'Nothing was heard. Try again, closer to the phone.';
-
-  @override
-  String get voiceListening => 'Listening…';
 
   @override
   String get voiceSearchStart => 'Search by voice';

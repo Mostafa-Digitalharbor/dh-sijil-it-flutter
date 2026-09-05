@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Sijil IT</title>
+<meta name="description" content="Privacy policy for the Sijil IT mobile app by Digital Harbor.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1d21;
+    --muted: #5b6470;
+    --rule: #e3e7ec;
+    --accent: #0b5cab;
+    --card: #f6f8fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --fg: #e8ebee;
+      --muted: #9aa4b0;
+      --rule: #2a2f35;
+      --accent: #6ba8e8;
+      --card: #1c2025;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 .35rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.15rem; margin: 2.5rem 0 .75rem; letter-spacing: -.005em; }
+  h3 { font-size: 1rem; margin: 1.5rem 0 .5rem; }
+  p, li { color: var(--fg); }
+  .meta { color: var(--muted); font-size: .9rem; margin: 0; }
+  a { color: var(--accent); }
+  ul { padding-inline-start: 1.25rem; }
+  li { margin: .4rem 0; }
+  .lead {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 0 0 1rem;
+  }
+  .lead p { margin: .5rem 0; }
+  .lead p:first-child { margin-top: 0; }
+  .lead p:last-child { margin-bottom: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { text-align: start; padding: .6rem .7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-weight: 600; }
+  .switch {
+    display: inline-flex; gap: .5rem; align-items: center;
+    margin-top: 1rem; font-size: .9rem;
+  }
+  .switch button {
+    font: inherit; color: var(--accent); background: none;
+    border: 1px solid var(--rule); border-radius: 6px;
+    padding: .35rem .7rem; cursor: pointer;
+  }
+  .switch button[aria-pressed="true"] {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  [dir="rtl"] { text-align: right; }
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Sijil IT — Privacy Policy</h1>
+    <p class="meta">Digital Harbor · Effective 3 September 2026</p>
+    <div class="switch">
+      <button id="btn-en" aria-pressed="true">English</button>
+      <button id="btn-ar" aria-pressed="false">العربية</button>
+    </div>
+  </header>
+
+  <!-- ─────────────────────────── ENGLISH ─────────────────────────── -->
+  <main id="en">
+
+    <div class="lead">
+      <p><strong>The short version.</strong> Sijil IT is a client for an Odoo
+      server that <em>you</em> run. Your assets, your employees and your
+      maintenance records travel between your phone and your own server. They
+      never reach Digital Harbor, and we have no way to read them.</p>
+      <p>The only information that comes to us is an anonymous crash report
+      when the app fails, and it is scrubbed of anything identifying before it
+      leaves your device. We do not use advertising, analytics or tracking of
+      any kind.</p>
+    </div>
+
+    <h2>1. Who this policy is from</h2>
+    <p>Sijil IT is published by Digital Harbor ("we", "us"). This policy covers
+    the Sijil IT mobile app for iOS and Android. It does not cover your Odoo
+    server, which is operated by your own employer or IT department and governed
+    by their policies.</p>
+    <p>Questions: <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a></p>
+
+    <h2>2. Who controls what</h2>
+    <p>This distinction matters, so it is worth being precise about it.</p>
+    <table>
+      <tr>
+        <th>Data</th><th>Who controls it</th><th>Our access</th>
+      </tr>
+      <tr>
+        <td>Assets, employees, maintenance records, photos, notes</td>
+        <td>Your organisation, in its own Odoo database</td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td>Your Odoo server address, username, password or API key</td>
+        <td>You, on your own device</td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td>Crash reports</td>
+        <td>Digital Harbor</td>
+        <td>Yes — see section 5</td>
+      </tr>
+    </table>
+
+    <h2>3. What the app stores on your device</h2>
+    <ul>
+      <li><strong>Your credentials.</strong> Your Odoo password or API key is
+      stored in the iOS Keychain or Android's EncryptedSharedPreferences. It is
+      never written to an ordinary file, never placed in a log, and never sent
+      anywhere except to the Odoo server you configured, over HTTPS.</li>
+      <li><strong>A cache of what you last viewed</strong> — assets, employees,
+      categories — so the app still works when you lose signal. The operating
+      system encrypts these files at rest as part of the app's storage. You can
+      erase the cache at any time from Settings → Clear cache.</li>
+      <li><strong>A queue of changes made offline</strong>, held only until they
+      reach your Odoo server.</li>
+      <li><strong>Your preferences</strong>: language, theme, and whether the
+      app asks for Face ID or a fingerprint before opening.</li>
+    </ul>
+    <p>Signing out erases your stored credential. Uninstalling the app erases
+    everything above.</p>
+
+    <h2>4. What leaves your device, and where it goes</h2>
+
+    <h3>4.1 Your Odoo server</h3>
+    <p>Everything you read and write in the app is exchanged with the server
+    address you entered, over HTTPS. We do not proxy, mirror, or observe this
+    traffic — there is no Digital Harbor server between your phone and your
+    Odoo instance. What your organisation does with that data is governed by
+    its own privacy policy.</p>
+    <p>This includes the two things you create rather than read: a
+    <strong>photo</strong> of an asset's condition when it is returned, and the
+    <strong>signature</strong> you draw to confirm a handover. Both are uploaded
+    to your organisation's Odoo as attachments on the record they belong to.
+    The app keeps no separate copy of either.</p>
+
+    <h3>4.2 Apple's and Google's speech recognition (only if you use voice search)</h3>
+    <p>Voice search is optional. When you tap the microphone and speak, the
+    recording is handed to the speech recognition service built into your
+    device's operating system, which may process the audio on Apple's or
+    Google's servers in order to transcribe it. That transcript comes back as
+    text in the search box. Digital Harbor never receives the audio. If you
+    would rather this never happen, simply do not use voice search; nothing in
+    the app requires it.</p>
+
+    <h3>4.3 Crash reports</h3>
+    <p>See the next section.</p>
+
+    <h2>5. Crash reports</h2>
+    <p>When the app crashes or hits an unexpected error, it sends a report to
+    Sentry, an error-monitoring service acting as our processor. A report
+    contains the error, where in the code it happened, the app version, and the
+    device model and OS version.</p>
+    <p>Before any report leaves your device it passes through a scrubber that
+    removes passwords, API keys, tokens and credentials in URLs. We have also
+    switched off, explicitly, the features that would otherwise send more:</p>
+    <ul>
+      <li>No screenshots and no view hierarchies.</li>
+      <li>No network request bodies — those carry your Odoo credential.</li>
+      <li>No record of what you tapped, which would otherwise be a trail of
+      asset and employee names.</li>
+      <li>No personally identifying information, and no IP address.</li>
+    </ul>
+    <p>Crash reports are not linked to your identity and are never used for
+    advertising, profiling or tracking. They are used for one purpose: fixing
+    the app.</p>
+    <p>To be plain about which build you have: crash reporting is
+    <strong>enabled in the versions distributed through the App Store and
+    Google Play</strong>. It is compiled in at build time, so a build made
+    without the reporting key sends nothing at all — not "sends nothing
+    useful", but never starts the reporter. If your organisation requires a
+    build with no crash reporting whatsoever, ask us and we will provide
+    one.</p>
+
+    <h2>6. What we never do</h2>
+    <ul>
+      <li>No advertising, and no advertising identifiers.</li>
+      <li>No tracking across other companies' apps or websites.</li>
+      <li>No product analytics — we do not measure which screens you visit.</li>
+      <li>No selling of data, and no sharing of it with data brokers or with
+      anyone for advertising. The crash reporter in section 5 is the single
+      third party that receives anything at all, and it receives only what is
+      described there.</li>
+      <li>No location collection of any kind. The app never asks for location
+      permission.</li>
+      <li>No access to your contacts, calendar, messages or call history. The
+      <em>Email</em> and <em>Call</em> buttons on an employee's profile hand
+      the address or number to your own mail app or dialler — the app does not
+      place the call and does not read your contacts.</li>
+      <li>No third-party SDKs beyond the crash reporter described above.</li>
+    </ul>
+
+    <h2>7. Permissions the app asks for</h2>
+    <table>
+      <tr><th>Permission</th><th>Why</th><th>Optional?</th></tr>
+      <tr><td>Camera</td><td>To scan an asset's QR code or barcode. Frames are processed on the device and never stored or transmitted.</td><td>Yes — you can search instead</td></tr>
+      <tr><td>Photo library</td><td>To attach a photo of an asset's condition. The photo goes to your Odoo server.</td><td>Yes</td></tr>
+      <tr><td>Microphone &amp; speech recognition</td><td>Voice search, as described in 4.2.</td><td>Yes</td></tr>
+      <tr><td>Face ID / biometrics</td><td>To lock the app. Off by default. The check happens on the device; we never receive biometric data.</td><td>Yes</td></tr>
+      <tr><td>Notifications</td><td>Warranty-expiry and overdue-return reminders. Asked for only at the moment you switch those reminders on in Settings.</td><td>Yes</td></tr>
+      <tr><td>Network access</td><td>To reach your Odoo server.</td><td>Required</td></tr>
+    </table>
+    <p>Each permission is genuinely optional except network access. Declining
+    one disables that single feature and nothing else.</p>
+
+    <h2>8. Children</h2>
+    <p>Sijil IT is workplace software for IT and facilities teams. It is not
+    directed at children and we do not knowingly collect data from anyone under
+    16.</p>
+
+    <h2>9. Your rights</h2>
+    <p>For the records held in your organisation's Odoo database — your name,
+    your department, the equipment assigned to you — your employer is the data
+    controller. Requests to access, correct or delete that data should go to
+    them; we cannot act on it because we cannot see it.</p>
+    <p>For crash reports, which we do control, write to
+    <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a>
+    and we will delete any report associated with your device on request.</p>
+
+    <h2>10. Changes</h2>
+    <p>If this policy changes in a way that affects what the app collects, we
+    will update the date at the top and describe the change in the release
+    notes of the version that introduces it.</p>
+
+    <h2>11. Contact</h2>
+    <p>Digital Harbor<br>
+    <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a></p>
+
+  </main>
+
+  <!-- ─────────────────────────── العربية ─────────────────────────── -->
+  <main id="ar" dir="rtl" lang="ar" hidden>
+
+    <div class="lead">
+      <p><strong>باختصار.</strong> «سجل IT» تطبيق يتصل بخادم Odoo تملكه
+      <em>أنت</em>. أصولك وموظفوك وسجلات الصيانة تنتقل بين هاتفك وخادمك أنت.
+      لا تصل إلى Digital Harbor إطلاقًا، ولا نملك أي وسيلة للاطلاع عليها.</p>
+      <p>الشيء الوحيد الذي يصلنا هو تقرير عطل مجهول الهوية عند تعطّل التطبيق،
+      ويُنقّى من كل ما يمكن أن يدل على شخص قبل أن يغادر جهازك. لا نستخدم أي
+      إعلانات أو تحليلات أو تتبّع من أي نوع.</p>
+    </div>
+
+    <h2>١. من يصدر هذه السياسة</h2>
+    <p>«سجل IT» تطبيق تنشره شركة Digital Harbor. تغطي هذه السياسة التطبيق على
+    iOS وAndroid فقط، ولا تغطي خادم Odoo الخاص بك، فهو تحت إدارة جهة عملك
+    وسياساتها.</p>
+    <p>للاستفسار: <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a></p>
+
+    <h2>٢. من يتحكم في ماذا</h2>
+    <table>
+      <tr><th>البيانات</th><th>الجهة المتحكمة</th><th>وصولنا إليها</th></tr>
+      <tr><td>الأصول والموظفون وسجلات الصيانة والصور والملاحظات</td><td>مؤسستك، داخل قاعدة بيانات Odoo الخاصة بها</td><td>لا شيء</td></tr>
+      <tr><td>عنوان الخادم واسم المستخدم وكلمة المرور أو مفتاح API</td><td>أنت، على جهازك</td><td>لا شيء</td></tr>
+      <tr><td>تقارير الأعطال</td><td>Digital Harbor</td><td>نعم — راجع البند ٥</td></tr>
+    </table>
+
+    <h2>٣. ما يخزّنه التطبيق على جهازك</h2>
+    <ul>
+      <li><strong>بيانات الدخول.</strong> تُحفظ كلمة المرور أو مفتاح API في
+      Keychain على iOS أو EncryptedSharedPreferences على Android. لا تُكتب في
+      ملف عادي، ولا تظهر في أي سجل، ولا تُرسل إلى أي جهة سوى خادم Odoo الذي
+      حددته أنت، عبر HTTPS.</li>
+      <li><strong>نسخة مؤقتة مما اطّلعت عليه</strong> — الأصول والموظفون
+      والفئات — حتى يعمل التطبيق عند انقطاع الشبكة. ويشفّر نظام التشغيل هذه
+      الملفات على القرص. يمكنك مسحها في أي وقت من الإعدادات ← مسح الذاكرة
+      المؤقتة.</li>
+      <li><strong>قائمة انتظار بالتغييرات</strong> التي أجريتها دون اتصال،
+      تُحفظ حتى تصل إلى خادمك فقط.</li>
+      <li><strong>تفضيلاتك</strong>: اللغة والمظهر وقفل التطبيق ببصمة الوجه أو
+      الإصبع.</li>
+    </ul>
+    <p>تسجيل الخروج يمسح بيانات الدخول المخزّنة، وحذف التطبيق يمسح كل ما
+    سبق.</p>
+
+    <h2>٤. ما يغادر جهازك وإلى أين</h2>
+
+    <h3>٤.١ خادم Odoo الخاص بك</h3>
+    <p>كل ما تقرأه أو تكتبه يجري تبادله مع العنوان الذي أدخلته، عبر HTTPS. لا
+    يمر هذا الاتصال بأي خادم تابع لنا ولا نراقبه — لا يوجد وسيط بين هاتفك
+    وخادمك.</p>
+    <p>ويشمل ذلك ما تنشئه أنت لا ما تقرأه فقط: <strong>صورة</strong> حالة الأصل
+    عند إرجاعه، و<strong>التوقيع</strong> الذي ترسمه لإثبات التسليم. كلاهما
+    يُرفَع إلى Odoo الخاص بمؤسستك كمرفق على السجل الذي يخصّه، ولا يحتفظ التطبيق
+    بنسخة منفصلة من أيٍّ منهما.</p>
+
+    <h3>٤.٢ خدمة التعرّف على الكلام (عند استخدام البحث الصوتي فقط)</h3>
+    <p>البحث الصوتي اختياري. عند الضغط على الميكروفون والتحدث، يُسلَّم التسجيل
+    إلى خدمة التعرّف على الكلام المدمجة في نظام التشغيل، وقد تعالج الصوت على
+    خوادم Apple أو Google لتحويله إلى نص يظهر في خانة البحث. لا يصلنا التسجيل
+    الصوتي أبدًا. وإن كنت تفضّل ألا يحدث ذلك، فلا تستخدم البحث الصوتي — لا شيء
+    في التطبيق يتطلبه.</p>
+
+    <h2>٥. تقارير الأعطال</h2>
+    <p>عند تعطّل التطبيق يُرسَل تقرير إلى خدمة Sentry بصفتها معالجًا نيابة
+    عنّا. يحتوي التقرير على الخطأ وموضعه في الكود وإصدار التطبيق وطراز الجهاز
+    وإصدار نظامه.</p>
+    <p>وقبل أن يغادر أي تقرير جهازك يمر عبر مُنقٍّ يزيل كلمات المرور ومفاتيح
+    API والرموز وبيانات الدخول داخل الروابط. كما عطّلنا صراحةً كل ما قد يرسل
+    أكثر من ذلك:</p>
+    <ul>
+      <li>لا لقطات شاشة ولا بنية واجهات.</li>
+      <li>لا محتويات لطلبات الشبكة — فهي تحمل بيانات دخولك.</li>
+      <li>لا تسجيل لما تضغط عليه، إذ سيكون أثرًا بأسماء أصول وموظفين.</li>
+      <li>لا بيانات تعريف شخصية ولا عنوان IP.</li>
+    </ul>
+    <p>هذه التقارير غير مرتبطة بهويتك، ولا تُستخدم للإعلانات أو التتبّع، بل
+    لإصلاح التطبيق فقط.</p>
+    <p>وتوضيحًا لأي نسخة بين يديك: تقارير الأعطال <strong>مفعّلة في النسخ
+    الموزّعة عبر App Store وGoogle Play</strong>. وهي تُدمَج وقت البناء، فالنسخة
+    التي تُبنى دون مفتاح التقارير لا ترسل شيئًا إطلاقًا — لا أنها ترسل قليلًا،
+    بل لا يبدأ المُبلِّغ فيها أصلًا. وإن كانت مؤسستك تشترط نسخة خالية تمامًا من
+    تقارير الأعطال، اطلبها منّا ونوفّرها.</p>
+
+    <h2>٦. ما لا نفعله أبدًا</h2>
+    <ul>
+      <li>لا إعلانات ولا معرّفات إعلانية.</li>
+      <li>لا تتبّع عبر تطبيقات أو مواقع شركات أخرى.</li>
+      <li>لا تحليلات استخدام — لا نقيس الشاشات التي تزورها.</li>
+      <li>لا بيع للبيانات ولا مشاركتها مع وسطاء بيانات ولا مع أي جهة لغرض
+      إعلاني. وخدمة تقارير الأعطال في البند ٥ هي الطرف الثالث الوحيد الذي يصله
+      أي شيء، ولا يصله إلا ما ورد هناك.</li>
+      <li>لا جمع للموقع الجغرافي بأي صورة. التطبيق لا يطلب إذن الموقع
+      أصلًا.</li>
+      <li>لا وصول إلى جهات الاتصال أو التقويم أو الرسائل أو سجل المكالمات. وزرّا
+      <em>البريد</em> و<em>الاتصال</em> في ملف الموظف يسلّمان العنوان أو الرقم
+      إلى تطبيق البريد أو الهاتف لديك — فلا يجري التطبيق المكالمة ولا يقرأ جهات
+      اتصالك.</li>
+      <li>لا حزم طرف ثالث سوى تقارير الأعطال الموضحة أعلاه.</li>
+    </ul>
+
+    <h2>٧. الأذونات التي يطلبها التطبيق</h2>
+    <table>
+      <tr><th>الإذن</th><th>السبب</th><th>اختياري؟</th></tr>
+      <tr><td>الكاميرا</td><td>لمسح رمز QR أو الباركود. تُعالَج الصور على الجهاز ولا تُخزَّن ولا تُرسَل.</td><td>نعم — يمكنك البحث بدلًا منه</td></tr>
+      <tr><td>الصور</td><td>لإرفاق صورة تُظهر حالة الأصل، وتذهب إلى خادم Odoo لديك.</td><td>نعم</td></tr>
+      <tr><td>الميكروفون والتعرّف على الكلام</td><td>البحث الصوتي، كما في البند ٤.٢.</td><td>نعم</td></tr>
+      <tr><td>بصمة الوجه أو الإصبع</td><td>لقفل التطبيق، وهو معطّل افتراضيًا. يتم التحقق على الجهاز ولا تصلنا أي بيانات حيوية.</td><td>نعم</td></tr>
+      <tr><td>الإشعارات</td><td>تذكيرات انتهاء الضمان وتأخّر الإرجاع. تُطلب فقط لحظة تفعيلك لتلك التذكيرات من الإعدادات.</td><td>نعم</td></tr>
+      <tr><td>الاتصال بالشبكة</td><td>للوصول إلى خادم Odoo.</td><td>مطلوب</td></tr>
+    </table>
+    <p>كل الأذونات اختيارية فعليًا عدا الاتصال بالشبكة، ورفض أيٍّ منها يعطّل تلك
+    الميزة وحدها لا غير.</p>
+
+    <h2>٨. الأطفال</h2>
+    <p>«سجل IT» برنامج عمل موجّه لفرق تقنية المعلومات والمرافق، وليس موجّهًا
+    للأطفال، ولا نجمع عن قصد بيانات من هم دون السادسة عشرة.</p>
+
+    <h2>٩. حقوقك</h2>
+    <p>بالنسبة للسجلات داخل قاعدة بيانات Odoo في مؤسستك — اسمك وقسمك والأجهزة
+    المسندة إليك — فجهة عملك هي المتحكم في البيانات، وتُوجَّه إليها طلبات
+    الاطلاع أو التصحيح أو الحذف، لأننا لا نستطيع تنفيذها ببساطة لأننا لا
+    نراها.</p>
+    <p>أما تقارير الأعطال فهي تحت تحكّمنا، ويمكنك مراسلتنا على
+    <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a>
+    لحذف أي تقرير مرتبط بجهازك.</p>
+
+    <h2>١٠. التعديلات</h2>
+    <p>إذا تغيّرت هذه السياسة بما يؤثر على ما يجمعه التطبيق، سنحدّث التاريخ في
+    الأعلى ونوضّح التغيير في ملاحظات إصدار النسخة التي أدخلته.</p>
+
+    <h2>١١. للتواصل</h2>
+    <p>Digital Harbor<br>
+    <a href="mailto:privacy@digital-harbor.net">privacy@digital-harbor.net</a></p>
+
+  </main>
+
+  <footer>
+    <p>© 2026 Digital Harbor. Sijil IT is not affiliated with or endorsed by
+    Odoo S.A. Odoo is a trademark of Odoo S.A.</p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var en = document.getElementById('en');
+    var ar = document.getElementById('ar');
+    var btnEn = document.getElementById('btn-en');
+    var btnAr = document.getElementById('btn-ar');
+
+    function show(lang) {
+      var arabic = lang === 'ar';
+      en.hidden = arabic;
+      ar.hidden = !arabic;
+      btnEn.setAttribute('aria-pressed', String(!arabic));
+      btnAr.setAttribute('aria-pressed', String(arabic));
+      document.documentElement.lang = arabic ? 'ar' : 'en';
+    }
+
+    btnEn.addEventListener('click', function () { show('en'); });
+    btnAr.addEventListener('click', function () { show('ar'); });
+
+    // Open in the reader's own language when it is Arabic, without touching
+    // the URL — App Review follows the link in English and should land on it.
+    if ((navigator.language || '').slice(0, 2) === 'ar') show('ar');
+  })();
+</script>
+
+</body>
+</html>

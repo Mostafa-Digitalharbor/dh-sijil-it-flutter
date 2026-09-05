@@ -60,6 +60,30 @@ void main() {
       );
     });
 
+    // The ampersand has to be decoded last, and this is the case that proves
+    // it. An asset genuinely named `Dell <Pro>` is escaped once by Odoo into
+    // `&amp;lt;Pro&amp;gt;`. Decoding `&amp;` first yields `&lt;Pro&gt;`,
+    // which the following passes then decode a second time into `<Pro>` —
+    // markup the record never contained, after the tag stripper has already
+    // run and can no longer remove it.
+    test('unescapes exactly once, whatever the order of the entities', () {
+      expect(
+        <String, dynamic>{
+          'note': '<p>Dell &amp;lt;Pro&amp;gt;</p>',
+        }.readHtmlAsText('note'),
+        'Dell &lt;Pro&gt;',
+      );
+    });
+
+    test('decodes the numeric and named quote forms Odoo emits', () {
+      expect(
+        <String, dynamic>{
+          'note': '<p>O&#39;Brien&apos;s &#34;kit&quot;</p>',
+        }.readHtmlAsText('note'),
+        'O\'Brien\'s "kit"',
+      );
+    });
+
     test('an empty paragraph becomes null, not an empty string', () {
       expect(
         <String, dynamic>{'note': '<p></p>'}.readHtmlAsText('note'),

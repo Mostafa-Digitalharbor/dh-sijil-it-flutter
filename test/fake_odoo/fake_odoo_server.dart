@@ -32,6 +32,15 @@ class FakeOdooServer {
   /// Set to fail every request, simulating an unreachable host.
   bool refuseEverything = false;
 
+  /// Whether `/web/database/list` answers.
+  ///
+  /// Kept apart from [FakeOdooData.allowDatabaseListing], which governs the
+  /// XML-RPC `/xmlrpc/2/db` service, because on a hosted Odoo the two disagree:
+  /// the XML-RPC db service is switched off and the web route still answers.
+  /// That disagreement is the entire case the JSON fallback exists for, so the
+  /// fake has to be able to reproduce it.
+  bool allowJsonDatabaseListing = false;
+
   /// Answer every request with this HTTP status instead of 200.
   ///
   /// Odoo behind a reverse proxy is the normal deployment, and the proxy has
@@ -93,6 +102,7 @@ class FakeOdooServer {
     calls.clear();
     faults.clear();
     refuseEverything = false;
+    allowJsonDatabaseListing = false;
     httpStatus = null;
     rawBody = null;
     rawContentType = null;
@@ -137,6 +147,13 @@ class FakeOdooServer {
 
     final path = request.uri.path;
 
+    // Handled before the XML-RPC parse, because this route is JSON in both
+    // directions and `_parseMethodCall` would reject it as malformed.
+    if (path == '/web/database/list') {
+      await _handleJsonDatabaseList(request);
+      return;
+    }
+
     String reply;
     try {
       final call = _parseMethodCall(body);
@@ -163,6 +180,47 @@ class FakeOdooServer {
       ..statusCode = HttpStatus.ok
       ..headers.contentType = ContentType('text', 'xml', charset: 'utf-8')
       ..write(reply);
+    await request.response.close();
+  }
+
+  // ── /web/database/list ───────────────────────────────────────────────────
+
+  /// Odoo's own JSON route for the login page's database dropdown.
+  ///
+  /// Answers the way Odoo does in both directions: a refusal is an HTTP 200
+  /// carrying an `error` member, not a status code — which is precisely the
+  /// shape a client that only checked the status would read as success.
+  Future<void> _handleJsonDatabaseList(HttpRequest request) async {
+    calls.add(
+      const RecordedCall(
+        path: '/web/database/list',
+        method: 'list',
+        params: <Object?>[],
+      ),
+    );
+
+    final payload = allowJsonDatabaseListing
+        ? <String, Object?>{'jsonrpc': '2.0', 'result': data.databases}
+        : <String, Object?>{
+            'jsonrpc': '2.0',
+            'error': <String, Object?>{
+              'code': 200,
+              'message': 'Odoo Server Error',
+              'data': <String, Object?>{
+                'name': 'odoo.exceptions.AccessError',
+                'message': 'Database not found.',
+              },
+            },
+          };
+
+    request.response
+      ..statusCode = HttpStatus.ok
+      ..headers.contentType = ContentType(
+        'application',
+        'json',
+        charset: 'utf-8',
+      )
+      ..write(jsonEncode(payload));
     await request.response.close();
   }
 
@@ -245,11 +303,12 @@ class FakeOdooServer {
       throw _Fault(1, 'FATAL: database "$database" does not exist');
     }
     if (uid != data.userId || secret != data.secret) {
-      throw _Fault(
-        3,
-        'odoo.exceptions.AccessDenied: Access Denied\n'
-        'Session expired',
-      );
+      // Exactly what Odoo 19 puts on the wire, which is less than it looks:
+      // the bare string, fault code 3, no exception class and no traceback.
+      // The fixture used to add "Session expired" to it, and that extra
+      // sentence was doing the classifying — so the app looked correct here
+      // while mapping the real message to a generic server error.
+      throw _Fault(3, 'Access Denied');
     }
 
     _maybeFault('$model.$method');
